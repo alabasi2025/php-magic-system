@@ -117,7 +117,7 @@
             <div class="h-64 flex items-end justify-between space-x-2 space-x-reverse">
                 <div class="flex-1 bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg hover:from-blue-600 hover:to-blue-500 transition-all duration-200" style="height: 60%;" title="السبت: 45,000 ريال"></div>
                 <div class="flex-1 bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg hover:from-blue-600 hover:to-blue-500 transition-all duration-200" style="height: 75%;" title="الأحد: 60,000 ريال"></div>
-                <div class="flex-1 bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg hover:from-blue-600 hover:to-blue-500 transition-all duration-200" style="height: 50%;" title="الاثنين: 38,000 ريال"></div>
+                <div class="flex-1 bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg hover:from-blue-600 hover:to-blue-500 transition-all duration-200" style="height: 50.75%;" title="الاثنين: 38,000 ريال"></div>
                 <div class="flex-1 bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg hover:from-blue-600 hover:to-blue-500 transition-all duration-200" style="height: 85%;" title="الثلاثاء: 72,000 ريال"></div>
                 <div class="flex-1 bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg hover:from-blue-600 hover:to-blue-500 transition-all duration-200" style="height: 65%;" title="الأربعاء: 52,000 ريال"></div>
                 <div class="flex-1 bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg hover:from-blue-600 hover:to-blue-500 transition-all duration-200" style="height: 90%;" title="الخميس: 78,000 ريال"></div>
@@ -274,7 +274,7 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
                     <span class="text-gray-700 font-medium">إصدار النظام</span>
-                    <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">v1.0.0</span>
+                    <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">v1.1.0</span>
                 </div>
                 
                 <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
@@ -297,17 +297,17 @@
 
                 <div class="p-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg text-white">
                     <p class="text-sm mb-2">إجمالي الملفات المنشأة</p>
-                    <p class="text-3xl font-bold">480</p>
+                    <p class="text-3xl font-bold">497</p>
                     <p class="text-xs mt-1 text-blue-100">125 Services • 102 Controllers • 81 Models</p>
                 </div>
 
                 <div class="p-4 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg text-white">
                     <p class="text-sm mb-2">التقدم الإجمالي</p>
                     <div class="flex items-center justify-between">
-                        <p class="text-3xl font-bold">50%</p>
+                        <p class="text-3xl font-bold">50.75%</p>
                         <i class="fas fa-chart-line text-2xl"></i>
                     </div>
-                    <p class="text-xs mt-1 text-green-100">1000 من 2000 مهمة</p>
+                    <p class="text-xs mt-1 text-green-100">1015 من 2000 مهمة</p>
                 </div>
             </div>
         </div>
