@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Supplier Model
+ * UserRole Model
  * 
  * @package App\Models
  * @property int $id
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  */
-class Supplier extends Model
+class UserRole extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -24,7 +24,7 @@ class Supplier extends Model
      *
      * @var string
      */
-    protected $table = 'suppliers';
+    protected $table = 'user_roles';
 
     /**
      * The attributes that are mass assignable.

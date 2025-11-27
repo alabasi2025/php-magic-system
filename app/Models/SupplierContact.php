@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Supplier Model
+ * SupplierContact Model
  * 
  * @package App\Models
  * @property int $id
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  */
-class Supplier extends Model
+class SupplierContact extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -24,7 +24,7 @@ class Supplier extends Model
      *
      * @var string
      */
-    protected $table = 'suppliers';
+    protected $table = 'supplier_contacts';
 
     /**
      * The attributes that are mass assignable.

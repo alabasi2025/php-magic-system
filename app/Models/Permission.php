@@ -4,23 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @OA\Schema(
- *     title="Permission Model",
- *     description="Permission model for managing user permissions in the SEMOP Magic System.",
- *     @OA\Property(property="id", type="integer", readOnly="true", description="Permission ID"),
- *     @OA\Property(property="name", type="string", description="Human-readable name of the permission (e.g., 'View Users')"),
- *     @OA\Property(property="slug", type="string", description="Unique system slug for the permission (e.g., 'users.view')"),
- *     @OA\Property(property="description", type="string", nullable="true", description="Detailed description of what the permission allows"),
- *     @OA\Property(property="created_at", type="string", format="date-time", readOnly="true", description="Creation timestamp"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", readOnly="true", description="Last update timestamp")
- * )
+ * Permission Model
+ * 
+ * @package App\Models
+ * @property int $id
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  */
 class Permission extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -36,8 +33,9 @@ class Permission extends Model
      */
     protected $fillable = [
         'name',
-        'slug',
         'description',
+        'status',
+        'is_active',
     ];
 
     /**
@@ -46,46 +44,26 @@ class Permission extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        // No specific casts needed for this model by default, but can be added later.
+        'is_active' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     /**
-     * Get the roles that are assigned this permission.
+     * The attributes that should be hidden for serialization.
      *
-     * This defines a many-to-many relationship between Permissions and Roles.
-     * The intermediate table is typically 'role_permission' or 'permission_role'.
-     *
-     * @return BelongsToMany<Role>
+     * @var array<int, string>
      */
-    public function roles(): BelongsToMany
-    {
-        // Assuming a pivot table named 'role_permission' with foreign keys 'permission_id' and 'role_id'.
-        return $this->belongsToMany(Role::class, 'role_permission', 'permission_id', 'role_id');
-    }
+    protected $hidden = [];
 
     /**
-     * Check if the permission is assigned to a specific role.
+     * Get the attributes that should be searchable.
      *
-     * @param Role|int $role The Role model instance or ID to check against.
-     * @return bool
+     * @return array<int, string>
      */
-    public function hasRole(Role|int $role): bool
+    public function getSearchableAttributes(): array
     {
-        if ($role instanceof Role) {
-            return $this->roles()->where('role_id', $role->id)->exists();
-        }
-
-        return $this->roles()->where('role_id', $role)->exists();
-    }
-
-    /**
-     * Find a permission by its unique slug.
-     *
-     * @param string $slug The slug of the permission.
-     * @return Permission|null
-     */
-    public static function findBySlug(string $slug): ?Permission
-    {
-        return static::where('slug', $slug)->first();
+        return ['name', 'description'];
     }
 }
