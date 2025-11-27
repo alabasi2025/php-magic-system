@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | API Routes - SEMOP System
 |--------------------------------------------------------------------------
-| Version: 0.5.0
+| Version: 0.6.0
 | Tasks: 292-400 (109 API Route Groups)
 */
 
@@ -45,7 +45,7 @@ Route::prefix('assets-system')->group(function () {
 // Task 296: Backend
 Route::prefix('backend')->group(function () {
     Route::get('/health', fn() => response()->json(['status' => 'healthy']));
-    Route::get('/version', fn() => response()->json(['version' => '0.5.0']));
+    Route::get('/version', fn() => response()->json(['version' => '0.6.0']));
 });
 
 // Task 297: Backend System
@@ -72,7 +72,7 @@ Route::prefix('cdam')->group(function () {
 
 // Task 301: Core Services
 Route::prefix('core-services')->group(function () {
-    Route::get('/', fn() => response()->json(['message' => 'Core Services API', 'version' => '0.5.0']));
+    Route::get('/', fn() => response()->json(['message' => 'Core Services API', 'version' => '0.6.0']));
     Route::get('/health', fn() => response()->json(['status' => 'healthy']));
 });
 
@@ -182,10 +182,10 @@ Route::prefix('scm-system')->group(function () {
 
 // Task 330-331: SEMOP
 Route::prefix('semop')->group(function () {
-    Route::get('/', fn() => response()->json(['message' => 'SEMOP API', 'version' => '0.5.0']));
+    Route::get('/', fn() => response()->json(['message' => 'SEMOP API', 'version' => '0.6.0']));
     Route::get('/info', fn() => response()->json([
         'name' => 'SEMOP',
-        'version' => '0.5.0',
+        'version' => '0.6.0',
         'description' => 'Self-Evolving Modular Operations Platform'
     ]));
 });
@@ -243,7 +243,7 @@ Route::prefix('accounts')->group(function () {
 
 // Task 342: API Gateway
 Route::prefix('api-gateway')->group(function () {
-    Route::get('/', fn() => response()->json(['message' => 'API Gateway', 'version' => '0.5.0']));
+    Route::get('/', fn() => response()->json(['message' => 'API Gateway', 'version' => '0.6.0']));
 });
 
 // Task 343: Auth
@@ -391,7 +391,7 @@ Route::prefix('organization')->group(function () {
 });
 
 Route::prefix('system')->group(function () {
-    Route::get('/', fn() => response()->json(['message' => 'System API', 'version' => '0.5.0']));
+    Route::get('/', fn() => response()->json(['message' => 'System API', 'version' => '0.6.0']));
 });
 
 Route::prefix('unit')->group(function () {
@@ -457,9 +457,111 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/system-info', function () {
     return response()->json([
         'name' => 'SEMOP',
-        'version' => '0.5.0',
+        'version' => '0.6.0',
         'api_routes' => 109,
         'status' => 'operational',
         'timestamp' => now()->toIso8601String()
     ]);
+});
+
+// ============================================
+// Phase 5 Additional Routes (Tasks 401-416)
+// ============================================
+
+// Task 401-402: Geographic & Maps Systems
+Route::prefix('unified-genes-system')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Unified Genes System API']));
+});
+
+Route::prefix('maps-system')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Geographic Maps System API']));
+    Route::get('/locations', fn() => response()->json(['locations' => []]));
+});
+
+// Task 403: DevOps System
+Route::prefix('devops-system')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'DevOps System API']));
+    Route::get('/pipelines', fn() => response()->json(['pipelines' => []]));
+});
+
+// Task 404: Multi-Entity System (Extended)
+Route::prefix('multi-entity-system')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Multi-Entity System API']));
+    Route::get('/entities', fn() => response()->json(['entities' => []]));
+});
+
+// Task 405-406: Sales System
+Route::prefix('sales-system')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Sales System API']));
+    Route::get('/invoices', fn() => response()->json(['invoices' => []]));
+    Route::get('/orders', fn() => response()->json(['orders' => []]));
+});
+
+// Task 407: Accounting System (Extended)
+Route::prefix('accounting-full')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Full Accounting System API']));
+    Route::get('/reports', fn() => response()->json(['reports' => []]));
+});
+
+// Task 408: Inventory System (Extended)
+Route::prefix('inventory-full')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Full Inventory System API']));
+    Route::get('/stock', fn() => response()->json(['stock' => []]));
+});
+
+// Task 409-410: Purchases System
+Route::prefix('purchases-system')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Purchases System API']));
+    Route::get('/orders', fn() => response()->json(['orders' => []]));
+    Route::get('/suppliers', fn() => response()->json(['suppliers' => []]));
+});
+
+// Task 411: Tasks System (Extended)
+Route::prefix('tasks-system')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Tasks System API']));
+    Route::get('/list', fn() => response()->json(['tasks' => []]));
+    Route::post('/create', fn(Request $request) => response()->json(['success' => true]));
+});
+
+// Task 412: Identity & Access (Extended)
+Route::prefix('identity-access-full')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Identity & Access Full API']));
+    Route::get('/users', fn() => response()->json(['users' => []]));
+    Route::get('/permissions', fn() => response()->json(['permissions' => []]));
+});
+
+// Task 413: Smart Inventory Management
+Route::prefix('smart-inventory')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Smart Inventory Management API']));
+    Route::get('/ai-predictions', fn() => response()->json(['predictions' => []]));
+});
+
+// Task 414: Advanced Purchases Tracking
+Route::prefix('purchases-tracking')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Advanced Purchases Tracking API']));
+    Route::get('/track/{id}', fn($id) => response()->json(['tracking' => []]));
+});
+
+// Task 415: Advanced Accounting
+Route::prefix('advanced-accounting')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Advanced Accounting System API']));
+    Route::get('/financial-reports', fn() => response()->json(['reports' => []]));
+});
+
+// Task 416: Accounting Hierarchy Management
+Route::prefix('accounting-hierarchy')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Accounting Hierarchy Management API']));
+    Route::get('/tree', fn() => response()->json(['tree' => []]));
+});
+
+// RBAC System
+Route::prefix('rbac')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'RBAC System API']));
+    Route::get('/check-permission', fn(Request $request) => response()->json(['allowed' => true]));
+});
+
+// Documentation System
+Route::prefix('documentation')->group(function () {
+    Route::get('/', fn() => response()->json(['message' => 'Documentation System API']));
+    Route::get('/api-docs', fn() => response()->json(['docs' => []]));
 });

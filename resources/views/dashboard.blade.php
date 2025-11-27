@@ -165,7 +165,7 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
                     <span class="text-gray-600">إصدار النظام</span>
-                    <span class="font-bold text-gray-800">v0.5.0</span>
+                    <span class="font-bold text-gray-800">v0.6.0</span>
                 </div>
                 
                 <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
