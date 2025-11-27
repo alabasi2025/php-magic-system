@@ -8,7 +8,7 @@ namespace App\Services;
  * Business logic service for Users system
  * 
  * @package App\Services
- * @version 0.6.0
+ * @version 0.7.0
  */
 class UsersService
 {
