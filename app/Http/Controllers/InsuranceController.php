@@ -5,21 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 /**
- * CustomerController
+ * InsuranceController
  * 
- * Controller for العملاء module
+ * Controller for التأمين الطبي module
  * 
  * @package App\Http\Controllers
  */
-class CustomerController extends Controller
+class InsuranceController extends Controller
 {
     /**
-     * Display the main page for العملاء
+     * Display the main page for التأمين الطبي
      *
      * @return \Illuminate\View\View
      */
     public function index()
     {
-        return view('modules.customer');
+        return view('modules.insurance');
     }
 }
