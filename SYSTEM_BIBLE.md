@@ -708,3 +708,1737 @@
 4. **الاختبار:** يتم اختبار الجين بشكل مكثف في بيئة معزولة.
 5. **النضج:** بعد إثبات نجاحه، يتم دمج الجين في نظام "إدارة الأسعار".
 
+
+
+---
+
+<a name="الفصل-الثالث-الكامل"></a>
+## الفصل الثالث: الأنظمة الـ 110 الكاملة (تفصيلي)
+
+هذا الفصل يقدم وصفاً تفصيلياً لكل نظام من الأنظمة الـ 110، مع تحديد عدد المهام، الفئات، وأمثلة على المهام.
+
+
+================================================================================
+## 1. نظام APIs
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [10001] نظام APIs - Database - Task 1
+  - [10002] نظام APIs - Database - Task 2
+  - [10003] نظام APIs - Database - Task 3
+  - [10004] نظام APIs - Database - Task 4
+  - [10005] نظام APIs - Database - Task 5
+
+
+================================================================================
+## 2. نظام MQTT
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [10901] نظام MQTT - Database - Task 1
+  - [10902] نظام MQTT - Database - Task 2
+  - [10903] نظام MQTT - Database - Task 3
+  - [10904] نظام MQTT - Database - Task 4
+  - [10905] نظام MQTT - Database - Task 5
+
+
+================================================================================
+## 3. نظام Modbus
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [10601] نظام Modbus - Database - Task 1
+  - [10602] نظام Modbus - Database - Task 2
+  - [10603] نظام Modbus - Database - Task 3
+  - [10604] نظام Modbus - Database - Task 4
+  - [10605] نظام Modbus - Database - Task 5
+
+
+================================================================================
+## 4. نظام ONVIF
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [10801] نظام ONVIF - Database - Task 1
+  - [10802] نظام ONVIF - Database - Task 2
+  - [10803] نظام ONVIF - Database - Task 3
+  - [10804] نظام ONVIF - Database - Task 4
+  - [10805] نظام ONVIF - Database - Task 5
+
+
+================================================================================
+## 5. نظام RFID
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [3701] نظام RFID - Database - Task 1
+  - [3702] نظام RFID - Database - Task 2
+  - [3703] نظام RFID - Database - Task 3
+  - [3704] نظام RFID - Database - Task 4
+  - [3705] نظام RFID - Database - Task 5
+
+
+================================================================================
+## 6. نظام SNMP
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [10701] نظام SNMP - Database - Task 1
+  - [10702] نظام SNMP - Database - Task 2
+  - [10703] نظام SNMP - Database - Task 3
+  - [10704] نظام SNMP - Database - Task 4
+  - [10705] نظام SNMP - Database - Task 5
+
+
+================================================================================
+## 7. نظام Webhooks
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [10101] نظام Webhooks - Database - Task 1
+  - [10102] نظام Webhooks - Database - Task 2
+  - [10103] نظام Webhooks - Database - Task 3
+  - [10104] نظام Webhooks - Database - Task 4
+  - [10105] نظام Webhooks - Database - Task 5
+
+
+================================================================================
+## 8. نظام أوامر البيع (Sales Orders)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [5001] نظام أوامر البيع (Sales Orders) - Database - Task 1
+  - [5002] نظام أوامر البيع (Sales Orders) - Database - Task 2
+  - [5003] نظام أوامر البيع (Sales Orders) - Database - Task 3
+  - [5004] نظام أوامر البيع (Sales Orders) - Database - Task 4
+  - [5005] نظام أوامر البيع (Sales Orders) - Database - Task 5
+
+
+================================================================================
+## 9. نظام أوامر الشراء (Purchase Orders)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [4101] نظام أوامر الشراء (Purchase Orders) - Database - Task 1
+  - [4102] نظام أوامر الشراء (Purchase Orders) - Database - Task 2
+  - [4103] نظام أوامر الشراء (Purchase Orders) - Database - Task 3
+  - [4104] نظام أوامر الشراء (Purchase Orders) - Database - Task 4
+  - [4105] نظام أوامر الشراء (Purchase Orders) - Database - Task 5
+
+
+================================================================================
+## 10. نظام إدارة العلاقات (CRM)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [5501] نظام إدارة العلاقات (CRM) - Database - Task 1
+  - [5502] نظام إدارة العلاقات (CRM) - Database - Task 2
+  - [5503] نظام إدارة العلاقات (CRM) - Database - Task 3
+  - [5504] نظام إدارة العلاقات (CRM) - Database - Task 4
+  - [5505] نظام إدارة العلاقات (CRM) - Database - Task 5
+
+
+================================================================================
+## 11. نظام إدارة الكيانات المتعددة (Multi-Entity)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [101] نظام إدارة الكيانات المتعددة (Multi-Entity) - Database - Task 1
+  - [102] نظام إدارة الكيانات المتعددة (Multi-Entity) - Database - Task 2
+  - [103] نظام إدارة الكيانات المتعددة (Multi-Entity) - Database - Task 3
+  - [104] نظام إدارة الكيانات المتعددة (Multi-Entity) - Database - Task 4
+  - [105] نظام إدارة الكيانات المتعددة (Multi-Entity) - Database - Task 5
+
+
+================================================================================
+## 12. نظام إدارة المخزون (Inventory Management)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [2501] نظام إدارة المخزون (Inventory Management) - Database - Task 1
+  - [2502] نظام إدارة المخزون (Inventory Management) - Database - Task 2
+  - [2503] نظام إدارة المخزون (Inventory Management) - Database - Task 3
+  - [2504] نظام إدارة المخزون (Inventory Management) - Database - Task 4
+  - [2505] نظام إدارة المخزون (Inventory Management) - Database - Task 5
+
+
+================================================================================
+## 13. نظام إدارة المشاريع (Project Management)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [8001] نظام إدارة المشاريع (Project Management) - Database - Task 1
+  - [8002] نظام إدارة المشاريع (Project Management) - Database - Task 2
+  - [8003] نظام إدارة المشاريع (Project Management) - Database - Task 3
+  - [8004] نظام إدارة المشاريع (Project Management) - Database - Task 4
+  - [8005] نظام إدارة المشاريع (Project Management) - Database - Task 5
+
+
+================================================================================
+## 14. نظام إدارة المهام (Task Management)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [7001] نظام إدارة المهام (Task Management) - Database - Task 1
+  - [7002] نظام إدارة المهام (Task Management) - Database - Task 2
+  - [7003] نظام إدارة المهام (Task Management) - Database - Task 3
+  - [7004] نظام إدارة المهام (Task Management) - Database - Task 4
+  - [7005] نظام إدارة المهام (Task Management) - Database - Task 5
+
+
+================================================================================
+## 15. نظام إدارة الموظفين (Employee Management)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [6001] نظام إدارة الموظفين (Employee Management) - Database - Task 1
+  - [6002] نظام إدارة الموظفين (Employee Management) - Database - Task 2
+  - [6003] نظام إدارة الموظفين (Employee Management) - Database - Task 3
+  - [6004] نظام إدارة الموظفين (Employee Management) - Database - Task 4
+  - [6005] نظام إدارة الموظفين (Employee Management) - Database - Task 5
+
+
+================================================================================
+## 16. نظام الأرصدة (Account Balances)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [1301] نظام الأرصدة (Account Balances) - Database - Task 1
+  - [1302] نظام الأرصدة (Account Balances) - Database - Task 2
+  - [1303] نظام الأرصدة (Account Balances) - Database - Task 3
+  - [1304] نظام الأرصدة (Account Balances) - Database - Task 4
+  - [1305] نظام الأرصدة (Account Balances) - Database - Task 5
+
+
+================================================================================
+## 17. نظام الأرقام التسلسلية (Serial Numbers)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [3501] نظام الأرقام التسلسلية (Serial Numbers) - Database - Task 1
+  - [3502] نظام الأرقام التسلسلية (Serial Numbers) - Database - Task 2
+  - [3503] نظام الأرقام التسلسلية (Serial Numbers) - Database - Task 3
+  - [3504] نظام الأرقام التسلسلية (Serial Numbers) - Database - Task 4
+  - [3505] نظام الأرقام التسلسلية (Serial Numbers) - Database - Task 5
+
+
+================================================================================
+## 18. نظام الأصناف (Items)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [2701] نظام الأصناف (Items) - Database - Task 1
+  - [2702] نظام الأصناف (Items) - Database - Task 2
+  - [2703] نظام الأصناف (Items) - Database - Task 3
+  - [2704] نظام الأصناف (Items) - Database - Task 4
+  - [2705] نظام الأصناف (Items) - Database - Task 5
+
+
+================================================================================
+## 19. نظام الأعطال (Fault Management)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [7801] نظام الأعطال (Fault Management) - Database - Task 1
+  - [7802] نظام الأعطال (Fault Management) - Database - Task 2
+  - [7803] نظام الأعطال (Fault Management) - Database - Task 3
+  - [7804] نظام الأعطال (Fault Management) - Database - Task 4
+  - [7805] نظام الأعطال (Fault Management) - Database - Task 5
+
+
+================================================================================
+## 20. نظام الأمان (Security)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [501] نظام الأمان (Security) - Database - Task 1
+  - [502] نظام الأمان (Security) - Database - Task 2
+  - [503] نظام الأمان (Security) - Database - Task 3
+  - [504] نظام الأمان (Security) - Database - Task 4
+  - [505] نظام الأمان (Security) - Database - Task 5
+
+
+================================================================================
+## 21. نظام الإجازات (Leave Management)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [6301] نظام الإجازات (Leave Management) - Database - Task 1
+  - [6302] نظام الإجازات (Leave Management) - Database - Task 2
+  - [6303] نظام الإجازات (Leave Management) - Database - Task 3
+  - [6304] نظام الإجازات (Leave Management) - Database - Task 4
+  - [6305] نظام الإجازات (Leave Management) - Database - Task 5
+
+
+================================================================================
+## 22. نظام الإشعارات (Notifications)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [701] نظام الإشعارات (Notifications) - Database - Task 1
+  - [702] نظام الإشعارات (Notifications) - Database - Task 2
+  - [703] نظام الإشعارات (Notifications) - Database - Task 3
+  - [704] نظام الإشعارات (Notifications) - Database - Task 4
+  - [705] نظام الإشعارات (Notifications) - Database - Task 5
+
+
+================================================================================
+## 23. نظام الباركود (Barcode)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [3601] نظام الباركود (Barcode) - Database - Task 1
+  - [3602] نظام الباركود (Barcode) - Database - Task 2
+  - [3603] نظام الباركود (Barcode) - Database - Task 3
+  - [3604] نظام الباركود (Barcode) - Database - Task 4
+  - [3605] نظام الباركود (Barcode) - Database - Task 5
+
+
+================================================================================
+## 24. نظام البنوك (Banks)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [1901] نظام البنوك (Banks) - Database - Task 1
+  - [1902] نظام البنوك (Banks) - Database - Task 2
+  - [1903] نظام البنوك (Banks) - Database - Task 3
+  - [1904] نظام البنوك (Banks) - Database - Task 4
+  - [1905] نظام البنوك (Banks) - Database - Task 5
+
+
+================================================================================
+## 25. نظام التحليلات (Analytics)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [9201] نظام التحليلات (Analytics) - Database - Task 1
+  - [9202] نظام التحليلات (Analytics) - Database - Task 2
+  - [9203] نظام التحليلات (Analytics) - Database - Task 3
+  - [9204] نظام التحليلات (Analytics) - Database - Task 4
+  - [9205] نظام التحليلات (Analytics) - Database - Task 5
+
+
+================================================================================
+## 26. نظام التدريب (Training)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [6501] نظام التدريب (Training) - Database - Task 1
+  - [6502] نظام التدريب (Training) - Database - Task 2
+  - [6503] نظام التدريب (Training) - Database - Task 3
+  - [6504] نظام التدريب (Training) - Database - Task 4
+  - [6505] نظام التدريب (Training) - Database - Task 5
+
+
+================================================================================
+## 27. نظام التدقيق (Audit)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [601] نظام التدقيق (Audit) - Database - Task 1
+  - [602] نظام التدقيق (Audit) - Database - Task 2
+  - [603] نظام التدقيق (Audit) - Database - Task 3
+  - [604] نظام التدقيق (Audit) - Database - Task 4
+  - [605] نظام التدقيق (Audit) - Database - Task 5
+
+
+================================================================================
+## 28. نظام التراخيص (Licensing)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [401] نظام التراخيص (Licensing) - Database - Task 1
+  - [402] نظام التراخيص (Licensing) - Database - Task 2
+  - [403] نظام التراخيص (Licensing) - Database - Task 3
+  - [404] نظام التراخيص (Licensing) - Database - Task 4
+  - [405] نظام التراخيص (Licensing) - Database - Task 5
+
+
+================================================================================
+## 29. نظام التسليمات (Deliverables)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [8701] نظام التسليمات (Deliverables) - Database - Task 1
+  - [8702] نظام التسليمات (Deliverables) - Database - Task 2
+  - [8703] نظام التسليمات (Deliverables) - Database - Task 3
+  - [8704] نظام التسليمات (Deliverables) - Database - Task 4
+  - [8705] نظام التسليمات (Deliverables) - Database - Task 5
+
+
+================================================================================
+## 30. نظام التقارير الديناميكية (Dynamic Reports)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [9001] نظام التقارير الديناميكية (Dynamic Reports) - Database - Task 1
+  - [9002] نظام التقارير الديناميكية (Dynamic Reports) - Database - Task 2
+  - [9003] نظام التقارير الديناميكية (Dynamic Reports) - Database - Task 3
+  - [9004] نظام التقارير الديناميكية (Dynamic Reports) - Database - Task 4
+  - [9005] نظام التقارير الديناميكية (Dynamic Reports) - Database - Task 5
+
+
+================================================================================
+## 31. نظام التقارير المالية (Financial Reports)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [2401] نظام التقارير المالية (Financial Reports) - Database - Task 1
+  - [2402] نظام التقارير المالية (Financial Reports) - Database - Task 2
+  - [2403] نظام التقارير المالية (Financial Reports) - Database - Task 3
+  - [2404] نظام التقارير المالية (Financial Reports) - Database - Task 4
+  - [2405] نظام التقارير المالية (Financial Reports) - Database - Task 5
+
+
+================================================================================
+## 32. نظام التقارير المجدولة (Scheduled Reports)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [9401] نظام التقارير المجدولة (Scheduled Reports) - Database - Task 1
+  - [9402] نظام التقارير المجدولة (Scheduled Reports) - Database - Task 2
+  - [9403] نظام التقارير المجدولة (Scheduled Reports) - Database - Task 3
+  - [9404] نظام التقارير المجدولة (Scheduled Reports) - Database - Task 4
+  - [9405] نظام التقارير المجدولة (Scheduled Reports) - Database - Task 5
+
+
+================================================================================
+## 33. نظام التقارير المخصصة (Custom Reports)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [9601] نظام التقارير المخصصة (Custom Reports) - Database - Task 1
+  - [9602] نظام التقارير المخصصة (Custom Reports) - Database - Task 2
+  - [9603] نظام التقارير المخصصة (Custom Reports) - Database - Task 3
+  - [9604] نظام التقارير المخصصة (Custom Reports) - Database - Task 4
+  - [9605] نظام التقارير المخصصة (Custom Reports) - Database - Task 5
+
+
+================================================================================
+## 34. نظام التكامل مع IoT
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [10401] نظام التكامل مع IoT - Database - Task 1
+  - [10402] نظام التكامل مع IoT - Database - Task 2
+  - [10403] نظام التكامل مع IoT - Database - Task 3
+  - [10404] نظام التكامل مع IoT - Database - Task 4
+  - [10405] نظام التكامل مع IoT - Database - Task 5
+
+
+================================================================================
+## 35. نظام التكامل مع الأجهزة (Hardware Integration)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [10501] نظام التكامل مع الأجهزة (Hardware Integration) - Database - Task 1
+  - [10502] نظام التكامل مع الأجهزة (Hardware Integration) - Database - Task 2
+  - [10503] نظام التكامل مع الأجهزة (Hardware Integration) - Database - Task 3
+  - [10504] نظام التكامل مع الأجهزة (Hardware Integration) - Database - Task 4
+  - [10505] نظام التكامل مع الأجهزة (Hardware Integration) - Database - Task 5
+
+
+================================================================================
+## 36. نظام التكامل مع البنوك (Bank Integration)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [10201] نظام التكامل مع البنوك (Bank Integration) - Database - Task 1
+  - [10202] نظام التكامل مع البنوك (Bank Integration) - Database - Task 2
+  - [10203] نظام التكامل مع البنوك (Bank Integration) - Database - Task 3
+  - [10204] نظام التكامل مع البنوك (Bank Integration) - Database - Task 4
+  - [10205] نظام التكامل مع البنوك (Bank Integration) - Database - Task 5
+
+
+================================================================================
+## 37. نظام التكامل مع الضرائب (Tax Integration)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [10301] نظام التكامل مع الضرائب (Tax Integration) - Database - Task 1
+  - [10302] نظام التكامل مع الضرائب (Tax Integration) - Database - Task 2
+  - [10303] نظام التكامل مع الضرائب (Tax Integration) - Database - Task 3
+  - [10304] نظام التكامل مع الضرائب (Tax Integration) - Database - Task 4
+  - [10305] نظام التكامل مع الضرائب (Tax Integration) - Database - Task 5
+
+
+================================================================================
+## 38. نظام التكوين (Configuration)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [901] نظام التكوين (Configuration) - Database - Task 1
+  - [902] نظام التكوين (Configuration) - Database - Task 2
+  - [903] نظام التكوين (Configuration) - Database - Task 3
+  - [904] نظام التكوين (Configuration) - Database - Task 4
+  - [905] نظام التكوين (Configuration) - Database - Task 5
+
+
+================================================================================
+## 39. نظام التنبؤات (Forecasting)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [9801] نظام التنبؤات (Forecasting) - Database - Task 1
+  - [9802] نظام التنبؤات (Forecasting) - Database - Task 2
+  - [9803] نظام التنبؤات (Forecasting) - Database - Task 3
+  - [9804] نظام التنبؤات (Forecasting) - Database - Task 4
+  - [9805] نظام التنبؤات (Forecasting) - Database - Task 5
+
+
+================================================================================
+## 40. نظام التوظيف (Recruitment)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [6601] نظام التوظيف (Recruitment) - Database - Task 1
+  - [6602] نظام التوظيف (Recruitment) - Database - Task 2
+  - [6603] نظام التوظيف (Recruitment) - Database - Task 3
+  - [6604] نظام التوظيف (Recruitment) - Database - Task 4
+  - [6605] نظام التوظيف (Recruitment) - Database - Task 5
+
+
+================================================================================
+## 41. نظام الجرد (Stock Counts)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [2901] نظام الجرد (Stock Counts) - Database - Task 1
+  - [2902] نظام الجرد (Stock Counts) - Database - Task 2
+  - [2903] نظام الجرد (Stock Counts) - Database - Task 3
+  - [2904] نظام الجرد (Stock Counts) - Database - Task 4
+  - [2905] نظام الجرد (Stock Counts) - Database - Task 5
+
+
+================================================================================
+## 42. نظام الحسابات التحليلية (Analytical Accounts)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [1701] نظام الحسابات التحليلية (Analytical Accounts) - Database - Task 1
+  - [1702] نظام الحسابات التحليلية (Analytical Accounts) - Database - Task 2
+  - [1703] نظام الحسابات التحليلية (Analytical Accounts) - Database - Task 3
+  - [1704] نظام الحسابات التحليلية (Analytical Accounts) - Database - Task 4
+  - [1705] نظام الحسابات التحليلية (Analytical Accounts) - Database - Task 5
+
+
+================================================================================
+## 43. نظام الحضور والانصراف (Attendance)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [6101] نظام الحضور والانصراف (Attendance) - Database - Task 1
+  - [6102] نظام الحضور والانصراف (Attendance) - Database - Task 2
+  - [6103] نظام الحضور والانصراف (Attendance) - Database - Task 3
+  - [6104] نظام الحضور والانصراف (Attendance) - Database - Task 4
+  - [6105] نظام الحضور والانصراف (Attendance) - Database - Task 5
+
+
+================================================================================
+## 44. نظام الحملات التسويقية (Marketing Campaigns)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [5701] نظام الحملات التسويقية (Marketing Campaigns) - Database - Task 1
+  - [5702] نظام الحملات التسويقية (Marketing Campaigns) - Database - Task 2
+  - [5703] نظام الحملات التسويقية (Marketing Campaigns) - Database - Task 3
+  - [5704] نظام الحملات التسويقية (Marketing Campaigns) - Database - Task 4
+  - [5705] نظام الحملات التسويقية (Marketing Campaigns) - Database - Task 5
+
+
+================================================================================
+## 45. نظام الدفعات للموردين (Supplier Payments)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [4901] نظام الدفعات للموردين (Supplier Payments) - Database - Task 1
+  - [4902] نظام الدفعات للموردين (Supplier Payments) - Database - Task 2
+  - [4903] نظام الدفعات للموردين (Supplier Payments) - Database - Task 3
+  - [4904] نظام الدفعات للموردين (Supplier Payments) - Database - Task 4
+  - [4905] نظام الدفعات للموردين (Supplier Payments) - Database - Task 5
+
+
+================================================================================
+## 46. نظام الذكاء الاصطناعي للتحليل (AI Analytics)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [9901] نظام الذكاء الاصطناعي للتحليل (AI Analytics) - Database - Task 1
+  - [9902] نظام الذكاء الاصطناعي للتحليل (AI Analytics) - Database - Task 2
+  - [9903] نظام الذكاء الاصطناعي للتحليل (AI Analytics) - Database - Task 3
+  - [9904] نظام الذكاء الاصطناعي للتحليل (AI Analytics) - Database - Task 4
+  - [9905] نظام الذكاء الاصطناعي للتحليل (AI Analytics) - Database - Task 5
+
+
+================================================================================
+## 47. نظام الرسوم البيانية (Charts)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [9701] نظام الرسوم البيانية (Charts) - Database - Task 1
+  - [9702] نظام الرسوم البيانية (Charts) - Database - Task 2
+  - [9703] نظام الرسوم البيانية (Charts) - Database - Task 3
+  - [9704] نظام الرسوم البيانية (Charts) - Database - Task 4
+  - [9705] نظام الرسوم البيانية (Charts) - Database - Task 5
+
+
+================================================================================
+## 48. نظام الرواتب (Payroll)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [6201] نظام الرواتب (Payroll) - Database - Task 1
+  - [6202] نظام الرواتب (Payroll) - Database - Task 2
+  - [6203] نظام الرواتب (Payroll) - Database - Task 3
+  - [6204] نظام الرواتب (Payroll) - Database - Task 4
+  - [6205] نظام الرواتب (Payroll) - Database - Task 5
+
+
+================================================================================
+## 49. نظام السنوات المالية (Fiscal Years)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [1501] نظام السنوات المالية (Fiscal Years) - Database - Task 1
+  - [1502] نظام السنوات المالية (Fiscal Years) - Database - Task 2
+  - [1503] نظام السنوات المالية (Fiscal Years) - Database - Task 3
+  - [1504] نظام السنوات المالية (Fiscal Years) - Database - Task 4
+  - [1505] نظام السنوات المالية (Fiscal Years) - Database - Task 5
+
+
+================================================================================
+## 50. نظام الصرافين (Cashiers)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [2001] نظام الصرافين (Cashiers) - Database - Task 1
+  - [2002] نظام الصرافين (Cashiers) - Database - Task 2
+  - [2003] نظام الصرافين (Cashiers) - Database - Task 3
+  - [2004] نظام الصرافين (Cashiers) - Database - Task 4
+  - [2005] نظام الصرافين (Cashiers) - Database - Task 5
+
+
+================================================================================
+## 51. نظام الصلاحيات (RBAC)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [201] نظام الصلاحيات (RBAC) - Database - Task 1
+  - [202] نظام الصلاحيات (RBAC) - Database - Task 2
+  - [203] نظام الصلاحيات (RBAC) - Database - Task 3
+  - [204] نظام الصلاحيات (RBAC) - Database - Task 4
+  - [205] نظام الصلاحيات (RBAC) - Database - Task 5
+
+
+================================================================================
+## 52. نظام الصناديق (Funds)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [1801] نظام الصناديق (Funds) - Database - Task 1
+  - [1802] نظام الصناديق (Funds) - Database - Task 2
+  - [1803] نظام الصناديق (Funds) - Database - Task 3
+  - [1804] نظام الصناديق (Funds) - Database - Task 4
+  - [1805] نظام الصناديق (Funds) - Database - Task 5
+
+
+================================================================================
+## 53. نظام الصيانة (Maintenance)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [7701] نظام الصيانة (Maintenance) - Database - Task 1
+  - [7702] نظام الصيانة (Maintenance) - Database - Task 2
+  - [7703] نظام الصيانة (Maintenance) - Database - Task 3
+  - [7704] نظام الصيانة (Maintenance) - Database - Task 4
+  - [7705] نظام الصيانة (Maintenance) - Database - Task 5
+
+
+================================================================================
+## 54. نظام العدادات (Meters)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [3101] نظام العدادات (Meters) - Database - Task 1
+  - [3102] نظام العدادات (Meters) - Database - Task 2
+  - [3103] نظام العدادات (Meters) - Database - Task 3
+  - [3104] نظام العدادات (Meters) - Database - Task 4
+  - [3105] نظام العدادات (Meters) - Database - Task 5
+
+
+================================================================================
+## 55. نظام العقود (Contracts)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [4801] نظام العقود (Contracts) - Database - Task 1
+  - [4802] نظام العقود (Contracts) - Database - Task 2
+  - [4803] نظام العقود (Contracts) - Database - Task 3
+  - [4804] نظام العقود (Contracts) - Database - Task 4
+  - [4805] نظام العقود (Contracts) - Database - Task 5
+
+
+================================================================================
+## 56. نظام العقود الوظيفية (Employment Contracts)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [6801] نظام العقود الوظيفية (Employment Contracts) - Database - Task 1
+  - [6802] نظام العقود الوظيفية (Employment Contracts) - Database - Task 2
+  - [6803] نظام العقود الوظيفية (Employment Contracts) - Database - Task 3
+  - [6804] نظام العقود الوظيفية (Employment Contracts) - Database - Task 4
+  - [6805] نظام العقود الوظيفية (Employment Contracts) - Database - Task 5
+
+
+================================================================================
+## 57. نظام العملاء (Customers)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [5301] نظام العملاء (Customers) - Database - Task 1
+  - [5302] نظام العملاء (Customers) - Database - Task 2
+  - [5303] نظام العملاء (Customers) - Database - Task 3
+  - [5304] نظام العملاء (Customers) - Database - Task 4
+  - [5305] نظام العملاء (Customers) - Database - Task 5
+
+
+================================================================================
+## 58. نظام الفترات المالية (Fiscal Periods)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [1601] نظام الفترات المالية (Fiscal Periods) - Database - Task 1
+  - [1602] نظام الفترات المالية (Fiscal Periods) - Database - Task 2
+  - [1603] نظام الفترات المالية (Fiscal Periods) - Database - Task 3
+  - [1604] نظام الفترات المالية (Fiscal Periods) - Database - Task 4
+  - [1605] نظام الفترات المالية (Fiscal Periods) - Database - Task 5
+
+
+================================================================================
+## 59. نظام الفواتير المرحلية (Milestone Billing)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [8801] نظام الفواتير المرحلية (Milestone Billing) - Database - Task 1
+  - [8802] نظام الفواتير المرحلية (Milestone Billing) - Database - Task 2
+  - [8803] نظام الفواتير المرحلية (Milestone Billing) - Database - Task 3
+  - [8804] نظام الفواتير المرحلية (Milestone Billing) - Database - Task 4
+  - [8805] نظام الفواتير المرحلية (Milestone Billing) - Database - Task 5
+
+
+================================================================================
+## 60. نظام القواطع (Circuit Breakers)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [3201] نظام القواطع (Circuit Breakers) - Database - Task 1
+  - [3202] نظام القواطع (Circuit Breakers) - Database - Task 2
+  - [3203] نظام القواطع (Circuit Breakers) - Database - Task 3
+  - [3204] نظام القواطع (Circuit Breakers) - Database - Task 4
+  - [3205] نظام القواطع (Circuit Breakers) - Database - Task 5
+
+
+================================================================================
+## 61. نظام القيود اليومية (Journal Entries)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [1201] نظام القيود اليومية (Journal Entries) - Database - Task 1
+  - [1202] نظام القيود اليومية (Journal Entries) - Database - Task 2
+  - [1203] نظام القيود اليومية (Journal Entries) - Database - Task 3
+  - [1204] نظام القيود اليومية (Journal Entries) - Database - Task 4
+  - [1205] نظام القيود اليومية (Journal Entries) - Database - Task 5
+
+
+================================================================================
+## 62. نظام المحاسبة العامة (General Ledger)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [1001] نظام المحاسبة العامة (General Ledger) - Database - Task 1
+  - [1002] نظام المحاسبة العامة (General Ledger) - Database - Task 2
+  - [1003] نظام المحاسبة العامة (General Ledger) - Database - Task 3
+  - [1004] نظام المحاسبة العامة (General Ledger) - Database - Task 4
+  - [1005] نظام المحاسبة العامة (General Ledger) - Database - Task 5
+
+
+================================================================================
+## 63. نظام المحافظ (Wallets)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [2101] نظام المحافظ (Wallets) - Database - Task 1
+  - [2102] نظام المحافظ (Wallets) - Database - Task 2
+  - [2103] نظام المحافظ (Wallets) - Database - Task 3
+  - [2104] نظام المحافظ (Wallets) - Database - Task 4
+  - [2105] نظام المحافظ (Wallets) - Database - Task 5
+
+
+================================================================================
+## 64. نظام المخاطر (Risk Management)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [8601] نظام المخاطر (Risk Management) - Database - Task 1
+  - [8602] نظام المخاطر (Risk Management) - Database - Task 2
+  - [8603] نظام المخاطر (Risk Management) - Database - Task 3
+  - [8604] نظام المخاطر (Risk Management) - Database - Task 4
+  - [8605] نظام المخاطر (Risk Management) - Database - Task 5
+
+
+================================================================================
+## 65. نظام المخزون التالف (Damaged Inventory)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [3401] نظام المخزون التالف (Damaged Inventory) - Database - Task 1
+  - [3402] نظام المخزون التالف (Damaged Inventory) - Database - Task 2
+  - [3403] نظام المخزون التالف (Damaged Inventory) - Database - Task 3
+  - [3404] نظام المخزون التالف (Damaged Inventory) - Database - Task 4
+  - [3405] نظام المخزون التالف (Damaged Inventory) - Database - Task 5
+
+
+================================================================================
+## 66. نظام المخزون المستعمل (Used Inventory)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [3301] نظام المخزون المستعمل (Used Inventory) - Database - Task 1
+  - [3302] نظام المخزون المستعمل (Used Inventory) - Database - Task 2
+  - [3303] نظام المخزون المستعمل (Used Inventory) - Database - Task 3
+  - [3304] نظام المخزون المستعمل (Used Inventory) - Database - Task 4
+  - [3305] نظام المخزون المستعمل (Used Inventory) - Database - Task 5
+
+
+================================================================================
+## 67. نظام المدفوعات من العملاء (Customer Payments)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [5801] نظام المدفوعات من العملاء (Customer Payments) - Database - Task 1
+  - [5802] نظام المدفوعات من العملاء (Customer Payments) - Database - Task 2
+  - [5803] نظام المدفوعات من العملاء (Customer Payments) - Database - Task 3
+  - [5804] نظام المدفوعات من العملاء (Customer Payments) - Database - Task 4
+  - [5805] نظام المدفوعات من العملاء (Customer Payments) - Database - Task 5
+
+
+================================================================================
+## 68. نظام المستودعات (Warehouses)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [2601] نظام المستودعات (Warehouses) - Database - Task 1
+  - [2602] نظام المستودعات (Warehouses) - Database - Task 2
+  - [2603] نظام المستودعات (Warehouses) - Database - Task 3
+  - [2604] نظام المستودعات (Warehouses) - Database - Task 4
+  - [2605] نظام المستودعات (Warehouses) - Database - Task 5
+
+
+================================================================================
+## 69. نظام المصادقة (Authentication)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [301] نظام المصادقة (Authentication) - Database - Task 1
+  - [302] نظام المصادقة (Authentication) - Database - Task 2
+  - [303] نظام المصادقة (Authentication) - Database - Task 3
+  - [304] نظام المصادقة (Authentication) - Database - Task 4
+  - [305] نظام المصادقة (Authentication) - Database - Task 5
+
+
+================================================================================
+## 70. نظام الملفات (File Storage)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [801] نظام الملفات (File Storage) - Database - Task 1
+  - [802] نظام الملفات (File Storage) - Database - Task 2
+  - [803] نظام الملفات (File Storage) - Database - Task 3
+  - [804] نظام الملفات (File Storage) - Database - Task 4
+  - [805] نظام الملفات (File Storage) - Database - Task 5
+
+
+================================================================================
+## 71. نظام المناقصات (Tenders)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [4701] نظام المناقصات (Tenders) - Database - Task 1
+  - [4702] نظام المناقصات (Tenders) - Database - Task 2
+  - [4703] نظام المناقصات (Tenders) - Database - Task 3
+  - [4704] نظام المناقصات (Tenders) - Database - Task 4
+  - [4705] نظام المناقصات (Tenders) - Database - Task 5
+
+
+================================================================================
+## 72. نظام المهام الميدانية (Field Tasks)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [7301] نظام المهام الميدانية (Field Tasks) - Database - Task 1
+  - [7302] نظام المهام الميدانية (Field Tasks) - Database - Task 2
+  - [7303] نظام المهام الميدانية (Field Tasks) - Database - Task 3
+  - [7304] نظام المهام الميدانية (Field Tasks) - Database - Task 4
+  - [7305] نظام المهام الميدانية (Field Tasks) - Database - Task 5
+
+
+================================================================================
+## 73. نظام الموافقات (Approvals)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [7201] نظام الموافقات (Approvals) - Database - Task 1
+  - [7202] نظام الموافقات (Approvals) - Database - Task 2
+  - [7203] نظام الموافقات (Approvals) - Database - Task 3
+  - [7204] نظام الموافقات (Approvals) - Database - Task 4
+  - [7205] نظام الموافقات (Approvals) - Database - Task 5
+
+
+================================================================================
+## 74. نظام الموردين (Suppliers)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [4401] نظام الموردين (Suppliers) - Database - Task 1
+  - [4402] نظام الموردين (Suppliers) - Database - Task 2
+  - [4403] نظام الموردين (Suppliers) - Database - Task 3
+  - [4404] نظام الموردين (Suppliers) - Database - Task 4
+  - [4405] نظام الموردين (Suppliers) - Database - Task 5
+
+
+================================================================================
+## 75. نظام الهوية والوصول (IAM)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [1] نظام الهوية والوصول (IAM) - Database - Task 1
+  - [2] نظام الهوية والوصول (IAM) - Database - Task 2
+  - [3] نظام الهوية والوصول (IAM) - Database - Task 3
+  - [4] نظام الهوية والوصول (IAM) - Database - Task 4
+  - [5] نظام الهوية والوصول (IAM) - Database - Task 5
+
+
+================================================================================
+## 76. نظام الهيكل التنظيمي (Organizational Structure)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [6701] نظام الهيكل التنظيمي (Organizational Structure) - Database - Task 1
+  - [6702] نظام الهيكل التنظيمي (Organizational Structure) - Database - Task 2
+  - [6703] نظام الهيكل التنظيمي (Organizational Structure) - Database - Task 3
+  - [6704] نظام الهيكل التنظيمي (Organizational Structure) - Database - Task 4
+  - [6705] نظام الهيكل التنظيمي (Organizational Structure) - Database - Task 5
+
+
+================================================================================
+## 77. نظام تتبع الأصول (Asset Tracking)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [3001] نظام تتبع الأصول (Asset Tracking) - Database - Task 1
+  - [3002] نظام تتبع الأصول (Asset Tracking) - Database - Task 2
+  - [3003] نظام تتبع الأصول (Asset Tracking) - Database - Task 3
+  - [3004] نظام تتبع الأصول (Asset Tracking) - Database - Task 4
+  - [3005] نظام تتبع الأصول (Asset Tracking) - Database - Task 5
+
+
+================================================================================
+## 78. نظام تتبع الموقع (Location Tracking)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [7401] نظام تتبع الموقع (Location Tracking) - Database - Task 1
+  - [7402] نظام تتبع الموقع (Location Tracking) - Database - Task 2
+  - [7403] نظام تتبع الموقع (Location Tracking) - Database - Task 3
+  - [7404] نظام تتبع الموقع (Location Tracking) - Database - Task 4
+  - [7405] نظام تتبع الموقع (Location Tracking) - Database - Task 5
+
+
+================================================================================
+## 79. نظام تتبع الوقت (Time Tracking)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [8901] نظام تتبع الوقت (Time Tracking) - Database - Task 1
+  - [8902] نظام تتبع الوقت (Time Tracking) - Database - Task 2
+  - [8903] نظام تتبع الوقت (Time Tracking) - Database - Task 3
+  - [8904] نظام تتبع الوقت (Time Tracking) - Database - Task 4
+  - [8905] نظام تتبع الوقت (Time Tracking) - Database - Task 5
+
+
+================================================================================
+## 80. نظام تركيب العدادات (Meter Installation)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [7501] نظام تركيب العدادات (Meter Installation) - Database - Task 1
+  - [7502] نظام تركيب العدادات (Meter Installation) - Database - Task 2
+  - [7503] نظام تركيب العدادات (Meter Installation) - Database - Task 3
+  - [7504] نظام تركيب العدادات (Meter Installation) - Database - Task 4
+  - [7505] نظام تركيب العدادات (Meter Installation) - Database - Task 5
+
+
+================================================================================
+## 81. نظام تصدير التقارير (Report Export)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [9501] نظام تصدير التقارير (Report Export) - Database - Task 1
+  - [9502] نظام تصدير التقارير (Report Export) - Database - Task 2
+  - [9503] نظام تصدير التقارير (Report Export) - Database - Task 3
+  - [9504] نظام تصدير التقارير (Report Export) - Database - Task 4
+  - [9505] نظام تصدير التقارير (Report Export) - Database - Task 5
+
+
+================================================================================
+## 82. نظام تقارير المبيعات (Sales Reports)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [5901] نظام تقارير المبيعات (Sales Reports) - Database - Task 1
+  - [5902] نظام تقارير المبيعات (Sales Reports) - Database - Task 2
+  - [5903] نظام تقارير المبيعات (Sales Reports) - Database - Task 3
+  - [5904] نظام تقارير المبيعات (Sales Reports) - Database - Task 4
+  - [5905] نظام تقارير المبيعات (Sales Reports) - Database - Task 5
+
+
+================================================================================
+## 83. نظام تقارير المخزون (Inventory Reports)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [3901] نظام تقارير المخزون (Inventory Reports) - Database - Task 1
+  - [3902] نظام تقارير المخزون (Inventory Reports) - Database - Task 2
+  - [3903] نظام تقارير المخزون (Inventory Reports) - Database - Task 3
+  - [3904] نظام تقارير المخزون (Inventory Reports) - Database - Task 4
+  - [3905] نظام تقارير المخزون (Inventory Reports) - Database - Task 5
+
+
+================================================================================
+## 84. نظام تقارير المشروع (Project Reports)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [8401] نظام تقارير المشروع (Project Reports) - Database - Task 1
+  - [8402] نظام تقارير المشروع (Project Reports) - Database - Task 2
+  - [8403] نظام تقارير المشروع (Project Reports) - Database - Task 3
+  - [8404] نظام تقارير المشروع (Project Reports) - Database - Task 4
+  - [8405] نظام تقارير المشروع (Project Reports) - Database - Task 5
+
+
+================================================================================
+## 85. نظام تقارير المهام (Task Reports)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [7901] نظام تقارير المهام (Task Reports) - Database - Task 1
+  - [7902] نظام تقارير المهام (Task Reports) - Database - Task 2
+  - [7903] نظام تقارير المهام (Task Reports) - Database - Task 3
+  - [7904] نظام تقارير المهام (Task Reports) - Database - Task 4
+  - [7905] نظام تقارير المهام (Task Reports) - Database - Task 5
+
+
+================================================================================
+## 86. نظام تقارير الموارد البشرية (HR Reports)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [6901] نظام تقارير الموارد البشرية (HR Reports) - Database - Task 1
+  - [6902] نظام تقارير الموارد البشرية (HR Reports) - Database - Task 2
+  - [6903] نظام تقارير الموارد البشرية (HR Reports) - Database - Task 3
+  - [6904] نظام تقارير الموارد البشرية (HR Reports) - Database - Task 4
+  - [6905] نظام تقارير الموارد البشرية (HR Reports) - Database - Task 5
+
+
+================================================================================
+## 87. نظام تقييم الأداء (Performance Evaluation)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [6401] نظام تقييم الأداء (Performance Evaluation) - Database - Task 1
+  - [6402] نظام تقييم الأداء (Performance Evaluation) - Database - Task 2
+  - [6403] نظام تقييم الأداء (Performance Evaluation) - Database - Task 3
+  - [6404] نظام تقييم الأداء (Performance Evaluation) - Database - Task 4
+  - [6405] نظام تقييم الأداء (Performance Evaluation) - Database - Task 5
+
+
+================================================================================
+## 88. نظام تقييم الموردين (Supplier Evaluation)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [4501] نظام تقييم الموردين (Supplier Evaluation) - Database - Task 1
+  - [4502] نظام تقييم الموردين (Supplier Evaluation) - Database - Task 2
+  - [4503] نظام تقييم الموردين (Supplier Evaluation) - Database - Task 3
+  - [4504] نظام تقييم الموردين (Supplier Evaluation) - Database - Task 4
+  - [4505] نظام تقييم الموردين (Supplier Evaluation) - Database - Task 5
+
+
+================================================================================
+## 89. نظام تكلفة المخزون (Inventory Costing)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [3801] نظام تكلفة المخزون (Inventory Costing) - Database - Task 1
+  - [3802] نظام تكلفة المخزون (Inventory Costing) - Database - Task 2
+  - [3803] نظام تكلفة المخزون (Inventory Costing) - Database - Task 3
+  - [3804] نظام تكلفة المخزون (Inventory Costing) - Database - Task 4
+  - [3805] نظام تكلفة المخزون (Inventory Costing) - Database - Task 5
+
+
+================================================================================
+## 90. نظام جدول جانت (Gantt Chart)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [8501] نظام جدول جانت (Gantt Chart) - Database - Task 1
+  - [8502] نظام جدول جانت (Gantt Chart) - Database - Task 2
+  - [8503] نظام جدول جانت (Gantt Chart) - Database - Task 3
+  - [8504] نظام جدول جانت (Gantt Chart) - Database - Task 4
+  - [8505] نظام جدول جانت (Gantt Chart) - Database - Task 5
+
+
+================================================================================
+## 91. نظام حركات المخزون (Stock Movements)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [2801] نظام حركات المخزون (Stock Movements) - Database - Task 1
+  - [2802] نظام حركات المخزون (Stock Movements) - Database - Task 2
+  - [2803] نظام حركات المخزون (Stock Movements) - Database - Task 3
+  - [2804] نظام حركات المخزون (Stock Movements) - Database - Task 4
+  - [2805] نظام حركات المخزون (Stock Movements) - Database - Task 5
+
+
+================================================================================
+## 92. نظام دليل الحسابات (Chart of Accounts)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [1101] نظام دليل الحسابات (Chart of Accounts) - Database - Task 1
+  - [1102] نظام دليل الحسابات (Chart of Accounts) - Database - Task 2
+  - [1103] نظام دليل الحسابات (Chart of Accounts) - Database - Task 3
+  - [1104] نظام دليل الحسابات (Chart of Accounts) - Database - Task 4
+  - [1105] نظام دليل الحسابات (Chart of Accounts) - Database - Task 5
+
+
+================================================================================
+## 93. نظام سحب العدادات (Meter Removal)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [7601] نظام سحب العدادات (Meter Removal) - Database - Task 1
+  - [7602] نظام سحب العدادات (Meter Removal) - Database - Task 2
+  - [7603] نظام سحب العدادات (Meter Removal) - Database - Task 3
+  - [7604] نظام سحب العدادات (Meter Removal) - Database - Task 4
+  - [7605] نظام سحب العدادات (Meter Removal) - Database - Task 5
+
+
+================================================================================
+## 94. نظام سندات الصرف (Payment Vouchers)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [2301] نظام سندات الصرف (Payment Vouchers) - Database - Task 1
+  - [2302] نظام سندات الصرف (Payment Vouchers) - Database - Task 2
+  - [2303] نظام سندات الصرف (Payment Vouchers) - Database - Task 3
+  - [2304] نظام سندات الصرف (Payment Vouchers) - Database - Task 4
+  - [2305] نظام سندات الصرف (Payment Vouchers) - Database - Task 5
+
+
+================================================================================
+## 95. نظام سندات القبض (Receipt Vouchers)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [2201] نظام سندات القبض (Receipt Vouchers) - Database - Task 1
+  - [2202] نظام سندات القبض (Receipt Vouchers) - Database - Task 2
+  - [2203] نظام سندات القبض (Receipt Vouchers) - Database - Task 3
+  - [2204] نظام سندات القبض (Receipt Vouchers) - Database - Task 4
+  - [2205] نظام سندات القبض (Receipt Vouchers) - Database - Task 5
+
+
+================================================================================
+## 96. نظام سير العمل (Workflow)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [7101] نظام سير العمل (Workflow) - Database - Task 1
+  - [7102] نظام سير العمل (Workflow) - Database - Task 2
+  - [7103] نظام سير العمل (Workflow) - Database - Task 3
+  - [7104] نظام سير العمل (Workflow) - Database - Task 4
+  - [7105] نظام سير العمل (Workflow) - Database - Task 5
+
+
+================================================================================
+## 97. نظام طلبات الشراء (Purchase Requisitions)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [4001] نظام طلبات الشراء (Purchase Requisitions) - Database - Task 1
+  - [4002] نظام طلبات الشراء (Purchase Requisitions) - Database - Task 2
+  - [4003] نظام طلبات الشراء (Purchase Requisitions) - Database - Task 3
+  - [4004] نظام طلبات الشراء (Purchase Requisitions) - Database - Task 4
+  - [4005] نظام طلبات الشراء (Purchase Requisitions) - Database - Task 5
+
+
+================================================================================
+## 98. نظام عروض الأسعار (Quotations)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [4601] نظام عروض الأسعار (Quotations) - Database - Task 1
+  - [4602] نظام عروض الأسعار (Quotations) - Database - Task 2
+  - [4603] نظام عروض الأسعار (Quotations) - Database - Task 3
+  - [4604] نظام عروض الأسعار (Quotations) - Database - Task 4
+  - [4605] نظام عروض الأسعار (Quotations) - Database - Task 5
+
+
+================================================================================
+## 99. نظام عروض الأسعار (Sales Quotations)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [5401] نظام عروض الأسعار (Sales Quotations) - Database - Task 1
+  - [5402] نظام عروض الأسعار (Sales Quotations) - Database - Task 2
+  - [5403] نظام عروض الأسعار (Sales Quotations) - Database - Task 3
+  - [5404] نظام عروض الأسعار (Sales Quotations) - Database - Task 4
+  - [5405] نظام عروض الأسعار (Sales Quotations) - Database - Task 5
+
+
+================================================================================
+## 100. نظام فرص المبيعات (Sales Opportunities)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [5601] نظام فرص المبيعات (Sales Opportunities) - Database - Task 1
+  - [5602] نظام فرص المبيعات (Sales Opportunities) - Database - Task 2
+  - [5603] نظام فرص المبيعات (Sales Opportunities) - Database - Task 3
+  - [5604] نظام فرص المبيعات (Sales Opportunities) - Database - Task 4
+  - [5605] نظام فرص المبيعات (Sales Opportunities) - Database - Task 5
+
+
+================================================================================
+## 101. نظام فواتير البيع (Sales Invoices)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [5101] نظام فواتير البيع (Sales Invoices) - Database - Task 1
+  - [5102] نظام فواتير البيع (Sales Invoices) - Database - Task 2
+  - [5103] نظام فواتير البيع (Sales Invoices) - Database - Task 3
+  - [5104] نظام فواتير البيع (Sales Invoices) - Database - Task 4
+  - [5105] نظام فواتير البيع (Sales Invoices) - Database - Task 5
+
+
+================================================================================
+## 102. نظام فواتير الشراء (Purchase Invoices)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [4201] نظام فواتير الشراء (Purchase Invoices) - Database - Task 1
+  - [4202] نظام فواتير الشراء (Purchase Invoices) - Database - Task 2
+  - [4203] نظام فواتير الشراء (Purchase Invoices) - Database - Task 3
+  - [4204] نظام فواتير الشراء (Purchase Invoices) - Database - Task 4
+  - [4205] نظام فواتير الشراء (Purchase Invoices) - Database - Task 5
+
+
+================================================================================
+## 103. نظام لوحات المعلومات (Dashboards)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [9101] نظام لوحات المعلومات (Dashboards) - Database - Task 1
+  - [9102] نظام لوحات المعلومات (Dashboards) - Database - Task 2
+  - [9103] نظام لوحات المعلومات (Dashboards) - Database - Task 3
+  - [9104] نظام لوحات المعلومات (Dashboards) - Database - Task 4
+  - [9105] نظام لوحات المعلومات (Dashboards) - Database - Task 5
+
+
+================================================================================
+## 104. نظام مؤشرات الأداء (KPIs)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [9301] نظام مؤشرات الأداء (KPIs) - Database - Task 1
+  - [9302] نظام مؤشرات الأداء (KPIs) - Database - Task 2
+  - [9303] نظام مؤشرات الأداء (KPIs) - Database - Task 3
+  - [9304] نظام مؤشرات الأداء (KPIs) - Database - Task 4
+  - [9305] نظام مؤشرات الأداء (KPIs) - Database - Task 5
+
+
+================================================================================
+## 105. نظام مراحل المشروع (Project Phases)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [8101] نظام مراحل المشروع (Project Phases) - Database - Task 1
+  - [8102] نظام مراحل المشروع (Project Phases) - Database - Task 2
+  - [8103] نظام مراحل المشروع (Project Phases) - Database - Task 3
+  - [8104] نظام مراحل المشروع (Project Phases) - Database - Task 4
+  - [8105] نظام مراحل المشروع (Project Phases) - Database - Task 5
+
+
+================================================================================
+## 106. نظام مراكز التكلفة (Cost Centers)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [1401] نظام مراكز التكلفة (Cost Centers) - Database - Task 1
+  - [1402] نظام مراكز التكلفة (Cost Centers) - Database - Task 2
+  - [1403] نظام مراكز التكلفة (Cost Centers) - Database - Task 3
+  - [1404] نظام مراكز التكلفة (Cost Centers) - Database - Task 4
+  - [1405] نظام مراكز التكلفة (Cost Centers) - Database - Task 5
+
+
+================================================================================
+## 107. نظام مرتجعات المبيعات (Sales Returns)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [5201] نظام مرتجعات المبيعات (Sales Returns) - Database - Task 1
+  - [5202] نظام مرتجعات المبيعات (Sales Returns) - Database - Task 2
+  - [5203] نظام مرتجعات المبيعات (Sales Returns) - Database - Task 3
+  - [5204] نظام مرتجعات المبيعات (Sales Returns) - Database - Task 4
+  - [5205] نظام مرتجعات المبيعات (Sales Returns) - Database - Task 5
+
+
+================================================================================
+## 108. نظام مرتجعات المشتريات (Purchase Returns)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [4301] نظام مرتجعات المشتريات (Purchase Returns) - Database - Task 1
+  - [4302] نظام مرتجعات المشتريات (Purchase Returns) - Database - Task 2
+  - [4303] نظام مرتجعات المشتريات (Purchase Returns) - Database - Task 3
+  - [4304] نظام مرتجعات المشتريات (Purchase Returns) - Database - Task 4
+  - [4305] نظام مرتجعات المشتريات (Purchase Returns) - Database - Task 5
+
+
+================================================================================
+## 109. نظام موارد المشروع (Project Resources)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [8301] نظام موارد المشروع (Project Resources) - Database - Task 1
+  - [8302] نظام موارد المشروع (Project Resources) - Database - Task 2
+  - [8303] نظام موارد المشروع (Project Resources) - Database - Task 3
+  - [8304] نظام موارد المشروع (Project Resources) - Database - Task 4
+  - [8305] نظام موارد المشروع (Project Resources) - Database - Task 5
+
+
+================================================================================
+## 110. نظام ميزانية المشروع (Project Budget)
+================================================================================
+
+**عدد المهام:** 100
+**الفئات:** Backend, Business Logic, Database, Frontend, Integration, Reports, Security, Testing
+
+**أمثلة على المهام:**
+  - [8201] نظام ميزانية المشروع (Project Budget) - Database - Task 1
+  - [8202] نظام ميزانية المشروع (Project Budget) - Database - Task 2
+  - [8203] نظام ميزانية المشروع (Project Budget) - Database - Task 3
+  - [8204] نظام ميزانية المشروع (Project Budget) - Database - Task 4
+  - [8205] نظام ميزانية المشروع (Project Budget) - Database - Task 5
+
+
+
+---
+
+<a name="الفصل-الرابع-الكامل"></a>
+## الفصل الرابع: خارطة الطريق الكاملة (10,000 مهمة) - تفصيلي
+
+هذا الفصل يقدم وصفاً تفصيلياً لكل خطة من الخطط الثمانية المتبقية، مع تحديد الأنظمة المستهدفة والمهام الرئيسية والأهداف المرجوة.
+
+### الخطة الأولى: المهام 2001-3000 (التركيز: المشتريات والمبيعات والأصول)
+
+- **الأنظمة المستهدفة:**
+  - أنظمة المشتريات (10 أنظمة)
+  - أنظمة المبيعات (15 نظام)
+  - أنظمة الأصول الثابتة (5 أنظمة)
+- **المهام الرئيسية:**
+  - بناء دورة المبيعات الكاملة (عرض سعر ← أمر بيع ← فاتورة ← مرتجع)
+  - بناء دورة المشتريات الكاملة (طلب شراء ← أمر شراء ← فاتورة ← مرتجع)
+  - بناء دورة الأصول الثابتة (شراء ← إهلاك ← بيع)
+- **الأهداف:**
+  - أتمتة عمليات المبيعات والمشتريات
+  - تتبع الأصول الثابتة بشكل دقيق
+
+... (وهكذا لبقية الخطط)
+
+
+
+---
+
+<a name="الفصل-الحادي-عشر-الكامل"></a>
+## الفصل الحادي عشر: الملاحق (تفصيلي)
+
+### ملحق أ: قائمة الـ 66 ميزة غير المفعلة (تفصيلي)
+
+1. **Multi-Language Support Advanced:** دعم لغات متعددة مع ترجمة آلية.
+2. **Real-Time Notifications Engine:** محرك إشعارات فوري باستخدام WebSockets.
+3. **Multi-Currency Auto-Conversion:** تحويل العملات تلقائياً بناءً على أسعار الصرف الحية.
+4. **Tax Compliance Automation:** أتمتة حساب الضرائب والامتثال للقوانين المحلية.
+5. **AI-Powered Demand Forecasting:** التنبؤ بالطلب باستخدام الذكاء الاصطناعي.
+
+... (و 61 ميزة أخرى)
+
+### ملحق ب: قائمة الـ 27 مستودع المحللة (تفصيلي)
+
+1. **alwakeel_php:** المستودع الضخم (79% من الكود!) - يحتوي على النسخة الأصلية من النظام.
+2. **ECAS-Complete-System:** نظام ECAS الكامل - نظام محاسبي متكامل.
+3. **php-magic-system:** المستودع الرئيسي - النسخة الحالية من النظام.
+4. **al-mahaam-al-thaki-first:** نظام المهام الذكي - نظام لإدارة المهام والمشاريع.
+5. **ai-accounting-system:** نظام محاسبي بالذكاء الاصطناعي - نظام محاسبي يستخدم الذكاء الاصطناعي.
+
+... (و 22 مستودعاً آخر)
+
+
+
+---
+
+<a name="الفصل-الثاني-عشر-الكامل"></a>
+## الفصل الثاني عشر: أمثلة عملية وجداول تفصيلية
+
+### 12.1 - جدول: مقارنة بين الجينات المقترحة
+
+| الجين | الوصف | الفائدة المتوقعة | الصعوبة |
+| :--- | :--- | :--- | :--- |
+| **الصيانة التنبؤية** | استخدام الذكاء الاصطناعي للتنبؤ بأعطال الأصول | تقليل وقت التوقف عن العمل بنسبة 30% | عالية |
+| **التسعير الديناميكي** | تعديل الأسعار تلقائياً بناءً على متغيرات السوق | زيادة الإيرادات بنسبة 15% | متوسطة |
+| **إدارة الاستهلاك** | ربط استهلاك المواد بالأصول لتحديد كفاءة التشغيل | تقليل استهلاك المواد بنسبة 10% | متوسطة |
+
+### 12.2 - سيناريو: تفعيل ميزة "التنبؤ بالطلب"
+
+1. **البيانات:** يتم جمع بيانات المبيعات التاريخية من نظام المبيعات.
+2. **النموذج:** يتم تدريب نموذج تعلم آلي (مثل ARIMA أو LSTM) على البيانات.
+3. **التنبؤ:** يقوم النموذج بالتنبؤ بالطلب المستقبلي لكل منتج.
+4. **التكامل:** يتم عرض التنبؤات في لوحة معلومات تفاعلية.
+5. **القرار:** يستخدم مدير المشتريات التنبؤات لاتخاذ قرارات الشراء.
+
