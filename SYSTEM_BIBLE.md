@@ -1,5 +1,5 @@
 # 📖 الكتاب المقدس للنظام السحري
-## php-magic-system: The Complete Sacred Text
+## php-magic-system: The Sacred Text of the Magic System
 
 **الإصدار:** 2.0.0 (Complete Edition)
 **تاريخ التحديث:** 2025-11-27
