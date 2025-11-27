@@ -9,7 +9,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-4xl font-bold">لوحة التحكم</h1>
-                <p class="text-blue-100 mt-2 text-lg">مرحباً بك في نظام SEMOP لإدارة المؤسسات - الإصدار 0.7.0</p>
+                <p class="text-blue-100 mt-2 text-lg">مرحباً بك في نظام SEMOP لإدارة المؤسسات - الإصدار 1.0.0</p>
             </div>
             <div class="text-left bg-white/10 backdrop-blur-sm rounded-lg p-4">
                 <p class="text-sm text-blue-100">التاريخ</p>
@@ -274,7 +274,7 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
                     <span class="text-gray-700 font-medium">إصدار النظام</span>
-                    <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">v0.7.0</span>
+                    <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">v1.0.0</span>
                 </div>
                 
                 <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
@@ -297,17 +297,17 @@
 
                 <div class="p-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg text-white">
                     <p class="text-sm mb-2">إجمالي الملفات المنشأة</p>
-                    <p class="text-3xl font-bold">326</p>
+                    <p class="text-3xl font-bold">480</p>
                     <p class="text-xs mt-1 text-blue-100">125 Services • 102 Controllers • 81 Models</p>
                 </div>
 
                 <div class="p-4 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg text-white">
                     <p class="text-sm mb-2">التقدم الإجمالي</p>
                     <div class="flex items-center justify-between">
-                        <p class="text-3xl font-bold">30%</p>
+                        <p class="text-3xl font-bold">50%</p>
                         <i class="fas fa-chart-line text-2xl"></i>
                     </div>
-                    <p class="text-xs mt-1 text-green-100">600 من 2000 مهمة</p>
+                    <p class="text-xs mt-1 text-green-100">1000 من 2000 مهمة</p>
                 </div>
             </div>
         </div>
