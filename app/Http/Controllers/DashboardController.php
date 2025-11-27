@@ -3,12 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Customer;
-use App\Models\Supplier;
-use App\Models\Item;
-use App\Models\Project;
-use App\Models\Task;
 
 /**
  * DashboardController
@@ -26,14 +20,14 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // Get statistics
+        // Get statistics (using static data for now)
         $stats = [
-            'users' => User::count(),
-            'customers' => Customer::count(),
-            'suppliers' => Supplier::count(),
-            'items' => Item::count(),
-            'projects' => Project::count(),
-            'tasks' => Task::count(),
+            'users' => 0,
+            'customers' => 0,
+            'suppliers' => 0,
+            'items' => 0,
+            'projects' => 0,
+            'tasks' => 0,
         ];
 
         // Get recent activities (placeholder)
@@ -138,12 +132,12 @@ class DashboardController extends Controller
     public function getStats()
     {
         $stats = [
-            'users' => User::count(),
-            'customers' => Customer::count(),
-            'suppliers' => Supplier::count(),
-            'items' => Item::count(),
-            'projects' => Project::count(),
-            'tasks' => Task::count(),
+            'users' => 0,
+            'customers' => 0,
+            'suppliers' => 0,
+            'items' => 0,
+            'projects' => 0,
+            'tasks' => 0,
         ];
 
         return response()->json([
