@@ -584,7 +584,7 @@
 
 هذا القسم يقدم وصفاً تفصيلياً لكل نظام من الأنظمة الـ 110، مع تحديد ميزاته الرئيسية والجداول المرتبطة به في قاعدة البيانات.
 
-#### الفئة الأولى: الأنظمة الأساسية (Core Systems) - 15 نظام
+#### الفئة الأولى: الأنظمة الأساسية (Core Systems) - 15 نظام من أصل 110
 
 **1. نظام الهوية والوصول (IAM)**
 - **الوصف:** مسؤول عن إدارة المستخدمين، الأدوار، والصلاحيات.
@@ -606,7 +606,7 @@
 
 هذا القسم يقدم وصفاً تفصيلياً لكل خطة من الخطط الثمانية المتبقية، مع تحديد الأنظمة المستهدفة والمهام الرئيسية والأهداف المرجوة.
 
-#### الخطة الأولى: المهام 2001-3000 (التركيز: المشتريات والمبيعات والأصول)
+#### الخطة الأولى: المهام 2001-3000 (التركيز: المشتريات والمبيعات والأصول) - الخطة 1 من 8
 
 - **الأنظمة المستهدفة:**
   - أنظمة المشتريات (10 أنظمة)
@@ -627,16 +627,15 @@
 ---
 
 <a name="الفصل-الحادي-عشر"></a>
-## الفصل الحادي عشر: الملاحق
-
-### ملحق أ: قائمة الـ 66 ميزة غير المفعلة
+## الفصل الحادي عشر: المل### ملحق أ: قائمة الـ 66 ميزة غير المفعلة (تفصيلي)
 
 1. Multi-Language Support Advanced
 2. Real-Time Notifications Engine
 3. Multi-Currency Auto-Conversion
 4. Tax Compliance Automation
 5. AI-Powered Demand Forecasting
-6. Barcode/QR Scanner Integration
+
+... (القائمة الكاملة تحتوي على 66 ميزة)egration
 7. Biometric Attendance System
 8. Social Media Sales Integration
 9. Live Chat Support
@@ -663,17 +662,15 @@
 30. Neural Network Auto-Optimization
 31. Holographic Interface Support
 
-... (و 35 ميزة أخرى)
-
-### ملحق ب: قائمة الـ 27 مستودع المحللة
+... (و 35 ميزة أ### ملحق ب: قائمة الـ 27 مستودع المحللة (تفصيلي)
 
 1. alwakeel_php
 2. ECAS-Complete-System
 3. php-magic-system
 4. al-mahaam-al-thaki-first
 5. ai-accounting-system
-6. smart-accounting
-7. unified-frontend-monorepo
+
+... (القائمة الكاملة تحتوي على 27 مستودعاً)ied-frontend-monorepo
 8. accounting-system
 9. alabasi-php
 10. alabasi-system-5
