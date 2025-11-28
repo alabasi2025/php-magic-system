@@ -315,4 +315,248 @@ class DeveloperController extends Controller
     {
         return view('developer.debugbar');
     }
+    
+    // ========================================
+    // 🤖 AI Tools
+    // ========================================
+    
+    public function aiGenerateCode(Request $request)
+    {
+        try {
+            $prompt = $request->input('prompt');
+            
+            if (empty($prompt)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'الرجاء إدخال prompt'
+                ], 400);
+            }
+            
+            $apiKey = env('OPENAI_API_KEY');
+            
+            if (empty($apiKey)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OPENAI_API_KEY غير موجود في .env'
+                ], 500);
+            }
+            
+            $response = $this->callOpenAI($apiKey, [
+                ['role' => 'system', 'content' => 'You are a Laravel expert. Generate clean, PSR-12 compliant PHP code. Return only code without explanations.'],
+                ['role' => 'user', 'content' => $prompt]
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'code' => $response
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function aiDesignDatabase(Request $request)
+    {
+        try {
+            $description = $request->input('description');
+            
+            if (empty($description)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'الرجاء إدخال وصف قاعدة البيانات'
+                ], 400);
+            }
+            
+            $apiKey = env('OPENAI_API_KEY');
+            
+            $prompt = "Design a Laravel database schema for: {$description}. Return Laravel migration code.";
+            
+            $response = $this->callOpenAI($apiKey, [
+                ['role' => 'system', 'content' => 'You are a database expert. Generate Laravel migration code only.'],
+                ['role' => 'user', 'content' => $prompt]
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'schema' => $response
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function aiGenerateTests(Request $request)
+    {
+        try {
+            $class = $request->input('class');
+            
+            if (empty($class)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'الرجاء إدخال اسم الـ Class'
+                ], 400);
+            }
+            
+            $apiKey = env('OPENAI_API_KEY');
+            
+            $prompt = "Generate PHPUnit tests for Laravel {$class}. Include all CRUD operations.";
+            
+            $response = $this->callOpenAI($apiKey, [
+                ['role' => 'system', 'content' => 'You are a testing expert. Generate PHPUnit test code only.'],
+                ['role' => 'user', 'content' => $prompt]
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'tests' => $response
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function aiReviewCode(Request $request)
+    {
+        try {
+            $code = $request->input('code');
+            
+            if (empty($code)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'الرجاء إدخال الكود'
+                ], 400);
+            }
+            
+            $apiKey = env('OPENAI_API_KEY');
+            
+            $prompt = "Review this Laravel code and suggest improvements:\n\n{$code}";
+            
+            $response = $this->callOpenAI($apiKey, [
+                ['role' => 'system', 'content' => 'You are a code review expert. Analyze code and provide detailed feedback.'],
+                ['role' => 'user', 'content' => $prompt]
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'review' => $response
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function aiFixBug(Request $request)
+    {
+        try {
+            $error = $request->input('error');
+            
+            if (empty($error)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'الرجاء إدخال رسالة الخطأ'
+                ], 400);
+            }
+            
+            $apiKey = env('OPENAI_API_KEY');
+            
+            $prompt = "Fix this Laravel error:\n\n{$error}\n\nProvide the solution and fixed code.";
+            
+            $response = $this->callOpenAI($apiKey, [
+                ['role' => 'system', 'content' => 'You are a debugging expert. Analyze errors and provide solutions.'],
+                ['role' => 'user', 'content' => $prompt]
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'solution' => $response
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function aiDocumentCode(Request $request)
+    {
+        try {
+            $code = $request->input('code');
+            
+            if (empty($code)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'الرجاء إدخال الكود'
+                ], 400);
+            }
+            
+            $apiKey = env('OPENAI_API_KEY');
+            
+            $prompt = "Add PHPDoc comments to this Laravel code:\n\n{$code}";
+            
+            $response = $this->callOpenAI($apiKey, [
+                ['role' => 'system', 'content' => 'You are a documentation expert. Add detailed PHPDoc comments.'],
+                ['role' => 'user', 'content' => $prompt]
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'documented_code' => $response
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    // ========================================
+    // 🔧 Helper Methods
+    // ========================================
+    
+    private function callOpenAI($apiKey, $messages, $model = 'gpt-4')
+    {
+        $url = 'https://api.openai.com/v1/chat/completions';
+        
+        $data = [
+            'model' => $model,
+            'messages' => $messages,
+            'temperature' => 0.7,
+            'max_tokens' => 2000
+        ];
+        
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $apiKey
+        ]);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode !== 200) {
+            throw new \Exception('OpenAI API Error: ' . $response);
+        }
+        
+        $result = json_decode($response, true);
+        
+        return $result['choices'][0]['message']['content'] ?? '';
+    }
 }
