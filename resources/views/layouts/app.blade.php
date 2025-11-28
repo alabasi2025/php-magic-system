@@ -321,24 +321,14 @@
         
         // Developer Menu Toggle
         function toggleDeveloperMenu() {
-            console.log('toggleDeveloperMenu called');
             const menu = document.getElementById('developerMenu');
             const icon = document.getElementById('developerMenuIcon');
             
-            if (!menu) {
-                console.error('developerMenu not found!');
-                return;
+            if (menu && icon) {
+                menu.classList.toggle('hidden');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
             }
-            if (!icon) {
-                console.error('developerMenuIcon not found!');
-                return;
-            }
-            
-            console.log('Menu classes before:', menu.classList);
-            menu.classList.toggle('hidden');
-            icon.classList.toggle('fa-chevron-down');
-            icon.classList.toggle('fa-chevron-up');
-            console.log('Menu classes after:', menu.classList);
         }
         
         // Developer Tools Functions
