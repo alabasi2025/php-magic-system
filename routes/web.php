@@ -90,3 +90,6 @@ Route::prefix('developer')->name('developer.')->group(function () {
     Route::get('/system-info', [App\Http\Controllers\DeveloperController::class, 'systemInfo'])->name('system.info');
     Route::get('/logs', [App\Http\Controllers\DeveloperController::class, 'showLogs'])->name('logs');
 });
+
+// Developer Routes
+require __DIR__.'/developer.php';
