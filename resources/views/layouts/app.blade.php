@@ -275,7 +275,7 @@
                                         <i class="fas fa-server w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">معلومات الخادم</span>
                                     </a>
-                                    <a href="{{ route('developer.logs') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors">
+                                    <a href="{{ route('developer.logs.index') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors">
                                         <i class="fas fa-file-alt w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">السجلات (Logs)</span>
                                     </a>
