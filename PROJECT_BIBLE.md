@@ -404,7 +404,38 @@ php-magic-system/
 
 ## 🎯 الإصدارات
 
-### v2.8.0 (2025-11-29) - Current
+### v2.9.0 (2025-11-29) - Current
+**الإضافات:**
+- ✅ تكامل كامل مع Manus API
+- ✅ ManusApiService (10+ methods)
+- ✅ 3 Models: ManusTransaction, ManusUsageStat, ManusWebhook
+- ✅ 3 Migrations لجداول Manus
+- ✅ ManusApiController (15+ endpoints)
+- ✅ routes/manus.php (15+ routes)
+- ✅ config/manus.php
+- ✅ نظام تسجيل العمليات الكامل
+- ✅ إحصائيات الاستخدام
+- ✅ Webhooks support
+- ✅ Error handling شامل
+- ✅ Rate limiting
+- ✅ Cost tracking
+
+**الحالة:** 🟢 95% (ملفات مرفوعة - يحتاج Hard Refresh)
+
+**آخر Commit:** 8a094ce
+
+**الملفات المضافة:**
+- ✅ config/manus.php
+- ✅ app/Services/ManusApiService.php
+- ✅ app/Http/Controllers/ManusApiController.php
+- ✅ app/Models/ManusTransaction.php
+- ✅ app/Models/ManusUsageStat.php
+- ✅ app/Models/ManusWebhook.php
+- ✅ routes/manus.php
+- ✅ 3 migrations
+- ✅ .env.example
+
+### v2.8.0 (2025-11-29)
 **الإضافات:**
 - ✅ نظام المطور الشامل
 - ✅ DeveloperController (1019 سطر، 50+ function)
@@ -446,6 +477,24 @@ php-magic-system/
 ---
 
 ## 🔑 مفاتيح API
+
+### Manus API ⭐
+```bash
+# في .env
+MANUS_API_KEY=sk-6D***************5hy9j
+MANUS_API_URL=https://api.manus.im/v1
+MANUS_DEFAULT_MODEL=gpt-4.1-mini
+MANUS_MAX_TOKENS=2000
+MANUS_TEMPERATURE=0.7
+MANUS_TIMEOUT=60
+MANUS_LOGGING_ENABLED=true
+MANUS_RATE_LIMIT_ENABLED=true
+MANUS_MAX_REQUESTS_PER_MINUTE=60
+MANUS_COST_TRACKING_ENABLED=true
+
+# Dashboard
+https://manus.im/app/MCU0K7lD0yfdrD01Rcx4IUf/settings/integrations/api
+```
 
 ### OpenAI API
 ```bash
