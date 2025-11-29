@@ -18,6 +18,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Drop table if exists (for failed deployments)
+        Schema::dropIfExists('cost_center_allocations');
+        
         Schema::create('cost_center_allocations', function (Blueprint $table) {
             // Primary Key
             $table->id();
