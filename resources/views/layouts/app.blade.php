@@ -468,7 +468,7 @@
         }
         
         function showSystemInfo() {
-            alert('معلومات النظام:\n\nPHP: 8.2\nLaravel: 12.40.2\nالإصدار: v2.8.0');
+            alert('معلومات النظام:\n\nPHP: 8.2\nLaravel: 12.40.2\nالإصدار: v2.9.0');
         }
         
         function showLogs() {

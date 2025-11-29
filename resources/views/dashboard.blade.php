@@ -274,7 +274,7 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
                     <span class="text-gray-700 font-medium">إصدار النظام</span>
-                    <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">v2.8.0</span>
+                    <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">v2.9.0</span>
                 </div>
                 
                 <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">

@@ -93,3 +93,6 @@ Route::prefix('developer')->name('developer.')->group(function () {
 
 // Developer Routes
 require __DIR__.'/developer.php';
+
+// Manus API Routes
+require __DIR__.'/manus.php';
