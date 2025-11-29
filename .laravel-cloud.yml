@@ -1,2 +1,13 @@
-deploy:
-  - echo "Skipping migrations temporarily - will run manually"
+id: 1
+name: php-magic-system
+environments:
+  development:
+    build:
+      - 'composer install --no-dev --optimize-autoloader'
+      - 'npm ci && npm run build'
+    deploy:
+      - 'php artisan config:cache'
+      - 'php artisan route:cache'
+      - 'php artisan view:cache'
+      # Migrations disabled temporarily
+      # - 'php artisan migrate --force'
