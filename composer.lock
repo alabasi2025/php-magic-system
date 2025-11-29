@@ -5797,6 +5797,19 @@
                 "php": "^8.1",
                 "laravel/framework": "^11.0|^12.0"
             }
+        },
+        {
+            "name": "inertiajs/inertia-laravel",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/inertiajs/inertia-laravel.git",
+                "reference": "xyz789"
+            },
+            "require": {
+                "php": "^8.1",
+                "laravel/framework": "^11.0|^12.0"
+            }
         }
     ],
     "packages-dev": [
