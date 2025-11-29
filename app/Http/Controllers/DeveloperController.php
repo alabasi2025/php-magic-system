@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 use Exception;
 
 /**
- * DeveloperController - نظام المطور الشامل v2.8.0
+ * DeveloperController - نظام المطور الشامل v2.8.1
  * 
  * يحتوي على 8 أقسام رئيسية:
  * 1. Dashboard - لوحة التحكم
@@ -26,7 +26,7 @@ use Exception;
  * 8. AI Tools - أدوات الذكاء الاصطناعي
  * 
  * @package App\Http\Controllers
- * @version 2.8.0
+ * @version 2.8.1
  */
 class DeveloperController extends Controller
 {
@@ -57,7 +57,7 @@ class DeveloperController extends Controller
                 'system_overview' => $this->getSystemOverview(),
                 'quick_stats' => $this->getQuickStats(),
                 'recent_activity' => $this->getRecentActivity(),
-                'version' => 'v2.8.0'
+                'version' => 'v2.8.1'
             ];
 
             return view('developer.dashboard', $data);

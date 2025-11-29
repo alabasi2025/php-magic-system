@@ -9,7 +9,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-4xl font-bold">لوحة التحكم</h1>
-                <p class="text-blue-100 mt-2 text-lg">مرحباً بك في نظام SEMOP لإدارة المؤسسات - الإصدار 2.8.0</p>
+                <p class="text-blue-100 mt-2 text-lg">مرحباً بك في نظام SEMOP لإدارة المؤسسات - الإصدار 2.8.1</p>
             </div>
             <div class="text-left bg-white/10 backdrop-blur-sm rounded-lg p-4">
                 <p class="text-sm text-blue-100">التاريخ</p>
