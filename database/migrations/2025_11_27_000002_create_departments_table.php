@@ -26,7 +26,7 @@ return new class extends Migration
             // Using constrained() for convention-based foreign key to 'units' table
             $table->foreignId('unit_id')
                   ->comment('The ID of the parent organizational unit.')
-                  ->constrained()
+                  ->constrained('units')
                   ->onUpdate('cascade')
                   ->onDelete('cascade');
 
