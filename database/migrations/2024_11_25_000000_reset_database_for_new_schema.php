@@ -36,8 +36,15 @@ return new class extends Migration
         // Re-enable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         
+        // Recreate migrations table
+        DB::statement("CREATE TABLE `migrations` (
+            `id` int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `migration` varchar(255) NOT NULL,
+            `batch` int NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        
         // Log the reset
-        \Log::info('Database reset completed successfully. All tables dropped.');
+        \Log::info('Database reset completed successfully. All tables dropped and migrations table recreated.');
     }
 
     /**
