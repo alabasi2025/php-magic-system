@@ -1,0 +1,35 @@
+name: Generate Composer Lock
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-lock:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, curl, zip
+          coverage: none
+          
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        
+      - name: Commit composer.lock
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add composer.lock
+          git diff --staged --quiet || git commit -m "Auto: Generate composer.lock via GitHub Actions"
+          
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
