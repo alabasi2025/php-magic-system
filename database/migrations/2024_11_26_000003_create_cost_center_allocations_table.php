@@ -19,10 +19,7 @@ return new class extends Migration
     public function up(): void
     {
         // Drop table if exists (for failed deployments)
-        Schema::dropIfExists('cost_center_allocations');
         
-        // Drop the table if it exists to ensure clean migration
-        Schema::dropIfExists('$(basename "$file" .php | sed "s/.*_create_//;s/_table$//")');
         
         Schema::create('cost_center_allocations', function (Blueprint $table) {
             // Primary Key
@@ -64,6 +61,5 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cost_center_allocations');
     }
 };

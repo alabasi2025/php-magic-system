@@ -19,8 +19,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Drop the table if it exists to ensure clean migration
-        Schema::dropIfExists('accounts');
         
         // Create the 'accounts' table
         Schema::create('accounts', function (Blueprint $table) {
@@ -75,6 +73,5 @@ return new class extends Migration
     public function down(): void
     {
         // Drop the 'accounts' table if it exists
-        Schema::dropIfExists('accounts');
     }
 };
