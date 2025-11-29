@@ -19,6 +19,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Drop the table if it exists to ensure clean migration
+        Schema::dropIfExists('account_types');
+        
         // Create the 'account_types' table
         Schema::create('account_types', function (Blueprint $table) {
             // Primary key ID

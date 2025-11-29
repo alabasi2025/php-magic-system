@@ -17,6 +17,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Drop the table if it exists to ensure clean migration
+        Schema::dropIfExists('$(basename "$file" .php | sed "s/.*_create_//;s/_table$//")');
+        
         Schema::create('cost_centers', function (Blueprint $table) {
             // Primary Key
             $table->id();
