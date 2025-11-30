@@ -91,7 +91,7 @@ class ClientGene extends Model
     public static function deactivateGene(string $clientCode, string $geneName): bool
     {
         return static::where('client_code', $clientCode)
-            ->where('gene_name' => $geneName)
+            ->where('gene_name', $geneName)
             ->update(['is_active' => false]) > 0;
     }
 
