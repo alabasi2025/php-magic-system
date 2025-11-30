@@ -1,5 +1,4 @@
 <?php
-
 return [
     /*
     |--------------------------------------------------------------------------
@@ -13,9 +12,7 @@ return [
     | All other files should reference this config value.
     |
     */
-
-    'number' => 'v2.8.1',
-
+    'number' => 'v2.8.2',
     /*
     |--------------------------------------------------------------------------
     | Version Name (Optional)
@@ -24,9 +21,7 @@ return [
     | A friendly name for this version (e.g., "Phoenix", "Titan", etc.)
     |
     */
-
-    'name' => 'Task Scheduler Edition',
-
+    'name' => 'Partnership Accounting Edition',
     /*
     |--------------------------------------------------------------------------
     | Release Date
@@ -35,9 +30,7 @@ return [
     | The date this version was released
     |
     */
-
-    'release_date' => '2025-11-29',
-
+    'release_date' => '2025-11-30',
     /*
     |--------------------------------------------------------------------------
     | Full Version String
@@ -46,6 +39,5 @@ return [
     | Complete version string including name
     |
     */
-
-    'full' => 'SEMOP v2.8.1 - Task Scheduler Edition',
+    'full' => 'SEMOP v2.8.2 - Partnership Accounting Edition',
 ];

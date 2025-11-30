@@ -96,3 +96,17 @@ require __DIR__.'/developer.php';
 
 // Manus API Routes
 require __DIR__.'/manus.php';
+
+// Gene: PARTNERSHIP_ACCOUNTING Routes
+require __DIR__.'/../app/Genes/PARTNERSHIP_ACCOUNTING/routes.php';
+
+// Partnership Accounting Web Routes
+Route::prefix('partnership')->name('partnership.')->group(function () {
+    Route::get('/', [App\Http\Controllers\PartnershipController::class, 'index'])->name('index');
+    Route::get('/partners', [App\Http\Controllers\PartnershipController::class, 'partners'])->name('partners.index');
+    Route::get('/revenues', [App\Http\Controllers\PartnershipController::class, 'revenues'])->name('revenues.index');
+    Route::get('/expenses', [App\Http\Controllers\PartnershipController::class, 'expenses'])->name('expenses.index');
+    Route::get('/profits', [App\Http\Controllers\PartnershipController::class, 'profits'])->name('profits.index');
+    Route::get('/reports', [App\Http\Controllers\PartnershipController::class, 'reports'])->name('reports.index');
+    Route::get('/settings', [App\Http\Controllers\PartnershipController::class, 'settings'])->name('settings');
+});

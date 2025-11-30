@@ -181,6 +181,11 @@
                         <span class="sidebar-text">الجينات</span>
                     </a>
                     
+    
+                    <a href="{{ route('partnership.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-orange-50 text-gray-700 hover:text-orange-600">
+                        <i class="fas fa-handshake w-6"></i>
+                        <span class="sidebar-text">محاسبة الشراكات</span>
+                    </a>
                     <!-- نظام المطور -->
                     <div class="mt-4 pt-4 border-t border-gray-200">
                         <div class="px-3 mb-2">
@@ -275,7 +280,7 @@
                                         <i class="fas fa-server w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">معلومات الخادم</span>
                                     </a>
-                                    <a href="{{ route('developer.logs') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors">
+                                    <a href="{{ route('developer.logs.index') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors">
                                         <i class="fas fa-file-alt w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">السجلات (Logs)</span>
                                     </a>
