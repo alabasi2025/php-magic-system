@@ -23,7 +23,7 @@ Artisan::command('inspire', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Scheduled Tasks - SEMOP v2.8.0 Automated Maintenance
+| Scheduled Tasks - SEMOP v2.8.1 Automated Maintenance
 |--------------------------------------------------------------------------
 |
 | Laravel Task Scheduler - 8 مهام مجدولة للصيانة التلقائية
