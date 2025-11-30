@@ -57,7 +57,7 @@ class DeveloperController extends Controller
                 'system_overview' => $this->getSystemOverview(),
                 'quick_stats' => $this->getQuickStats(),
                 'recent_activity' => $this->getRecentActivity(),
-                'version' => 'v2.8.1'
+                'version' => config('version.number')
             ];
 
             return view('developer.dashboard', $data);
