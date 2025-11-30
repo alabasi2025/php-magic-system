@@ -69,7 +69,9 @@
     
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/dark_mode.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
     <script src="{{ asset('js/dark_mode.js') }}" defer></script>
+    <script src="{{ asset('js/dark-mode.js') }}" defer></script>
 </head>
 <body class="bg-gray-50">
     <!-- Top Navigation -->
@@ -89,6 +91,11 @@
                 
                 <!-- Right Menu -->
                 <div class="flex items-center space-x-4 space-x-reverse">
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" class="text-gray-600 hover:text-gray-900 transition-colors" title="تبديل الوضع الليلي">
+                        <i class="fas fa-moon text-xl"></i>
+                    </button>
+                    
                     <!-- Notifications -->
                     <button class="relative text-gray-600 hover:text-gray-900">
                         <i class="fas fa-bell text-xl"></i>
