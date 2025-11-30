@@ -12,7 +12,7 @@ return [
     | All other files should reference this config value.
     |
     */
-    'number' => 'v2.8.3',
+    'number' => 'v2.8.4',
     /*
     |--------------------------------------------------------------------------
     | Version Name (Optional)
@@ -21,7 +21,7 @@ return [
     | A friendly name for this version (e.g., "Phoenix", "Titan", etc.)
     |
     */
-    'name' => 'Partnership Accounting Edition',
+    'name' => 'Dark Mode Edition',
     /*
     |--------------------------------------------------------------------------
     | Release Date
@@ -39,5 +39,5 @@ return [
     | Complete version string including name
     |
     */
-    'full' => 'SEMOP v2.8.3 - Complete Genes System Edition',
+    'full' => 'SEMOP v2.8.4 - Dark Mode Edition',
 ];
