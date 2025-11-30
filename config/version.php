@@ -12,7 +12,7 @@ return [
     | All other files should reference this config value.
     |
     */
-    'number' => 'v2.8.2',
+    'number' => 'v2.8.3',
     /*
     |--------------------------------------------------------------------------
     | Version Name (Optional)
@@ -39,5 +39,5 @@ return [
     | Complete version string including name
     |
     */
-    'full' => 'SEMOP v2.8.2 - Partnership Accounting Edition',
+    'full' => 'SEMOP v2.8.3 - Complete Genes System Edition',
 ];
