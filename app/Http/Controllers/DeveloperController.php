@@ -1160,4 +1160,122 @@ class DeveloperController extends Controller
             ], 500);
         }
     }
+
+    // ========================================
+    // AI Helper Tools Methods
+    // ========================================
+
+    /**
+     * مراجعة الأكواد بـ AI
+     */
+    public function reviewCodeWithAi(Request $request)
+    {
+        try {
+            $request->validate([
+                'code' => 'required|string|min:10',
+                'language' => 'nullable|string|in:php,javascript,python,java'
+            ]);
+
+            $service = new \App\Services\AiHelperToolsService();
+            
+            $result = $service->reviewCode(
+                $request->input('code'),
+                $request->input('language', 'php')
+            );
+
+            return response()->json($result);
+        } catch (Exception $e) {
+            Log::error('AI Code Review Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في مراجعة الكود: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * إصلاح الأخطاء بـ AI
+     */
+    public function fixBugWithAi(Request $request)
+    {
+        try {
+            $request->validate([
+                'code' => 'required|string|min:10',
+                'error_message' => 'required|string|min:5',
+                'language' => 'nullable|string|in:php,javascript,python,java'
+            ]);
+
+            $service = new \App\Services\AiHelperToolsService();
+            
+            $result = $service->fixBug(
+                $request->input('code'),
+                $request->input('error_message'),
+                $request->input('language', 'php')
+            );
+
+            return response()->json($result);
+        } catch (Exception $e) {
+            Log::error('AI Bug Fix Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في إصلاح الخطأ: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * توليد الاختبارات بـ AI
+     */
+    public function generateTestsWithAiHelper(Request $request)
+    {
+        try {
+            $request->validate([
+                'code' => 'required|string|min:10',
+                'description' => 'nullable|string|max:1000'
+            ]);
+
+            $service = new \App\Services\AiHelperToolsService();
+            
+            $result = $service->generateTests(
+                $request->input('code'),
+                $request->input('description', '')
+            );
+
+            return response()->json($result);
+        } catch (Exception $e) {
+            Log::error('AI Test Generation Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في توليد الاختبارات: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * توليد التوثيق بـ AI
+     */
+    public function generateDocumentationWithAi(Request $request)
+    {
+        try {
+            $request->validate([
+                'code' => 'required|string|min:10',
+                'language' => 'nullable|string|in:php,javascript,python,java'
+            ]);
+
+            $service = new \App\Services\AiHelperToolsService();
+            
+            $result = $service->generateDocumentation(
+                $request->input('code'),
+                $request->input('language', 'php')
+            );
+
+            return response()->json($result);
+        } catch (Exception $e) {
+            Log::error('AI Documentation Generation Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في توليد التوثيق: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

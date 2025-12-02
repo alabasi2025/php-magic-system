@@ -88,3 +88,9 @@ Route::post('/developer/ai/code-generator', [DeveloperController::class, 'genera
 Route::post('/developer/ai/migration', [DeveloperController::class, 'generateMigrationWithAi'])->name('ai.migration');
 Route::post('/developer/ai/api-resource', [DeveloperController::class, 'generateApiResourceWithAi'])->name('ai.api-resource');
 Route::post('/developer/ai/tests', [DeveloperController::class, 'generateTestsWithAi'])->name('ai.tests');
+
+// AI Helper Tools Routes
+Route::post('/developer/ai/code-review', [DeveloperController::class, 'reviewCodeWithAi'])->name('ai.code-review');
+Route::post('/developer/ai/bug-fixer', [DeveloperController::class, 'fixBugWithAi'])->name('ai.bug-fixer');
+Route::post('/developer/ai/test-generator', [DeveloperController::class, 'generateTestsWithAiHelper'])->name('ai.test-generator');
+Route::post('/developer/ai/documentation', [DeveloperController::class, 'generateDocumentationWithAi'])->name('ai.documentation');
