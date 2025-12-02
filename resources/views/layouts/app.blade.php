@@ -193,6 +193,33 @@
                         <i class="fas fa-handshake w-6"></i>
                         <span class="sidebar-text">محاسبة الشراكات</span>
                     </a>
+                    
+                    <!-- الهيكل التنظيمي -->
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="px-3 mb-2">
+                            <span class="sidebar-text text-xs font-semibold text-gray-500 uppercase">الهيكل التنظيمي</span>
+                        </div>
+                        
+                        <a href="{{ route('holdings.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600">
+                            <i class="fas fa-building w-6"></i>
+                            <span class="sidebar-text">الشركات القابضة</span>
+                        </a>
+                        
+                        <a href="{{ route('units.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-green-50 text-gray-700 hover:text-green-600">
+                            <i class="fas fa-sitemap w-6"></i>
+                            <span class="sidebar-text">الوحدات</span>
+                        </a>
+                        
+                        <a href="{{ route('departments.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
+                            <i class="fas fa-layer-group w-6"></i>
+                            <span class="sidebar-text">الأقسام</span>
+                        </a>
+                        
+                        <a href="{{ route('organization.projects.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-yellow-50 text-gray-700 hover:text-yellow-600">
+                            <i class="fas fa-project-diagram w-6"></i>
+                            <span class="sidebar-text">المشاريع</span>
+                        </a>
+                    </div>
                     <!-- نظام المطور -->
                     <div class="mt-4 pt-4 border-t border-gray-200">
                         <div class="px-3 mb-2">
