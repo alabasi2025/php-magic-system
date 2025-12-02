@@ -48,6 +48,14 @@ class DeveloperController extends Controller
     // ========================================
 
     /**
+     * عرض لوحة تحكم المطور (Method index)
+     */
+    public function index()
+    {
+        return $this->getDashboard();
+    }
+
+    /**
      * عرض لوحة تحكم المطور
      */
     public function getDashboard()
