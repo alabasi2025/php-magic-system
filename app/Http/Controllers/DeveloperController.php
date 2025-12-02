@@ -1237,12 +1237,36 @@ class DeveloperController extends Controller
         }
     }
 
-    public function runSeeders()
+    public function runSeeders(Request $request)
     {
         try {
-            return response()->json(['success' => true]);
+            $seederClass = $request->input('seeder');
+            
+            if (!$seederClass) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'يجب تحديد اسم Seeder'
+                ], 400);
+            }
+            
+            // Run the seeder
+            Artisan::call('db:seed', [
+                '--class' => $seederClass,
+                '--force' => true
+            ]);
+            
+            $output = Artisan::output();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تشغيل Seeder بنجاح',
+                'output' => $output
+            ]);
         } catch (Exception $e) {
-            return response()->json(['success' => false], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ: ' . $e->getMessage()
+            ], 500);
         }
     }
 
