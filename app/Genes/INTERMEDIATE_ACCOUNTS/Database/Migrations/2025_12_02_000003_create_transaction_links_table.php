@@ -21,16 +21,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('alabasi_transaction_links');
         Schema::create('alabasi_transaction_links', function (Blueprint $table) {
             $table->id();
             
             // معاملة القبض
-                ->onDelete('cascade')
-                ->comment('معاملة القبض');
+            $table->unsignedBigInteger('receipt_transaction_id')->comment('معاملة القبض');
             
             // معاملة الدفع
-                ->onDelete('cascade')
-                ->comment('معاملة الدفع');
+            $table->unsignedBigInteger('payment_transaction_id')->comment('معاملة الدفع');
             
             // المبلغ المربوط
             $table->decimal('linked_amount', 15, 2)->comment('المبلغ المربوط');
@@ -39,6 +38,8 @@ return new class extends Migration
             $table->date('link_date')->comment('تاريخ الربط');
             
             // من أنشأ وعدّل
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             
             $table->timestamps();
             $table->softDeletes();

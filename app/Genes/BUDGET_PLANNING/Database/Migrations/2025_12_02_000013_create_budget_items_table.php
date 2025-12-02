@@ -14,14 +14,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('alabasi_budget_items');
         // إنشاء جدول 'alabasi_budget_items'
         Schema::create('alabasi_budget_items', function (Blueprint $table) {
             // العمود الأساسي: معرف فريد لبند الميزانية
             $table->id();
 
             // العمود الأجنبي: يربط البند بجدول الميزانيات (budgets)
-                  ->comment('معرف الميزانية المرتبط بها البند')
-                  ->cascadeOnDelete(); // حذف البنود عند حذف الميزانية
+            $table->unsignedBigInteger('budget_id')->comment('معرف الميزانية المرتبط بها البند');
 
             // العمود: فئة البند (مثل: رواتب، إيجار، تسويق)
             $table->string('category', 100)->comment('فئة بند الميزانية');
@@ -43,6 +43,7 @@ return new class extends Migration
 
             // أعمدة الطوابع الزمنية: created_at و updated_at
             $table->timestamps();
+            $table->softDeletes();
 
             // إضافة فهرس لتحسين أداء الاستعلامات على budget_id
             $table->index('budget_id');

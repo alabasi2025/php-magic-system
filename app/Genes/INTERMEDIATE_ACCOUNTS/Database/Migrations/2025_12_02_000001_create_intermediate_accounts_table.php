@@ -21,6 +21,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('alabasi_intermediate_accounts');
         Schema::create('alabasi_intermediate_accounts', function (Blueprint $table) {
             $table->id();
             
@@ -29,8 +30,7 @@ return new class extends Migration
             $table->string('code', 50)->unique()->comment('كود الحساب الوسيط');
             
             // الحساب الرئيسي المرتبط
-                ->onDelete('cascade')
-                ->comment('الحساب الرئيسي المرتبط');
+            $table->unsignedBigInteger('main_account_id')->nullable()->comment('الحساب الرئيسي المرتبط');
             
             // الحالة
             $table->boolean('is_active')->default(true)->comment('هل الحساب نشط');
@@ -39,6 +39,8 @@ return new class extends Migration
             $table->text('description')->nullable()->comment('وصف الحساب');
             
             // من أنشأ وعدّل
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             
             $table->timestamps();
             $table->softDeletes();

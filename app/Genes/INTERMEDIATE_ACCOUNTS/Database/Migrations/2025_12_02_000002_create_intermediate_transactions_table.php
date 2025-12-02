@@ -21,12 +21,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('alabasi_intermediate_transactions');
         Schema::create('alabasi_intermediate_transactions', function (Blueprint $table) {
             $table->id();
             
             // الحساب الوسيط
-                ->onDelete('cascade')
-                ->comment('الحساب الوسيط');
+            $table->unsignedBigInteger('intermediate_account_id')->comment('الحساب الوسيط');
             
             // نوع المعاملة
             $table->enum('type', ['receipt', 'payment'])->comment('نوع المعاملة: قبض أو دفع');
@@ -48,6 +48,8 @@ return new class extends Migration
             $table->boolean('is_transferred')->default(false)->comment('هل تم الترحيل');
             
             // من أنشأ وعدّل
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             
             $table->timestamps();
             $table->softDeletes();

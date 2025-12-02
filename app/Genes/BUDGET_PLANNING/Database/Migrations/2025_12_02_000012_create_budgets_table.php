@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('alabasi_budgets');
         Schema::create('alabasi_budgets', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -19,7 +20,13 @@ return new class extends Migration
             $table->date('end_date');
             $table->decimal('total_amount', 15, 2)->default(0);
             $table->enum('status', ['draft', 'active', 'closed'])->default('draft');
+            
+            // من أنشأ وعدّل
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            
             $table->timestamps();
+            $table->softDeletes();
 
             // الفهارس
             $table->index('fiscal_year');
