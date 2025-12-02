@@ -137,3 +137,6 @@ Route::prefix('partnership')->name('partnership.')->group(function () {
 
 // Organization Structure Routes are now loaded from ORGANIZATIONAL_STRUCTURE Gene
 // See: app/Genes/ORGANIZATIONAL_STRUCTURE/routes.php
+
+// Chart of Accounts Routes
+require __DIR__.'/chart_of_accounts_routes.php';
