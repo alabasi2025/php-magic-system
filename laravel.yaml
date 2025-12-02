@@ -1,0 +1,4 @@
+php: "8.2"
+env: production
+build:
+  npm: npm ci && npm run build
