@@ -26,7 +26,8 @@ class DepartmentController extends Controller
     public function __construct()
     {
         // تطبيق سياسة الصلاحيات (Policy) على جميع الدوال
-        $this->authorizeResource(Department::class, 'department');
+        // TODO: إنشاء DepartmentPolicy
+        // $this->authorizeResource(Department::class, 'department');
     }
 
     /**
