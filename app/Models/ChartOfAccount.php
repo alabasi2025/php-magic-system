@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -18,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class ChartOfAccount extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     /**
      * The table associated with the model.
@@ -56,6 +58,18 @@ class ChartOfAccount extends Model
      *
      * @var array<string, string>
      */
+    /**
+     * تكوين Activity Log
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['code', 'name', 'name_en', 'account_type', 'account_level', 'analytical_type', 'preferred_currencies', 'unit_id', 'parent_id'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "تم {$eventName} الحساب");
+    }
+
     protected $casts = [
         'preferred_currencies' => 'array',
         'is_active' => 'boolean',
