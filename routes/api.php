@@ -12,8 +12,73 @@ use Illuminate\Support\Facades\Route;
 */
 
 // ============================================
-// Phase 3 Routes (Tasks 292-300)
+// System Health & Status Routes
 // ============================================
+
+// Health Check
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'healthy',
+        'timestamp' => now(),
+        'version' => config('version.number'),
+        'database' => 'connected'
+    ]);
+});
+
+// Version
+Route::get('/version', function () {
+    return response()->json([
+        'version' => config('version.number'),
+        'name' => config('version.name'),
+        'release_date' => config('version.release_date')
+    ]);
+});
+
+// Database Status
+Route::get('/database/status', function () {
+    try {
+        \DB::connection()->getPdo();
+        return response()->json([
+            'status' => 'connected',
+            'database' => config('database.connections.mysql.database')
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'disconnected',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
+// Cache Status
+Route::get('/cache/status', function () {
+    try {
+        \Cache::put('test', 'test', 1);
+        return response()->json([
+            'status' => 'operational',
+            'driver' => config('cache.default')
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
+// System Info
+Route::get('/system/info', function () {
+    return response()->json([
+        'app_name' => config('app.name'),
+        'version' => config('version.number'),
+        'laravel_version' => app()->version(),
+        'php_version' => phpversion(),
+        'environment' => config('app.env'),
+        'debug' => config('app.debug')
+    ]);
+});
+
+
 
 // Task 292: ADVANCED_DISCOUNTS
 Route::prefix('advanced-discounts')->group(function () {

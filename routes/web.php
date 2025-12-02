@@ -75,6 +75,11 @@ Route::prefix('genes')->name('genes.')->group(function () {
     Route::get('/', [GeneController::class, 'index'])->name('index');
 });
 
+// Telescope Routes
+Route::middleware('auth')->group(function () {
+    Route::telescope();
+});
+
 // مسارات نظام المطور - v2.6.0
 Route::prefix('developer')->name('developer.')->group(function () {
     Route::get('/', [App\Http\Controllers\DeveloperController::class, 'index'])->name('index');
@@ -99,6 +104,17 @@ require __DIR__.'/manus.php';
 
 // Gene: PARTNERSHIP_ACCOUNTING Routes
 require __DIR__.'/../app/Genes/PARTNERSHIP_ACCOUNTING/routes.php';
+
+// Login Routes
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+Route::post('/login', [App\Http\Controllers\AuthController::class, 'login'])->name('login.post');
+Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
+
+// Clients Routes
+Route::get('/clients', [CustomerController::class, 'index'])->name('clients.index');
 
 // Partnership Accounting Web Routes
 Route::prefix('partnership')->name('partnership.')->group(function () {
