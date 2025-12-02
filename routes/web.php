@@ -128,3 +128,12 @@ Route::prefix('partnership')->name('partnership.')->group(function () {
     Route::get('/reports', [App\Http\Controllers\PartnershipController::class, 'reports'])->name('reports.index');
     Route::get('/settings', [App\Http\Controllers\PartnershipController::class, 'settings'])->name('settings');
 });
+
+// System Status and Analytics Routes
+Route::get('/system-status', function () {
+    return view('system-status');
+})->name('system.status');
+
+Route::get('/system-analytics', function () {
+    return view('system-analytics');
+})->name('system.analytics');
