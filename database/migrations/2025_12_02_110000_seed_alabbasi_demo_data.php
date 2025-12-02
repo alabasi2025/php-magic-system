@@ -187,8 +187,8 @@ return new class extends Migration
         $departments = [];
         $department_types = [
             ['name' => 'قسم المبيعات', 'name_en' => 'Sales Department', 'type' => 'sales'],
-            ['name' => 'قسم المحاسبة', 'name_en' => 'Accounting Department', 'type' => 'support'],
-            ['name' => 'قسم المخزون', 'name_en' => 'Inventory Department', 'type' => 'operational'],
+            ['name' => 'قسم المحاسبة', 'name_en' => 'Accounting Department', 'type' => 'accounting'],
+            ['name' => 'قسم المخزون', 'name_en' => 'Inventory Department', 'type' => 'operations'],
         ];
         
         foreach ($station_ids as $index => $station_id) {
