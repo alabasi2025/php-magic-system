@@ -218,7 +218,7 @@
                                         <i class="fas fa-telescope w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">Telescope</span>
                                     </a>
-                                    <a href="#" onclick="alert('Debugbar يظهر تلقائياً في أسفل الصفحة')" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors">
+                                    <a href="{{ route('developer.debugbar') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors">
                                         <i class="fas fa-bug w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">Debugbar</span>
                                     </a>
@@ -233,23 +233,23 @@
                             <div class="mb-3">
                                 <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">قاعدة البيانات</span>
                                 <div class="mt-1 space-y-1">
-                                    <a href="javascript:void(0)" onclick="runMigrations()" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 transition-colors">
+                                    <a href="{{ route('developer.migrations') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 transition-colors">
                                         <i class="fas fa-database w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">Migrations</span>
                                     </a>
-                                    <a href="#" onclick="runSeeders()" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 transition-colors">
+                                    <a href="{{ route('developer.seeders') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 transition-colors">
                                         <i class="fas fa-seedling w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">Seeders</span>
                                     </a>
-                                    <a href="{{ route('developer.database.info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-teal-50 text-gray-600 hover:text-teal-600 transition-colors">
+                                    <a href="{{ route('developer.database-info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-teal-50 text-gray-600 hover:text-teal-600 transition-colors">
                                         <i class="fas fa-info-circle w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">معلومات القاعدة</span>
                                     </a>
-                                    <a href="#" onclick="optimizeDatabase()" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-orange-50 text-gray-600 hover:text-orange-600 transition-colors">
+                                    <a href="{{ route('developer.database-optimize') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-orange-50 text-gray-600 hover:text-orange-600 transition-colors">
                                         <i class="fas fa-bolt w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">تحسين القاعدة</span>
                                     </a>
-                                    <a href="#" onclick="backupDatabase()" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors">
+                                    <a href="{{ route('developer.database-backup') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors">
                                         <i class="fas fa-download w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">نسخ احتياطي</span>
                                     </a>
@@ -260,19 +260,19 @@
                             <div class="mb-3">
                                 <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">أدوات الكود</span>
                                 <div class="mt-1 space-y-1">
-                                    <a href="#" onclick="clearAllCache()" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-colors">
+                                    <a href="{{ route('developer.cache') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-colors">
                                         <i class="fas fa-broom w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">مسح Cache</span>
                                     </a>
-                                    <a href="#" onclick="runPint()" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-cyan-50 text-gray-600 hover:text-cyan-600 transition-colors">
+                                    <a href="{{ route('developer.pint') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-cyan-50 text-gray-600 hover:text-cyan-600 transition-colors">
                                         <i class="fas fa-magic w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">تنسيق الكود (Pint)</span>
                                     </a>
-                                    <a href="#" onclick="runTests()" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-lime-50 text-gray-600 hover:text-lime-600 transition-colors">
+                                    <a href="{{ route('developer.tests') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-lime-50 text-gray-600 hover:text-lime-600 transition-colors">
                                         <i class="fas fa-vial w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">تشغيل الاختبارات</span>
                                     </a>
-                                    <a href="{{ route('developer.routes') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-violet-50 text-gray-600 hover:text-violet-600 transition-colors">
+                                    <a href="{{ route('developer.routes-list') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-violet-50 text-gray-600 hover:text-violet-600 transition-colors">
                                         <i class="fas fa-route w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">قائمة Routes</span>
                                     </a>
@@ -283,11 +283,11 @@
                             <div class="mb-3">
                                 <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">معلومات النظام</span>
                                 <div class="mt-1 space-y-1">
-                                    <a href="{{ route('developer.system.info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-colors">
+                                    <a href="{{ route('developer.server-info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-colors">
                                         <i class="fas fa-server w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">معلومات الخادم</span>
                                     </a>
-                                    <a href="{{ route('developer.logs.index') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors">
+                                    <a href="{{ route('developer.logs-viewer') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors">
                                         <i class="fas fa-file-alt w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">السجلات (Logs)</span>
                                     </a>
