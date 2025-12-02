@@ -107,6 +107,9 @@ require __DIR__.'/manus.php';
 // Gene: PARTNERSHIP_ACCOUNTING Routes
 require __DIR__.'/../app/Genes/PARTNERSHIP_ACCOUNTING/routes.php';
 
+// Gene: ORGANIZATIONAL_STRUCTURE Routes
+require __DIR__.'/../app/Genes/ORGANIZATIONAL_STRUCTURE/routes.php';
+
 // Login Routes
 Route::get('/login', function () {
     return view('auth.login');
@@ -129,27 +132,5 @@ Route::prefix('partnership')->name('partnership.')->group(function () {
     Route::get('/settings', [App\Http\Controllers\PartnershipController::class, 'settings'])->name('settings');
 });
 
-// Organization Structure Routes
-use App\Http\Controllers\Organization\HoldingController;
-use App\Http\Controllers\Organization\UnitController;
-use App\Http\Controllers\Organization\DepartmentController;
-use App\Http\Controllers\Organization\ProjectController as OrgProjectController;
-
-Route::prefix('organization')->name('organization.')->group(function () {
-    // Holdings - الشركات القابضة
-    Route::resource('holdings', HoldingController::class);
-    
-    // Units - الوحدات
-    Route::resource('units', UnitController::class);
-    
-    // Departments - الأقسام
-    Route::resource('departments', DepartmentController::class);
-    
-    // Projects - المشاريع
-    Route::resource('projects', OrgProjectController::class);
-});
-
-// Shortcut routes (without organization prefix)
-Route::resource('holdings', HoldingController::class);
-Route::resource('units', UnitController::class);
-Route::resource('departments', DepartmentController::class);
+// Organization Structure Routes are now loaded from ORGANIZATIONAL_STRUCTURE Gene
+// See: app/Genes/ORGANIZATIONAL_STRUCTURE/routes.php
