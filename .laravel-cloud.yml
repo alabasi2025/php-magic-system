@@ -2,7 +2,9 @@ php: "8.2"
 env: production
 
 deploy:
-  - echo "Deploying PHP Magic System v2.8.6"
+  - echo "Deploying PHP Magic System"
   - php artisan migrate --force
+  - php artisan db:seed --class=ChartOfAccountSeeder --force
   - php artisan cache:clear
   - php artisan config:clear
+  - php artisan view:clear
