@@ -19,6 +19,31 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register views for Genes
+        $this->loadViewsFromGenes();
+    }
+
+    /**
+     * Load views from all Genes
+     */
+    protected function loadViewsFromGenes(): void
+    {
+        $genesPath = app_path('Genes');
+        
+        if (is_dir($genesPath)) {
+            $genes = scandir($genesPath);
+            
+            foreach ($genes as $gene) {
+                if ($gene === '.' || $gene === '..') {
+                    continue;
+                }
+                
+                $geneViewsPath = $genesPath . '/' . $gene . '/Views';
+                
+                if (is_dir($geneViewsPath)) {
+                    $this->loadViewsFrom($geneViewsPath, strtolower($gene));
+                }
+            }
+        }
     }
 }

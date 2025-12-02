@@ -110,6 +110,9 @@ require __DIR__.'/../app/Genes/PARTNERSHIP_ACCOUNTING/routes.php';
 // Gene: ORGANIZATIONAL_STRUCTURE Routes
 require __DIR__.'/../app/Genes/ORGANIZATIONAL_STRUCTURE/routes.php';
 
+// Gene: CASH_BOXES Routes
+require __DIR__.'/../app/Genes/CASH_BOXES/routes.php';
+
 // Login Routes
 Route::get('/login', function () {
     return view('auth.login');
