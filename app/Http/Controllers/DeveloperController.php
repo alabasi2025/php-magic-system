@@ -1407,7 +1407,27 @@ class DeveloperController extends Controller
      */
     public function getDatabaseInfoPage()
     {
-        return view('developer.database-info', $this->getDatabaseInfo());
+        try {
+            $database = config('database.connections.' . config('database.default') . '.database');
+            $tables = DB::select('SHOW TABLE STATUS');
+            $total_tables = count($tables);
+            
+            $tableData = [];
+            foreach ($tables as $table) {
+                $tableData[] = [
+                    'name' => $table->Name,
+                    'rows' => $table->Rows ?? 0
+                ];
+            }
+            
+            return view('developer.database-info', [
+                'database' => $database,
+                'total_tables' => $total_tables,
+                'tables' => $tableData
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
     }
 
     /**
