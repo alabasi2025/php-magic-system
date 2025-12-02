@@ -1,0 +1,295 @@
+{
+  "info": {
+    "name": "SEMOP Developer System APIs",
+    "description": "Collection for testing Code Generator and Helper Tools APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Code Generator APIs",
+      "item": [
+        {
+          "name": "1. Get Code Generator Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/developer/ai/code-generator",
+              "host": ["{{base_url}}"],
+              "path": ["developer", "ai", "code-generator"]
+            },
+            "description": "عرض صفحة مولد الأكواد"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Generate CRUD",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"نموذج المنتجات يحتوي على اسم، وصف، سعر، فئة، صور، وحالة النشر\",\n  \"model_name\": \"Product\",\n  \"fields\": [\"name\", \"description\", \"price\", \"category_id\", \"images\", \"is_published\"],\n  \"auto_save\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/developer/ai/code-generator",
+              "host": ["{{base_url}}"],
+              "path": ["developer", "ai", "code-generator"]
+            },
+            "description": "توليد CRUD كامل من وصف طبيعي"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Generate Migration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"table_name\": \"products\",\n  \"description\": \"جدول المنتجات يحتوي على اسم، وصف، سعر، فئة، صور\",\n  \"fields\": [\"name\", \"description\", \"price\", \"category_id\", \"images\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/developer/ai/migration",
+              "host": ["{{base_url}}"],
+              "path": ["developer", "ai", "migration"]
+            },
+            "description": "توليد Migration للجدول"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Generate API Resource",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model_name\": \"Product\",\n  \"fields\": [\"id\", \"name\", \"description\", \"price\", \"category_id\", \"images\", \"is_published\", \"created_at\", \"updated_at\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/developer/ai/api-resource",
+              "host": ["{{base_url}}"],
+              "path": ["developer", "ai", "api-resource"]
+            },
+            "description": "توليد API Resource"
+          },
+          "response": []
+        },
+        {
+          "name": "5. Generate Tests",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model_name\": \"Product\",\n  \"description\": \"اختبر جميع عمليات CRUD للمنتجات والتحقق من الـ Validation\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/developer/ai/tests",
+              "host": ["{{base_url}}"],
+              "path": ["developer", "ai", "tests"]
+            },
+            "description": "توليد Unit Tests"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Helper Tools APIs",
+      "item": [
+        {
+          "name": "1. Code Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"<?php\\n\\nnamespace App\\\\Models;\\n\\nuse Illuminate\\\\Database\\\\Eloquent\\\\Model;\\n\\nclass Product extends Model\\n{\\n    protected $fillable = ['name', 'description', 'price'];\\n    \\n    public function getDiscountedPrice()\\n    {\\n        return $this->price * 0.9;\\n    }\\n}\",\n  \"language\": \"php\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/developer/ai/code-review",
+              "host": ["{{base_url}}"],
+              "path": ["developer", "ai", "code-review"]
+            },
+            "description": "مراجعة الأكواد والحصول على تقرير شامل"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Bug Fixer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"<?php\\n\\npublic function getUserById($id)\\n{\\n    $user = User::find($id);\\n    return $user->name;\\n}\",\n  \"error_message\": \"Call to a member function name() on null\",\n  \"language\": \"php\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/developer/ai/bug-fixer",
+              "host": ["{{base_url}}"],
+              "path": ["developer", "ai", "bug-fixer"]
+            },
+            "description": "إصلاح الأخطاء في الأكواد"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Test Generator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"<?php\\n\\nnamespace App\\\\Services;\\n\\nclass PaymentService\\n{\\n    public function processPayment($amount, $card)\\n    {\\n        if ($amount <= 0) {\\n            throw new Exception('Invalid amount');\\n        }\\n        // Process payment logic\\n        return true;\\n    }\\n}\",\n  \"description\": \"اختبر معالجة الدفع مع حالات مختلفة من المبالغ والبطاقات\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/developer/ai/test-generator",
+              "host": ["{{base_url}}"],
+              "path": ["developer", "ai", "test-generator"]
+            },
+            "description": "توليد الاختبارات للأكواد"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Documentation Generator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-CSRF-TOKEN",
+                "value": "{{csrf_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"<?php\\n\\npublic function calculateDiscount($price, $percentage)\\n{\\n    if ($percentage < 0 || $percentage > 100) {\\n        throw new InvalidArgumentException('Percentage must be between 0 and 100');\\n    }\\n    return $price * (1 - $percentage / 100);\\n}\",\n  \"language\": \"php\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/developer/ai/documentation",
+              "host": ["{{base_url}}"],
+              "path": ["developer", "ai", "documentation"]
+            },
+            "description": "توليد التوثيق للأكواد"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "System Status APIs",
+      "item": [
+        {
+          "name": "1. Get System Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/system-status",
+              "host": ["{{base_url}}"],
+              "path": ["system-status"]
+            },
+            "description": "عرض حالة النظام"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Get System Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/system-analytics",
+              "host": ["{{base_url}}"],
+              "path": ["system-analytics"]
+            },
+            "description": "عرض الإحصائيات والتقارير"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "csrf_token",
+      "value": "",
+      "type": "string",
+      "description": "يجب الحصول على CSRF Token من صفحة HTML أولاً"
+    }
+  ]
+}
