@@ -12,7 +12,7 @@ return [
     | All other files should reference this config value.
     |
     */
-    'number' => 'v2.8.4',
+    'number' => 'v2.8.5',
     /*
     |--------------------------------------------------------------------------
     | Version Name (Optional)
@@ -30,7 +30,7 @@ return [
     | The date this version was released
     |
     */
-    'release_date' => '2025-11-30',
+    'release_date' => '2025-12-02',
     /*
     |--------------------------------------------------------------------------
     | Full Version String
@@ -39,5 +39,5 @@ return [
     | Complete version string including name
     |
     */
-    'full' => 'SEMOP v2.8.4 - Dark Mode Edition',
+    'full' => 'SEMOP v2.8.5 - Enhanced Edition',
 ];

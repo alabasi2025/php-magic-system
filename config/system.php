@@ -13,7 +13,7 @@ return [
 
     'client_name' => env('SYSTEM_CLIENT_NAME', 'SEMOP System'),
     'client_code' => env('SYSTEM_CLIENT_CODE', 'SEMOP'),
-    'version' => 'v2.8.4',
+    'version' => 'v2.8.5',
     'environment' => env('APP_ENV', 'production'),
 
     /*
