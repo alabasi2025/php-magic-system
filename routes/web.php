@@ -128,3 +128,10 @@ Route::prefix('partnership')->name('partnership.')->group(function () {
     Route::get('/reports', [App\Http\Controllers\PartnershipController::class, 'reports'])->name('reports.index');
     Route::get('/settings', [App\Http\Controllers\PartnershipController::class, 'settings'])->name('settings');
 });
+
+Route::prefix('developer')->name('developer.')->group(function () {
+    Route::get('/vue', [App\Http\Controllers\DeveloperController::class, 'getVueDashboard'])->name('vue.dashboard');
+    Route::get('/telescope', [App\Http\Controllers\DeveloperController::class, 'getTelescope'])->name('telescope');
+    Route::get('/horizon', [App\Http\Controllers\DeveloperController::class, 'getHorizon'])->name('horizon');
+    Route::get('/permissions', [App\Http\Controllers\DeveloperController::class, 'getPermissions'])->name('permissions');
+});

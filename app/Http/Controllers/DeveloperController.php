@@ -1282,3 +1282,28 @@ class DeveloperController extends Controller
         }
     }
 }
+
+    public function getVueDashboard()
+    {
+        return view("developer.vue-dashboard", [
+            "phpVersion" => phpversion(),
+            "laravelVersion" => app()->version(),
+            "database" => config("database.default"),
+            "environment" => app()->environment(),
+        ]);
+    }
+
+    public function getTelescope()
+    {
+        return view("developer.telescope");
+    }
+
+    public function getHorizon()
+    {
+        return view("developer.horizon");
+    }
+
+    public function getPermissions()
+    {
+        return view("developer.permissions");
+    }
