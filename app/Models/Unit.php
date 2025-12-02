@@ -4,20 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Unit Model
+ * Unit Model - الوحدات
+ * 
+ * الوحدة هي كيان تنظيمي تابع للشركة القابضة
+ * يمكن أن تكون شركة، فرع، أو مؤسسة
  * 
  * @package App\Models
- * @property int $id
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
  */
 class Unit extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -32,10 +33,28 @@ class Unit extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'holding_id',
+        'parent_id',
+        'code',
         'name',
-        'description',
-        'status',
+        'name_en',
+        'type',
+        'email',
+        'phone',
+        'fax',
+        'address',
+        'city',
+        'country',
+        'postal_code',
+        'tax_number',
+        'commercial_register',
+        'manager_id',
         'is_active',
+        'start_date',
+        'end_date',
+        'notes',
+        'created_by',
+        'updated_by',
     ];
 
     /**
@@ -45,17 +64,118 @@ class Unit extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'start_date' => 'date',
+        'end_date' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
+
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
+     * الشركة القابضة
      */
-    protected $hidden = [];
+    public function holding(): BelongsTo
+    {
+        return $this->belongsTo(Holding::class, 'holding_id');
+    }
+
+    /**
+     * الوحدة الأم
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class, 'parent_id');
+    }
+
+    /**
+     * الوحدات الفرعية
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(Unit::class, 'parent_id');
+    }
+
+    /**
+     * المدير
+     */
+    public function manager(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
+
+    /**
+     * الأقسام التابعة
+     */
+    public function departments(): HasMany
+    {
+        return $this->hasMany(Department::class, 'unit_id');
+    }
+
+    /**
+     * المشاريع التابعة
+     */
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class, 'unit_id');
+    }
+
+    /**
+     * من أنشأ
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * من عدّل
+     */
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Scopes
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Scope للوحدات النشطة فقط
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope للوحدات حسب النوع
+     */
+    public function scopeOfType($query, $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Accessors & Mutators
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * الاسم الكامل
+     */
+    public function getFullNameAttribute(): string
+    {
+        return $this->code . ' - ' . $this->name;
+    }
 
     /**
      * Get the attributes that should be searchable.
@@ -64,6 +184,6 @@ class Unit extends Model
      */
     public function getSearchableAttributes(): array
     {
-        return ['name', 'description'];
+        return ['code', 'name', 'name_en', 'email', 'phone'];
     }
 }

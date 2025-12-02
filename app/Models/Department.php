@@ -4,28 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * @property int $id
- * @property string $name
- * @property string|null $description
- * @property int $unit_id
- * @property int|null $parent_id
- * @property int|null $manager_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- *
- * @property-read \App\Models\Unit $unit
- * @property-read \App\Models\Department|null $parent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Department> $children
- * @property-read \App\Models\User|null $manager
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $employees
+ * Department Model - الأقسام
+ * 
+ * القسم هو وحدة تنظيمية داخل الوحدة
+ * مثل: قسم المحاسبة، قسم الموارد البشرية، قسم المبيعات
+ * 
+ * @package App\Models
  */
 class Department extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'departments';
 
     /**
      * The attributes that are mass assignable.
@@ -33,11 +33,22 @@ class Department extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'description',
         'unit_id',
         'parent_id',
+        'code',
+        'name',
+        'name_en',
+        'type',
         'manager_id',
+        'email',
+        'phone',
+        'extension',
+        'location',
+        'budget',
+        'is_active',
+        'notes',
+        'created_by',
+        'updated_by',
     ];
 
     /**
@@ -46,10 +57,11 @@ class Department extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        // Assuming unit_id, parent_id, and manager_id are foreign keys and should be integers
-        'unit_id' => 'integer',
-        'parent_id' => 'integer',
-        'manager_id' => 'integer',
+        'budget' => 'decimal:2',
+        'is_active' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     /*
@@ -59,88 +71,112 @@ class Department extends Model
     */
 
     /**
-     * Get the Unit that the Department belongs to.
-     *
-     * @return BelongsTo
+     * الوحدة التابع لها
      */
     public function unit(): BelongsTo
     {
-        // Assuming the foreign key is 'unit_id' and the related model is 'App\Models\Unit'
-        // Unit model is assumed to exist for this relationship to be valid.
         return $this->belongsTo(Unit::class, 'unit_id');
     }
 
     /**
-     * Get the parent Department (for hierarchical structure).
-     *
-     * @return BelongsTo
+     * القسم الأم
      */
     public function parent(): BelongsTo
     {
-        // Self-referencing relationship using 'parent_id'
         return $this->belongsTo(Department::class, 'parent_id');
     }
 
     /**
-     * Get the child Departments (for hierarchical structure).
-     *
-     * @return HasMany
+     * الأقسام الفرعية
      */
     public function children(): HasMany
     {
-        // Self-referencing relationship using 'parent_id' as the foreign key in the child model
         return $this->hasMany(Department::class, 'parent_id');
     }
 
     /**
-     * Get the User who is the Manager of this Department.
-     *
-     * @return BelongsTo
+     * المدير
      */
     public function manager(): BelongsTo
     {
-        // Assuming the foreign key is 'manager_id' and the related model is 'App\Models\User'
-        // User model is assumed to exist for this relationship to be valid.
         return $this->belongsTo(User::class, 'manager_id');
     }
 
     /**
-     * Get all the Users (employees) that belong to this Department.
-     *
-     * Note: This assumes the 'users' table has a 'department_id' foreign key.
-     *
-     * @return HasMany
+     * الموظفون
      */
     public function employees(): HasMany
     {
-        // Assuming the foreign key on the User model is 'department_id'
-        // User model is assumed to exist for this relationship to be valid.
-        return $this->hasMany(User::class, 'department_id');
+        return $this->hasMany(Employee::class, 'department_id');
+    }
+
+    /**
+     * المشاريع التابعة
+     */
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class, 'department_id');
+    }
+
+    /**
+     * من أنشأ
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * من عدّل
+     */
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 
     /*
     |--------------------------------------------------------------------------
-    | Custom Methods
+    | Scopes
     |--------------------------------------------------------------------------
     */
 
     /**
-     * Check if the department has a parent department.
-     *
-     * @return bool
+     * Scope للأقسام النشطة فقط
      */
-    public function hasParent(): bool
+    public function scopeActive($query)
     {
-        return !is_null($this->parent_id);
+        return $query->where('is_active', true);
     }
 
     /**
-     * Check if the department has sub-departments.
-     *
-     * @return bool
+     * Scope للأقسام حسب النوع
      */
-    public function hasChildren(): bool
+    public function scopeOfType($query, $type)
     {
-        return $this->children()->exists();
+        return $query->where('type', $type);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Accessors & Mutators
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * الاسم الكامل
+     */
+    public function getFullNameAttribute(): string
+    {
+        return $this->code . ' - ' . $this->name;
+    }
+
+    /**
+     * Get the attributes that should be searchable.
+     *
+     * @return array<int, string>
+     */
+    public function getSearchableAttributes(): array
+    {
+        return ['code', 'name', 'name_en', 'email', 'phone'];
     }
 }
