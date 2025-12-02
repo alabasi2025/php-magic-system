@@ -75,10 +75,12 @@ Route::prefix('genes')->name('genes.')->group(function () {
     Route::get('/', [GeneController::class, 'index'])->name('index');
 });
 
-// Telescope Routes
-Route::middleware('auth')->group(function () {
-    Route::telescope();
-});
+// Telescope Routes (Only in development)
+if (config('app.env') !== 'production' || config('app.debug')) {
+    Route::middleware('auth')->group(function () {
+        Route::telescope();
+    });
+}
 
 // مسارات نظام المطور - v2.6.0
 Route::prefix('developer')->name('developer.')->group(function () {
