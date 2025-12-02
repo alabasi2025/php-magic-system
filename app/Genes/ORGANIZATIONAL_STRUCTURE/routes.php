@@ -32,4 +32,4 @@ Route::prefix('organization')->name('organization.')->group(function () {
 Route::resource('holdings', HoldingController::class);
 Route::resource('units', UnitController::class);
 Route::resource('departments', DepartmentController::class);
-// Note: 'projects' route is not included here to avoid conflict with main ProjectController
+Route::resource('projects', ProjectController::class);
