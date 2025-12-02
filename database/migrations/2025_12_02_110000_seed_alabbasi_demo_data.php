@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
  * - 3 محطات في الحديدة (الدهمية، الصبالية، غليل)
  * - 3 صناديق لكل محطة
  * - حسابات وسيطة لكل صندوق
+ * 
+ * ✅ يتعامل مع البيانات الموجودة مسبقاً (لا Duplicate Entry)
  */
 return new class extends Migration
 {
@@ -19,6 +21,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // التحقق من وجود البيانات - إذا كانت موجودة، لا نفعل شيء
+        if (DB::table('holdings')->where('code', 'ALABBASI')->exists()) {
+            echo "⚠️  البيانات التجريبية موجودة مسبقاً - تم التخطي\n";
+            return;
+        }
+
         // 1. إنشاء الشركة القابضة الرئيسية: مجموعة العباسي
         $alabbasi_holding_id = DB::table('holdings')->insertGetId([
             'code' => 'ALABBASI',
@@ -54,15 +62,17 @@ return new class extends Migration
                 'name_en' => 'Al-Abbasi Main Unit',
                 'type' => 'company',
                 'email' => 'main@alabbasi.com.sa',
-                'phone' => '+966 11 234 5680',
-                'address' => 'المقر الرئيسي، الرياض',
+                'phone' => '+966 11 234 5678',
+                'address' => 'طريق الملك فهد، حي العليا',
                 'city' => 'الرياض',
-                'country' => 'السعودية',
-                'tax_number' => '300012345600004',
-                'commercial_register' => '1010123457',
+                'country' => 'المملكة العربية السعودية',
+                'tax_number' => '300012345600003',
+                'commercial_register' => '1010123456',
                 'start_date' => '2010-01-01',
                 'is_active' => true,
                 'created_by' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'holding_id' => $alabbasi_holding_id,
@@ -73,28 +83,36 @@ return new class extends Migration
                 'type' => 'branch',
                 'email' => 'hodeidah@alabbasi.com.sa',
                 'phone' => '+967 3 234 567',
-                'address' => 'شارع الكورنيش، الحديدة',
+                'address' => 'شارع 26 سبتمبر',
                 'city' => 'الحديدة',
                 'country' => 'اليمن',
-                'start_date' => '2015-06-01',
+                'tax_number' => '400012345600001',
+                'commercial_register' => '2020123456',
+                'start_date' => '2015-01-01',
                 'is_active' => true,
                 'created_by' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'holding_id' => $alabbasi_holding_id,
                 'parent_id' => null,
-                'code' => 'MAABAR',
+                'code' => 'MABAR',
                 'name' => 'وحدة معبر',
-                'name_en' => 'Maabar Unit',
+                'name_en' => 'Mabar Unit',
                 'type' => 'branch',
-                'email' => 'maabar@alabbasi.com.sa',
-                'phone' => '+967 4 345 678',
-                'address' => 'شارع الحرية، معبر',
+                'email' => 'mabar@alabbasi.com.sa',
+                'phone' => '+967 4 234 567',
+                'address' => 'شارع الستين',
                 'city' => 'معبر',
                 'country' => 'اليمن',
-                'start_date' => '2016-03-01',
+                'tax_number' => '400012345600002',
+                'commercial_register' => '2020123457',
+                'start_date' => '2016-01-01',
                 'is_active' => true,
                 'created_by' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'holding_id' => $alabbasi_holding_id,
@@ -104,27 +122,28 @@ return new class extends Migration
                 'name_en' => 'Sanaa Unit',
                 'type' => 'branch',
                 'email' => 'sanaa@alabbasi.com.sa',
-                'phone' => '+967 1 456 789',
-                'address' => 'شارع الزبيري، صنعاء',
+                'phone' => '+967 1 234 567',
+                'address' => 'شارع الزبيري',
                 'city' => 'صنعاء',
                 'country' => 'اليمن',
+                'tax_number' => '400012345600003',
+                'commercial_register' => '2020123458',
                 'start_date' => '2017-01-01',
                 'is_active' => true,
                 'created_by' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ];
 
         $unit_ids = [];
         foreach ($units as $unit) {
-            $unit['created_at'] = now();
-            $unit['updated_at'] = now();
             $unit_ids[] = DB::table('units')->insertGetId($unit);
         }
 
-        // الوحدة الثانية هي الحديدة
-        $hodeidah_unit_id = $unit_ids[1];
-
-        // 3. إنشاء 3 محطات في الحديدة (كوحدات فرعية)
+        // 3. إنشاء 3 محطات في الحديدة (تابعة لوحدة الحديدة)
+        $hodeidah_unit_id = $unit_ids[1]; // وحدة الحديدة
+        
         $stations = [
             [
                 'holding_id' => $alabbasi_holding_id,
@@ -135,12 +154,13 @@ return new class extends Migration
                 'type' => 'division',
                 'email' => 'dahmiya@alabbasi.com.sa',
                 'phone' => '+967 3 234 570',
-                'address' => 'منطقة الدهمية، الحديدة',
+                'address' => 'منطقة الدهمية',
                 'city' => 'الحديدة',
                 'country' => 'اليمن',
-                'start_date' => '2015-06-01',
                 'is_active' => true,
                 'created_by' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'holding_id' => $alabbasi_holding_id,
@@ -151,12 +171,13 @@ return new class extends Migration
                 'type' => 'division',
                 'email' => 'sabaliya@alabbasi.com.sa',
                 'phone' => '+967 3 234 571',
-                'address' => 'منطقة الصبالية، الحديدة',
+                'address' => 'منطقة الصبالية',
                 'city' => 'الحديدة',
                 'country' => 'اليمن',
-                'start_date' => '2015-06-01',
                 'is_active' => true,
                 'created_by' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'holding_id' => $alabbasi_holding_id,
@@ -167,19 +188,18 @@ return new class extends Migration
                 'type' => 'division',
                 'email' => 'ghalil@alabbasi.com.sa',
                 'phone' => '+967 3 234 572',
-                'address' => 'منطقة غليل، الحديدة',
+                'address' => 'منطقة غليل',
                 'city' => 'الحديدة',
                 'country' => 'اليمن',
-                'start_date' => '2015-06-01',
                 'is_active' => true,
                 'created_by' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ];
 
         $station_ids = [];
         foreach ($stations as $station) {
-            $station['created_at'] = now();
-            $station['updated_at'] = now();
             $station_ids[] = DB::table('units')->insertGetId($station);
         }
 
@@ -193,8 +213,9 @@ return new class extends Migration
         
         foreach ($station_ids as $index => $station_id) {
             $station_code = $stations[$index]['code'];
+            
             for ($i = 0; $i < 3; $i++) {
-                $departments[] = [
+                $dept_id = DB::table('departments')->insertGetId([
                     'unit_id' => $station_id,
                     'parent_id' => null,
                     'code' => $station_code . '-DEPT-' . ($i + 1),
@@ -202,106 +223,97 @@ return new class extends Migration
                     'name_en' => $department_types[$i]['name_en'],
                     'type' => $department_types[$i]['type'],
                     'email' => strtolower($station_code) . '-dept' . ($i + 1) . '@alabbasi.com.sa',
-                    'phone' => '+967 3 234 ' . (580 + ($index * 10) + $i),
+                    'phone' => '+967 3 234 ' . (580 + $index * 3 + $i),
                     'is_active' => true,
-                    'created_by' => 1,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-        }
-
-        foreach ($departments as $dept) {
-            DB::table('departments')->insert($dept);
-        }
-
-        // 5. إنشاء 3 صناديق لكل محطة (9 صناديق إجمالاً)
-        $cash_boxes = [];
-        
-        foreach ($station_ids as $index => $station_id) {
-            $station_code = $stations[$index]['code'];
-            $station_name = $stations[$index]['name'];
-            
-            for ($i = 1; $i <= 3; $i++) {
-                // إنشاء حساب وسيط أولاً
-                $intermediate_account_id = DB::table('alabasi_intermediate_accounts')->insertGetId([
-                    'name' => "حساب وسيط - {$station_name} - صندوق {$i}",
-                    'code' => "{$station_code}-IA-{$i}",
-                    'main_account_id' => null,
-                    'is_active' => true,
-                    'description' => "حساب وسيط لصندوق {$i} في {$station_name}",
                     'created_by' => 1,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+                $departments[] = $dept_id;
+            }
+        }
 
-                // إنشاء الصندوق
-                $cash_boxes[] = [
-                    'code' => "{$station_code}-CB-{$i}",
-                    'name' => "صندوق {$i} - {$station_name}",
-                    'balance' => 100000.00,
+        // 5. إنشاء 3 صناديق لكل محطة
+        $cash_boxes = [];
+        foreach ($station_ids as $index => $station_id) {
+            $station_code = $stations[$index]['code'];
+            
+            for ($i = 0; $i < 3; $i++) {
+                $cash_box_id = DB::table('alabasi_cash_boxes')->insertGetId([
+                    'code' => $station_code . '-CASH-' . ($i + 1),
+                    'name' => 'صندوق ' . $stations[$index]['name'] . ' - ' . ($i + 1),
+                    'balance' => 100000.00, // 100,000 ريال يمني
                     'is_active' => true,
-                    'description' => "صندوق رقم {$i} في محطة {$station_name} - مرتبط بالحساب الوسيط {$station_code}-IA-{$i}",
+                    'description' => 'صندوق نقدي رقم ' . ($i + 1) . ' في ' . $stations[$index]['name'],
                     'created_by' => 1,
                     'created_at' => now(),
                     'updated_at' => now(),
+                ]);
+                $cash_boxes[] = [
+                    'id' => $cash_box_id,
+                    'station_id' => $station_id,
+                    'code' => $station_code . '-CASH-' . ($i + 1),
                 ];
             }
         }
 
-        foreach ($cash_boxes as $box) {
-            DB::table('alabasi_cash_boxes')->insert($box);
-        }
-
-        // 6. إنشاء بعض العمليات التجريبية على الحسابات الوسيطة
-        $transactions = [];
-        $intermediate_account_ids = DB::table('alabasi_intermediate_accounts')
-            ->where('code', 'like', '%-IA-%')
-            ->pluck('id')
-            ->toArray();
-
-        foreach ($intermediate_account_ids as $index => $account_id) {
-            // عملية إيداع
-            $transactions[] = [
-                'intermediate_account_id' => $account_id,
-                'type' => 'receipt',
-                'amount' => 50000.00 + ($index * 10000),
-                'status' => 'completed',
-                'description' => 'إيداع افتتاحي',
-                'reference_number' => 'REC-' . str_pad($index + 1, 5, '0', STR_PAD_LEFT),
-                'transaction_date' => now()->subDays(rand(1, 30)),
+        // 6. إنشاء حساب وسيط لكل صندوق
+        $intermediate_accounts = [];
+        foreach ($cash_boxes as $index => $cash_box) {
+            $account_id = DB::table('alabasi_intermediate_accounts')->insertGetId([
+                'name' => 'حساب وسيط - ' . $cash_box['code'],
+                'code' => 'INT-' . $cash_box['code'],
+                'main_account_id' => null,
+                'is_active' => true,
+                'description' => 'حساب وسيط للصندوق ' . $cash_box['code'],
                 'created_by' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
+            ]);
+            $intermediate_accounts[] = [
+                'id' => $account_id,
+                'cash_box_id' => $cash_box['id'],
+                'code' => 'INT-' . $cash_box['code'],
             ];
+        }
+
+        // 7. إنشاء عمليات تجريبية لكل حساب وسيط
+        foreach ($intermediate_accounts as $index => $account) {
+            // عملية إيداع
+            DB::table('alabasi_intermediate_transactions')->insert([
+                'intermediate_account_id' => $account['id'],
+                'type' => 'receipt',
+                'amount' => 65000.00,
+                'description' => 'إيداع تجريبي - ' . $account['code'],
+                'transaction_date' => now()->subDays(rand(1, 30)),
+                'reference_number' => 'DEP-' . str_pad($index + 1, 5, '0', STR_PAD_LEFT),
+                'created_by' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             // عملية سحب
-            $transactions[] = [
-                'intermediate_account_id' => $account_id,
+            DB::table('alabasi_intermediate_transactions')->insert([
+                'intermediate_account_id' => $account['id'],
                 'type' => 'payment',
-                'amount' => 20000.00 + ($index * 5000),
-                'status' => 'completed',
-                'description' => 'مصروفات تشغيلية',
-                'reference_number' => 'PAY-' . str_pad($index + 1, 5, '0', STR_PAD_LEFT),
+                'amount' => 30000.00,
+                'description' => 'سحب تجريبي - ' . $account['code'],
                 'transaction_date' => now()->subDays(rand(1, 15)),
+                'reference_number' => 'WITH-' . str_pad($index + 1, 5, '0', STR_PAD_LEFT),
                 'created_by' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ];
+            ]);
         }
 
-        foreach ($transactions as $transaction) {
-            DB::table('alabasi_intermediate_transactions')->insert($transaction);
-        }
-
-        echo "\n✅ تم إدراج البيانات التجريبية لنظام العباسي بنجاح:\n";
+        echo "✅ تم إدراج البيانات التجريبية بنجاح!\n";
         echo "   - 1 شركة قابضة (مجموعة العباسي)\n";
         echo "   - 4 وحدات رئيسية (العباسي، الحديدة، معبر، صنعاء)\n";
         echo "   - 3 محطات في الحديدة (الدهمية، الصبالية، غليل)\n";
         echo "   - 9 أقسام (3 لكل محطة)\n";
         echo "   - 9 صناديق (3 لكل محطة)\n";
         echo "   - 9 حسابات وسيطة (حساب لكل صندوق)\n";
-        echo "   - 18 عملية تجريبية (إيداع + سحب لكل حساب)\n\n";
+        echo "   - 18 عملية تجريبية (إيداع + سحب لكل حساب)\n";
     }
 
     /**
@@ -309,16 +321,14 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // حذف البيانات بالترتيب العكسي
-        DB::table('alabasi_intermediate_transactions')->where('reference_number', 'like', 'REC-%')->delete();
-        DB::table('alabasi_intermediate_transactions')->where('reference_number', 'like', 'PAY-%')->delete();
-        DB::table('alabasi_cash_boxes')->where('code', 'like', '%-CB-%')->delete();
-        DB::table('alabasi_intermediate_accounts')->where('code', 'like', '%-IA-%')->delete();
+        // حذف البيانات التجريبية بالترتيب العكسي
+        DB::table('alabasi_intermediate_transactions')->where('reference_number', 'like', 'DEP-%')->orWhere('reference_number', 'like', 'WITH-%')->delete();
+        DB::table('alabasi_intermediate_accounts')->where('code', 'like', 'INT-%')->delete();
+        DB::table('alabasi_cash_boxes')->where('code', 'like', '%-CASH-%')->delete();
         DB::table('departments')->where('code', 'like', '%-DEPT-%')->delete();
-        DB::table('units')->whereIn('code', ['DAHMIYA', 'SABALIYA', 'GHALIL'])->delete();
-        DB::table('units')->whereIn('code', ['ALABBASI-MAIN', 'HODEIDAH', 'MAABAR', 'SANAA'])->delete();
+        DB::table('units')->where('code', 'in', ['DAHMIYA', 'SABALIYA', 'GHALIL', 'ALABBASI-MAIN', 'HODEIDAH', 'MABAR', 'SANAA'])->delete();
         DB::table('holdings')->where('code', 'ALABBASI')->delete();
 
-        echo "\n❌ تم حذف البيانات التجريبية لنظام العباسي\n\n";
+        echo "✅ تم حذف البيانات التجريبية بنجاح!\n";
     }
 };
