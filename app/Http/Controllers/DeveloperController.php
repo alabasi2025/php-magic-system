@@ -1168,4 +1168,36 @@ class DeveloperController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get system information
+     */
+    public function systemInfo()
+    {
+        try {
+            $systemInfo = [
+                'php_version' => phpversion(),
+                'laravel_version' => \Illuminate\Foundation\Application::VERSION,
+                'server_os' => php_uname(),
+                'memory_limit' => ini_get('memory_limit'),
+                'max_execution_time' => ini_get('max_execution_time'),
+                'extensions' => get_loaded_extensions(),
+                'database' => [
+                    'driver' => config('database.default'),
+                    'host' => config('database.connections.' . config('database.default') . '.host'),
+                ]
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $systemInfo
+            ]);
+        } catch (Exception $e) {
+            Log::error('System Info Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في الحصول على معلومات النظام: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
