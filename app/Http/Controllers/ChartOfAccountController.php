@@ -62,11 +62,13 @@ class ChartOfAccountController extends Controller
 
             return view('chart-of-accounts.index', compact('accounts', 'units'));
         } catch (\Exception $e) {
-            // إذا كان الجدول غير موجود، عرض رسالة
-            $accounts = collect();
-            $units = Unit::active()->get();
-            session()->flash('warning', 'جدول دليل الحسابات غير موجود. يرجى تشغيل migrations أولاً.');
-            return view('chart-of-accounts.index', compact('accounts', 'units'));
+            // إذا كان الجدول غير موجود، عرض رسالة واضحة
+            return response()->view('errors.setup-required', [
+                'title' => 'دليل الحسابات',
+                'message' => 'جدول دليل الحسابات غير موجود في قاعدة البيانات.',
+                'instructions' => 'يرجى الذهاب إلى نظام المطور > Migrations وتشغيل migrations.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
