@@ -51,6 +51,17 @@ class DatabaseSeeder extends Seeder
         // This seeder is responsible for creating sample financial accounts or related data.
         $this->call(AccountSeeder::class);
 
+        // 5. Seed Organizational Structure (الهيكل التنظيمي)
+        // Seeders for Holdings, Units, Departments, and Projects
+        $this->command->info('\n📊 بدء تشغيل seeders الهيكل التنظيمي...');
+        $this->call([
+            HoldingSeeder::class,
+            UnitSeeder::class,
+            DepartmentSeeder::class,
+            \Database\Seeders\ProjectSeeder::class, // Organizational projects
+        ]);
+        $this->command->info('✅ تم الانتهاء من الهيكل التنظيمي (3 شركات + 12 وحدة + 18 قسم + 25 مشروع)\n');
+
         // Re-enable foreign key checks
         // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
