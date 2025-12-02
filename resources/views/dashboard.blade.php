@@ -9,7 +9,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-4xl font-bold">لوحة التحكم</h1>
-                <p class="text-blue-100 mt-2 text-lg">مرحباً بك في نظام SEMOP لإدارة المؤسسات - الإصدار 2.4.0</p>
+                <p class="text-blue-100 mt-2 text-lg">مرحباً بك في نظام SEMOP لإدارة المؤسسات - الإصدار {{ config('version.number') }}</p>
             </div>
             <div class="text-left bg-white/10 backdrop-blur-sm rounded-lg p-4">
                 <p class="text-sm text-blue-100">التاريخ</p>
@@ -274,7 +274,7 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
                     <span class="text-gray-700 font-medium">إصدار النظام</span>
-                    <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">v2.4.0</span>
+                    <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">{{ config('version.number') }}</span>
                 </div>
                 
                 <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">

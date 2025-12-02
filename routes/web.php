@@ -74,3 +74,39 @@ Route::prefix('insurance')->name('insurance.')->group(function () {
 Route::prefix('genes')->name('genes.')->group(function () {
     Route::get('/', [GeneController::class, 'index'])->name('index');
 });
+
+// مسارات نظام المطور - v2.6.0
+Route::prefix('developer')->name('developer.')->group(function () {
+    Route::get('/', [App\Http\Controllers\DeveloperController::class, 'index'])->name('index');
+    Route::post('/migrations/run', [App\Http\Controllers\DeveloperController::class, 'runMigrations'])->name('migrations.run');
+    Route::post('/seeders/run', [App\Http\Controllers\DeveloperController::class, 'runSeeders'])->name('seeders.run');
+    Route::get('/database/info', [App\Http\Controllers\DeveloperController::class, 'databaseInfo'])->name('database.info');
+    Route::post('/database/optimize', [App\Http\Controllers\DeveloperController::class, 'optimizeDatabase'])->name('database.optimize');
+    Route::post('/database/backup', [App\Http\Controllers\DeveloperController::class, 'backupDatabase'])->name('database.backup');
+    Route::post('/cache/clear', [App\Http\Controllers\DeveloperController::class, 'clearCache'])->name('cache.clear');
+    Route::post('/pint/run', [App\Http\Controllers\DeveloperController::class, 'runPint'])->name('pint.run');
+    Route::post('/tests/run', [App\Http\Controllers\DeveloperController::class, 'runTests'])->name('tests.run');
+    Route::get('/routes', [App\Http\Controllers\DeveloperController::class, 'showRoutes'])->name('routes');
+    Route::get('/system-info', [App\Http\Controllers\DeveloperController::class, 'systemInfo'])->name('system.info');
+    Route::get('/logs', [App\Http\Controllers\DeveloperController::class, 'showLogs'])->name('logs');
+});
+
+// Developer Routes
+require __DIR__.'/developer.php';
+
+// Manus API Routes
+require __DIR__.'/manus.php';
+
+// Gene: PARTNERSHIP_ACCOUNTING Routes
+require __DIR__.'/../app/Genes/PARTNERSHIP_ACCOUNTING/routes.php';
+
+// Partnership Accounting Web Routes
+Route::prefix('partnership')->name('partnership.')->group(function () {
+    Route::get('/', [App\Http\Controllers\PartnershipController::class, 'index'])->name('index');
+    Route::get('/partners', [App\Http\Controllers\PartnershipController::class, 'partners'])->name('partners.index');
+    Route::get('/revenues', [App\Http\Controllers\PartnershipController::class, 'revenues'])->name('revenues.index');
+    Route::get('/expenses', [App\Http\Controllers\PartnershipController::class, 'expenses'])->name('expenses.index');
+    Route::get('/profits', [App\Http\Controllers\PartnershipController::class, 'profits'])->name('profits.index');
+    Route::get('/reports', [App\Http\Controllers\PartnershipController::class, 'reports'])->name('reports.index');
+    Route::get('/settings', [App\Http\Controllers\PartnershipController::class, 'settings'])->name('settings');
+});
