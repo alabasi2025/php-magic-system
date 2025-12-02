@@ -3,8 +3,8 @@
 namespace App\Genes\ORGANIZATIONAL_STRUCTURE\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Genes\ORGANIZATIONAL_STRUCTURE\Models\Department;
-use App\Genes\ORGANIZATIONAL_STRUCTURE\Models\Unit;
+use App\Models\Department;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
