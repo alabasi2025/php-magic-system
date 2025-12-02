@@ -11,7 +11,7 @@
                 <h1 class="text-4xl font-bold text-white mb-2">
                     <i class="fas fa-code text-blue-400 mr-3"></i>لوحة تحكم المطور
                 </h1>
-                <p class="text-gray-400">نظام المطور المتكامل v2.8.5 - Enhanced Edition</p>
+                <p class="text-gray-400">نظام المطور المتكامل v2.8.8 - Enhanced Edition</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="refreshDashboard()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
@@ -395,7 +395,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                     <p class="text-gray-400 text-sm mb-2">إصدار النظام</p>
-                    <p class="text-white font-semibold">v2.8.5 - Enhanced Edition</p>
+                    <p class="text-white font-semibold">v2.8.8 - Enhanced Edition</p>
                 </div>
                 <div>
                     <p class="text-gray-400 text-sm mb-2">آخر تحديث</p>
