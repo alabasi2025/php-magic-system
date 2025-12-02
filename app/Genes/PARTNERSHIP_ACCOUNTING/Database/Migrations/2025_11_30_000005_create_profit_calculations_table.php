@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('alabasi_profit_calculations');
         Schema::create('alabasi_profit_calculations', function (Blueprint $table) {
             // Primary Key
             $table->id();
 
             // Khumaasiyya (البنية الخماسية) - Core Business Keys
-            // holding_id
-            // unit_id
-            // project_id
-            // partner_id - Added as a logical key for PARTNERSHIP_ACCOUNTING
+            $table->unsignedBigInteger('holding_id')->nullable()->comment('معرف الهولدنج');
+            $table->unsignedBigInteger('unit_id')->nullable()->comment('معرف الوحدة');
+            $table->unsignedBigInteger('project_id')->nullable()->comment('معرف المشروع');
+            $table->unsignedBigInteger('partner_id')->comment('معرف الشريك');
 
             // Calculation Data
             $table->date('calculation_date')->comment('تاريخ احتساب الأرباح');
@@ -27,6 +28,8 @@ return new class extends Migration
             $table->text('notes')->nullable()->comment('ملاحظات إضافية');
 
             // Auditing (التدقيق)
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
 
             // Timestamps and Soft Deletes
             $table->timestamps();

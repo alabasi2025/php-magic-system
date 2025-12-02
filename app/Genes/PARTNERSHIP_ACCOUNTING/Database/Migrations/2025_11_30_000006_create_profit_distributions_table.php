@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('alabasi_profit_distributions');
         Schema::create('alabasi_profit_distributions', function (Blueprint $table) {
             // Primary Key
             $table->id();
