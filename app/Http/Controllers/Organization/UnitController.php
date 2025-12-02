@@ -30,7 +30,7 @@ class UnitController extends Controller
     {
         // @note: افتراض وجود علاقات departments و projects في نموذج Unit
         $units = Unit::query()
-            ->with(['holding', 'parent', 'manager']) // العلاقات المطلوبة
+            ->with(['holding', 'parent']) // العلاقات المطلوبة
             ->withCount(['departments', 'projects']) // حساب عدد الأقسام والمشاريع
             ->when($request->has('trashed'), function ($query) {
                 // تضمين المحذوفة حذفا ناعما إذا طلب ذلك

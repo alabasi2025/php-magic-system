@@ -12,7 +12,7 @@ return [
     | All other files should reference this config value.
     |
     */
-    'number' => 'v2.10.0',
+    'number' => 'v2.10.1',
     /*
     |--------------------------------------------------------------------------
     | Version Name (Optional)
