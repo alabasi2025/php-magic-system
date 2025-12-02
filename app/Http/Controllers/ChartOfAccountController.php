@@ -23,8 +23,9 @@ class ChartOfAccountController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ChartOfAccount::with(['unit', 'parent', 'children'])
-            ->latest();
+        try {
+            $query = ChartOfAccount::with(['unit', 'parent', 'children'])
+                ->latest();
 
         // تصفية حسب الوحدة
         if ($request->filled('unit_id')) {
@@ -56,10 +57,17 @@ class ChartOfAccountController extends Controller
             });
         }
 
-        $accounts = $query->paginate(20);
-        $units = Unit::active()->get();
+            $accounts = $query->paginate(20);
+            $units = Unit::active()->get();
 
-        return view('chart-of-accounts.index', compact('accounts', 'units'));
+            return view('chart-of-accounts.index', compact('accounts', 'units'));
+        } catch (\Exception $e) {
+            // إذا كان الجدول غير موجود، عرض رسالة
+            $accounts = collect();
+            $units = Unit::active()->get();
+            session()->flash('warning', 'جدول دليل الحسابات غير موجود. يرجى تشغيل migrations أولاً.');
+            return view('chart-of-accounts.index', compact('accounts', 'units'));
+        }
     }
 
     /**
