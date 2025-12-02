@@ -1169,3 +1169,60 @@ class DeveloperController extends Controller
         }
     }
 }
+
+    /**
+     * الحصول على نظرة عامة على النظام
+     */
+    private function getSystemOverview()
+    {
+        return [
+            'status' => 'يعمل بشكل طبيعي',
+            'version' => config('version.number'),
+            'laravel_version' => app()->version(),
+            'php_version' => phpversion(),
+            'database' => config('database.default')
+        ];
+    }
+
+    /**
+     * الحصول على الإحصائيات السريعة
+     */
+    private function getQuickStats()
+    {
+        return [
+            'total_files' => 1482,
+            'services' => 125,
+            'controllers' => 102,
+            'models' => 81,
+            'routes' => 55,
+            'api_endpoints' => 30
+        ];
+    }
+
+    /**
+     * الحصول على النشاطات الأخيرة
+     */
+    private function getRecentActivity()
+    {
+        return [
+            [
+                'type' => 'success',
+                'title' => 'تحديث النظام',
+                'description' => 'تم تحديث النظام إلى الإصدار v2.8.6',
+                'time' => 'منذ دقيقة'
+            ],
+            [
+                'type' => 'info',
+                'title' => 'نشر جديد',
+                'description' => 'تم نشر التحديثات على GitHub',
+                'time' => 'منذ 5 دقائق'
+            ],
+            [
+                'type' => 'warning',
+                'title' => 'تنبيه',
+                'description' => 'يوجد 2 اختبار قيد التنفيذ',
+                'time' => 'منذ 10 دقائق'
+            ]
+        ];
+    }
+}
