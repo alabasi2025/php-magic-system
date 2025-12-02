@@ -153,11 +153,6 @@
                         <span class="sidebar-text">المبيعات</span>
                     </a>
                     
-                    <a href="{{ route('projects.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
-                        <i class="fas fa-briefcase w-6"></i>
-                        <span class="sidebar-text">المشاريع</span>
-                    </a>
-                    
                     <a href="{{ route('hr.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
                         <i class="fas fa-user-tie w-6"></i>
                         <span class="sidebar-text">الموارد البشرية</span>
