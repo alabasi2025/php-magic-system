@@ -1281,7 +1281,6 @@ class DeveloperController extends Controller
             return response()->json(['success' => false], 500);
         }
     }
-}
 
     public function getVueDashboard()
     {
@@ -1307,3 +1306,5 @@ class DeveloperController extends Controller
     {
         return view("developer.permissions");
     }
+
+}
