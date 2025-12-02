@@ -85,3 +85,44 @@ Route::post('/developer/ai/code-generator', [DeveloperController::class, 'genera
 Route::post('/developer/ai/migration', [DeveloperController::class, 'generateMigrationWithAi'])->name('ai.migration');
 Route::post('/developer/ai/api-resource', [DeveloperController::class, 'generateApiResourceWithAi'])->name('ai.api-resource');
 Route::post('/developer/ai/tests', [DeveloperController::class, 'generateTestsWithAi'])->name('ai.tests');
+
+
+// ========================================
+// الخانات الفرعية الإضافية - v2.8.8
+// ========================================
+
+// المراقبة والتصحيح
+Route::get('/developer/debugbar', [DeveloperController::class, 'getDebugbar'])->name('developer.debugbar');
+Route::get('/developer/telescope', [DeveloperController::class, 'getTelescope'])->name('developer.telescope');
+Route::get('/developer/horizon', [DeveloperController::class, 'getHorizon'])->name('developer.horizon');
+
+// قاعدة البيانات
+Route::get('/developer/migrations', [DeveloperController::class, 'getMigrationsPage'])->name('developer.migrations');
+Route::post('/developer/migrations/run', [DeveloperController::class, 'runMigrations'])->name('developer.migrations.run');
+Route::get('/developer/seeders', [DeveloperController::class, 'getSeedersPage'])->name('developer.seeders');
+Route::post('/developer/seeders/run', [DeveloperController::class, 'runSeeders'])->name('developer.seeders.run');
+Route::get('/developer/database-info', [DeveloperController::class, 'getDatabaseInfoPage'])->name('developer.database-info');
+Route::get('/developer/database-optimize', [DeveloperController::class, 'getDatabaseOptimizePage'])->name('developer.database-optimize');
+Route::post('/developer/database-optimize/run', [DeveloperController::class, 'runDatabaseOptimize'])->name('developer.database-optimize.run');
+Route::get('/developer/database-backup', [DeveloperController::class, 'getDatabaseBackupPage'])->name('developer.database-backup');
+Route::post('/developer/database-backup/create', [DeveloperController::class, 'createDatabaseBackup'])->name('developer.database-backup.create');
+Route::get('/developer/database-backup/download/{file}', [DeveloperController::class, 'downloadBackup'])->name('developer.database-backup.download');
+
+// أدوات الكود
+Route::get('/developer/cache', [DeveloperController::class, 'getCachePage'])->name('developer.cache');
+Route::post('/developer/cache/clear-all', [DeveloperController::class, 'clearAllCache'])->name('developer.cache.clear-all');
+Route::get('/developer/pint', [DeveloperController::class, 'getPintPage'])->name('developer.pint');
+Route::post('/developer/pint/format', [DeveloperController::class, 'runPintFormat'])->name('developer.pint.format');
+Route::get('/developer/tests', [DeveloperController::class, 'getTestsPage'])->name('developer.tests');
+Route::post('/developer/tests/execute', [DeveloperController::class, 'executeTests'])->name('developer.tests.execute');
+Route::get('/developer/routes-list', [DeveloperController::class, 'getRoutesListPage'])->name('developer.routes-list');
+
+// معلومات النظام
+Route::get('/developer/server-info', [DeveloperController::class, 'getServerInfoPage'])->name('developer.server-info');
+Route::get('/developer/logs-viewer', [DeveloperController::class, 'getLogsViewerPage'])->name('developer.logs-viewer');
+Route::get('/developer/logs-viewer/{file}', [DeveloperController::class, 'viewLogFile'])->name('developer.logs-viewer.file');
+Route::delete('/developer/logs-viewer/{file}', [DeveloperController::class, 'deleteLogFile'])->name('developer.logs-viewer.delete');
+
+// Main Developer Dashboard
+Route::get('/developer', [DeveloperController::class, 'getDashboard'])->name('developer.index');
+Route::get('/developer/vue-dashboard', [DeveloperController::class, 'getVueDashboard'])->name('developer.vue-dashboard');
