@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * Laravel Deployment Hook
+ * 
+ * This file is executed automatically after deployment
+ * It runs vendor:publish and migrate commands
+ */
+
+// Run vendor:publish commands
+$commands = [
+    'vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --force',
+    'vendor:publish --provider="Laravel\Telescope\TelescopeServiceProvider" --force',
+    'vendor:publish --provider="Barryvdh\Debugbar\ServiceProvider" --force',
+    'vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider" --force',
+    'vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --force',
+    'migrate --force',
+];
+
+foreach ($commands as $command) {
+    echo "Running: php artisan $command\n";
+    exec("php artisan $command", $output, $returnVar);
+    
+    if ($returnVar !== 0) {
+        echo "Error: Command failed with return code $returnVar\n";
+        echo implode("\n", $output) . "\n";
+    } else {
+        echo "Success: " . implode("\n", $output) . "\n";
+    }
+}
+
+echo "Deployment complete!\n";
