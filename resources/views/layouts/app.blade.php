@@ -189,6 +189,11 @@
                         <span class="sidebar-text">محاسبة الشراكات</span>
                     </a>
                     
+                    <a href="{{ route('chart-of-accounts.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600">
+                        <i class="fas fa-book w-6"></i>
+                        <span class="sidebar-text">دليل الحسابات</span>
+                    </a>
+                    
                     <!-- الهيكل التنظيمي -->
                     <div class="mt-4 pt-4 border-t border-gray-200">
                         <div class="px-3 mb-2">
