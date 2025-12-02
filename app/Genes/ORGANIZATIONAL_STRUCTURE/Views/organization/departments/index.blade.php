@@ -46,20 +46,20 @@
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">قائمة الإدارات</h6>
                     {{-- تعليق: زر إضافة جديد --}}
-                    <a href="{{ route('departments.create') }}" class="btn btn-primary btn-sm">
+                    <a href="{{ route('organization.departments.create') }}" class="btn btn-primary btn-sm">
                         <i class="fas fa-plus-circle ml-1"></i> إضافة إدارة جديدة
                     </a>
                 </div>
                 <div class="card-body">
                     {{-- تعليق: نموذج البحث --}}
-                    <form action="{{ route('departments.index') }}" method="GET" class="mb-4">
+                    <form action="{{ route('organization.departments.index') }}" method="GET" class="mb-4">
                         <div class="input-group">
                             <input type="text" name="search" class="form-control form-control-sm text-right" placeholder="ابحث بالرمز أو الاسم..." value="{{ request('search') }}">
                             <button class="btn btn-outline-secondary btn-sm" type="submit">
                                 <i class="fas fa-search"></i> بحث
                             </button>
                             @if(request('search'))
-                                <a href="{{ route('departments.index') }}" class="btn btn-outline-danger btn-sm">
+                                <a href="{{ route('organization.departments.index') }}" class="btn btn-outline-danger btn-sm">
                                     <i class="fas fa-times"></i> مسح
                                 </a>
                             @endif
@@ -100,13 +100,13 @@
                                     </td>
                                     <td>
                                         {{-- تعليق: أزرار الإجراءات (عرض، تعديل، حذف) --}}
-                                        <a href="{{ route('departments.show', $department->id) }}" class="btn btn-info btn-sm" title="عرض التفاصيل">
+                                        <a href="{{ route('organization.departments.show', $department->id) }}" class="btn btn-info btn-sm" title="عرض التفاصيل">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('departments.edit', $department->id) }}" class="btn btn-warning btn-sm" title="تعديل">
+                                        <a href="{{ route('organization.departments.edit', $department->id) }}" class="btn btn-warning btn-sm" title="تعديل">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('departments.destroy', $department->id) }}" method="POST" class="d-inline">
+                                        <form action="{{ route('organization.departments.destroy', $department->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm" title="حذف" onclick="return confirm('هل أنت متأكد من رغبتك في حذف هذه الإدارة؟')">

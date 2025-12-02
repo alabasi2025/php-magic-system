@@ -11,7 +11,7 @@
             <h1 class="h3 text-primary">
                 <i class="fas fa-pencil-alt me-2"></i> تعديل بيانات الوحدة
             </h1>
-            <a href="{{ route('units.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ route('organization.units.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-right me-1"></i> العودة للقائمة
             </a>
         </div>
@@ -41,7 +41,7 @@
             </div>
             <div class="card-body" dir="rtl">
                 {{-- بداية النموذج --}}
-                <form action="{{ route('units.update', $unit->id) }}" method="POST">
+                <form action="{{ route('organization.units.update', $unit->id) }}" method="POST">
                     @csrf
                     @method('PUT')
 

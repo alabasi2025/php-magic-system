@@ -38,7 +38,7 @@
                     @endif
 
                     {{-- نموذج الإدخال --}}
-                    <form action="{{ route('departments.store') }}" method="POST">
+                    <form action="{{ route('organization.departments.store') }}" method="POST">
                         @csrf {{-- توكن الحماية من هجمات CSRF --}}
 
                         {{-- حقل unit_id (الوحدة الأم) --}}
