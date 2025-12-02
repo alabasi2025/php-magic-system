@@ -18,7 +18,7 @@ class ProfitDistribution extends Model
      *
      * @var string
      */
-    protected $table = 'profit_distributions';
+    protected $table = 'alabasi_profit_distributions';
 
     /**
      * The attributes that aren't mass assignable.

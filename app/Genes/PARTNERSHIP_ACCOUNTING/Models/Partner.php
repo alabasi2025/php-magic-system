@@ -17,7 +17,7 @@ class Partner extends Model
      *
      * @var string
      */
-    protected $table = 'partners';
+    protected $table = 'alabasi_partners';
 
     /**
      * The attributes that are mass assignable.

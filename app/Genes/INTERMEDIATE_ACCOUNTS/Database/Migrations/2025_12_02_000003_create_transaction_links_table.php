@@ -21,18 +21,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transaction_links', function (Blueprint $table) {
+        Schema::create('alabasi_transaction_links', function (Blueprint $table) {
             $table->id();
             
             // معاملة القبض
             $table->foreignId('receipt_transaction_id')
-                ->constrained('intermediate_transactions')
+                ->constrained('alabasi_intermediate_transactions')
                 ->onDelete('cascade')
                 ->comment('معاملة القبض');
             
             // معاملة الدفع
             $table->foreignId('payment_transaction_id')
-                ->constrained('intermediate_transactions')
+                ->constrained('alabasi_intermediate_transactions')
                 ->onDelete('cascade')
                 ->comment('معاملة الدفع');
             
@@ -61,6 +61,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transaction_links');
+        Schema::dropIfExists('alabasi_transaction_links');
     }
 };

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('budgets', function (Blueprint $table) {
+        Schema::create('alabasi_budgets', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('fiscal_year', 4);
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('budgets');
+        Schema::dropIfExists('alabasi_budgets');
     }
 };

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('profit_distributions', function (Blueprint $table) {
+        Schema::create('alabasi_profit_distributions', function (Blueprint $table) {
             // Primary Key
             $table->id();
 
@@ -39,7 +39,7 @@ return new class extends Migration
             $table->foreign('holding_id')->references('id')->on('holdings')->onDelete('cascade');
             $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
-            $table->foreign('partner_id')->references('id')->on('partners')->onDelete('cascade');
+            $table->foreign('partner_id')->references('id')->on('alabasi_partners')->onDelete('cascade');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
 
@@ -55,6 +55,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('profit_distributions');
+        Schema::dropIfExists('alabasi_profit_distributions');
     }
 };

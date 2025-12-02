@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('simple_revenues', function (Blueprint $table) {
+        Schema::create('alabasi_simple_revenues', function (Blueprint $table) {
             // Primary Key
             $table->id();
 
@@ -53,6 +53,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('simple_revenues');
+        Schema::dropIfExists('alabasi_simple_revenues');
     }
 };

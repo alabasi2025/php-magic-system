@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('profit_calculations', function (Blueprint $table) {
+        Schema::create('alabasi_profit_calculations', function (Blueprint $table) {
             // Primary Key
             $table->id();
 
@@ -23,7 +23,7 @@ return new class extends Migration
             // project_id
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             // partner_id - Added as a logical key for PARTNERSHIP_ACCOUNTING
-            $table->foreignId('partner_id')->constrained('partners')->onDelete('cascade');
+            $table->foreignId('partner_id')->constrained('alabasi_partners')->onDelete('cascade');
 
             // Calculation Data
             $table->date('calculation_date')->comment('تاريخ احتساب الأرباح');
@@ -49,6 +49,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('profit_calculations');
+        Schema::dropIfExists('alabasi_profit_calculations');
     }
 };

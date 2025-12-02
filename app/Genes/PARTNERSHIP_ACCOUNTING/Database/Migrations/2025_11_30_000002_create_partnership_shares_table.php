@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('partnership_shares', function (Blueprint $table) {
+        Schema::create('alabasi_partnership_shares', function (Blueprint $table) {
             // Primary Key
             $table->bigIncrements('id');
 
@@ -48,6 +48,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('partnership_shares');
+        Schema::dropIfExists('alabasi_partnership_shares');
     }
 };

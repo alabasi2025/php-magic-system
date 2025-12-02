@@ -28,7 +28,7 @@ class IntermediateTransaction extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'intermediate_transactions';
+    protected $table = 'alabasi_intermediate_transactions';
 
     protected $fillable = [
         'intermediate_account_id',

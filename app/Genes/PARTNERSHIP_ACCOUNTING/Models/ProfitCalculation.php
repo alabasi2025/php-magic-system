@@ -22,7 +22,7 @@ class ProfitCalculation extends Model
      *
      * @var string
      */
-    protected $table = 'profit_calculations';
+    protected $table = 'alabasi_profit_calculations';
 
     /**
      * The attributes that are mass assignable.

@@ -21,7 +21,7 @@ class PartnershipShare extends Model
      *
      * @var string
      */
-    protected $table = 'partnership_shares';
+    protected $table = 'alabasi_partnership_shares';
 
     /**
      * The attributes that are mass assignable.

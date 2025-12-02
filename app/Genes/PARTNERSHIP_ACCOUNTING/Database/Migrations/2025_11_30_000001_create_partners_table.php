@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::dropIfExists('partners');
-        Schema::create('partners', function (Blueprint $table) {
+        Schema::dropIfExists('alabasi_partners');
+        Schema::create('alabasi_partners', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name')->unique();
             $table->string('code')->unique()->nullable();
@@ -49,6 +49,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('partners');
+        Schema::dropIfExists('alabasi_partners');
     }
 };

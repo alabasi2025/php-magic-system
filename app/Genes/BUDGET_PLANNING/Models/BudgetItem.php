@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 class BudgetItem extends Model
 {
     // اسم الجدول المرتبط بالنموذج في قاعدة البيانات
-    protected $table = 'budget_items';
+    protected $table = 'alabasi_budget_items';
 
     // الأعمدة التي يمكن تعبئتها جماعياً (Mass Assignable)
     protected $fillable = [

@@ -23,7 +23,7 @@ class TransactionLink extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'transaction_links';
+    protected $table = 'alabasi_transaction_links';
 
     protected $fillable = [
         'receipt_transaction_id',

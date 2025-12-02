@@ -12,7 +12,7 @@ return new class extends Migration
      * اسم الجدول
      * @var string
      */
-    protected string $tableName = 'generated_reports';
+    protected string $tableName = 'alabasi_generated_reports';
 
     /**
      * تشغيل الترحيل (إنشاء الجدول).
@@ -28,7 +28,7 @@ return new class extends Migration
             // نفترض وجود جدول report_templates
             $table->foreignId('template_id')
                   ->comment('معرف قالب التقرير')
-                  ->constrained('report_templates')
+                  ->constrained('alabasi_report_templates')
                   ->cascadeOnDelete();
 
             // عنوان التقرير

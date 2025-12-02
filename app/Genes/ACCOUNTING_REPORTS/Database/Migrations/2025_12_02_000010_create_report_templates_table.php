@@ -15,8 +15,8 @@ return new class extends Migration
     public function up(): void
     {
         // التحقق من عدم وجود الجدول قبل الإنشاء لتجنب الأخطاء
-        if (!Schema::hasTable('report_templates')) {
-            Schema::create('report_templates', function (Blueprint $table) {
+        if (!Schema::hasTable('alabasi_report_templates')) {
+            Schema::create('alabasi_report_templates', function (Blueprint $table) {
                 // المعرف الأساسي (Primary Key)
                 $table->id();
 
@@ -61,6 +61,6 @@ return new class extends Migration
     public function down(): void
     {
         // حذف الجدول في حال عكس الترحيل
-        Schema::dropIfExists('report_templates');
+        Schema::dropIfExists('alabasi_report_templates');
     }
 };

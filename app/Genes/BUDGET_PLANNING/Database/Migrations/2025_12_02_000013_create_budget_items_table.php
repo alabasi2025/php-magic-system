@@ -14,8 +14,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // إنشاء جدول 'budget_items'
-        Schema::create('budget_items', function (Blueprint $table) {
+        // إنشاء جدول 'alabasi_budget_items'
+        Schema::create('alabasi_budget_items', function (Blueprint $table) {
             // العمود الأساسي: معرف فريد لبند الميزانية
             $table->id();
 
@@ -23,7 +23,7 @@ return new class extends Migration
             // استخدام foreignId() لاتباع معايير Laravel الحديثة
             $table->foreignId('budget_id')
                   ->comment('معرف الميزانية المرتبط بها البند')
-                  ->constrained('budgets') // نفترض وجود جدول budgets في نفس الجين
+                  ->constrained('alabasi_budgets') // نفترض وجود جدول budgets في نفس الجين
                   ->cascadeOnDelete(); // حذف البنود عند حذف الميزانية
 
             // العمود: فئة البند (مثل: رواتب، إيجار، تسويق)
@@ -59,7 +59,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // حذف جدول 'budget_items' إذا كان موجودًا
-        Schema::dropIfExists('budget_items');
+        // حذف جدول 'alabasi_budget_items' إذا كان موجودًا
+        Schema::dropIfExists('alabasi_budget_items');
     }
 };

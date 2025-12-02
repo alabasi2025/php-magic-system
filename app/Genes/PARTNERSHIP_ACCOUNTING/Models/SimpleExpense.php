@@ -17,7 +17,7 @@ class SimpleExpense extends Model
      *
      * @var string
      */
-    protected $table = 'simple_expenses';
+    protected $table = 'alabasi_simple_expenses';
 
     /**
      * The attributes that are mass assignable.

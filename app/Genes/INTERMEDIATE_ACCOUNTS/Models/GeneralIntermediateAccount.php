@@ -23,7 +23,7 @@ class GeneralIntermediateAccount extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'general_intermediate_accounts';
+    protected $table = 'alabasi_general_intermediate_accounts';
 
     protected $fillable = [
         'name',

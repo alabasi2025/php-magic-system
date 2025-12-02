@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('intermediate_accounts', function (Blueprint $table) {
+        Schema::create('alabasi_intermediate_accounts', function (Blueprint $table) {
             $table->id();
             
             // معلومات الحساب الوسيط
@@ -59,6 +59,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('intermediate_accounts');
+        Schema::dropIfExists('alabasi_intermediate_accounts');
     }
 };

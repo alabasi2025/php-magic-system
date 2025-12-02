@@ -13,7 +13,7 @@ class CashBoxTransaction extends Model
      *
      * @var string
      */
-    protected $table = 'cash_box_transactions';
+    protected $table = 'alabasi_cash_box_transactions';
 
     /**
      * The attributes that are mass assignable.

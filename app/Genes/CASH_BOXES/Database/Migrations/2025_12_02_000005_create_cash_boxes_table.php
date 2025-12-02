@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cash_boxes', function (Blueprint $table) {
+        Schema::create('alabasi_cash_boxes', function (Blueprint $table) {
             $table->id();
             $table->string('name', 100)->unique()->comment('اسم الصندوق/الخزنة');
             $table->string('code', 50)->unique()->comment('رمز الصندوق/الخزنة');
@@ -39,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cash_boxes');
+        Schema::dropIfExists('alabasi_cash_boxes');
     }
 };

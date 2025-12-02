@@ -21,12 +21,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('intermediate_transactions', function (Blueprint $table) {
+        Schema::create('alabasi_intermediate_transactions', function (Blueprint $table) {
             $table->id();
             
             // الحساب الوسيط
             $table->foreignId('intermediate_account_id')
-                ->constrained('intermediate_accounts')
+                ->constrained('alabasi_intermediate_accounts')
                 ->onDelete('cascade')
                 ->comment('الحساب الوسيط');
             
@@ -70,6 +70,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('intermediate_transactions');
+        Schema::dropIfExists('alabasi_intermediate_transactions');
     }
 };

@@ -17,7 +17,7 @@ class SimpleRevenue extends Model
      *
      * @var string
      */
-    protected $table = 'simple_revenues';
+    protected $table = 'alabasi_simple_revenues';
 
     /**
      * The attributes that are mass assignable.
