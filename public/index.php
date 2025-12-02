@@ -1,5 +1,10 @@
 <?php
 
+// Check PHP Version
+if (version_compare(PHP_VERSION, '8.2', '<')) {
+    die('<h1>❌ خطأ في إصدار PHP</h1><p>هذا المشروع يتطلب PHP 8.2 أو أعلى</p><p>الإصدار الحالي: ' . PHP_VERSION . '</p><p>يرجى تحديث PHP على الخادم</p>');
+}
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
