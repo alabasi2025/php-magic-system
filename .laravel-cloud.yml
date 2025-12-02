@@ -1,2 +1,8 @@
+php: "8.2"
+env: production
+
 deploy:
-  - echo "Skipping migrations temporarily - will run manually"
+  - echo "Deploying PHP Magic System v2.8.6"
+  - php artisan migrate --force
+  - php artisan cache:clear
+  - php artisan config:clear
