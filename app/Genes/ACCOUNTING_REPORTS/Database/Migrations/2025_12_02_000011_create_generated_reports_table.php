@@ -26,18 +26,14 @@ return new class extends Migration
 
             // معرف القالب الذي تم توليد التقرير بناءً عليه (للتكامل مع جين التقارير)
             // نفترض وجود جدول report_templates
-            $table->foreignId('template_id')
                   ->comment('معرف قالب التقرير')
-                  ->constrained('alabasi_report_templates')
                   ->cascadeOnDelete();
 
             // عنوان التقرير
             $table->string('title', 255)->comment('عنوان التقرير');
 
             // معرف المستخدم الذي قام بتوليد التقرير
-            $table->foreignId('generated_by')
                   ->comment('معرف المستخدم الذي قام بالتوليد')
-                  ->constrained('users') // نفترض وجود جدول users
                   ->cascadeOnDelete();
 
             // تاريخ بداية الفترة التي يغطيها التقرير

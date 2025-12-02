@@ -29,8 +29,6 @@ return new class extends Migration
             $table->string('code', 50)->unique()->comment('كود الحساب الوسيط');
             
             // الحساب الرئيسي المرتبط
-            $table->foreignId('main_account_id')
-                ->constrained('accounts')
                 ->onDelete('cascade')
                 ->comment('الحساب الرئيسي المرتبط');
             
@@ -41,8 +39,6 @@ return new class extends Migration
             $table->text('description')->nullable()->comment('وصف الحساب');
             
             // من أنشأ وعدّل
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
             
             $table->timestamps();
             $table->softDeletes();

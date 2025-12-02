@@ -35,11 +35,6 @@ return new class extends Migration
             $table->softDeletes();
 
             // 6. Foreign Key Constraints (Assuming standard table names)
-            $table->foreign('holding_id')->references('id')->on('holdings')->onDelete('cascade');
-            $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
-            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('restrict');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('restrict');
         });
     }
 

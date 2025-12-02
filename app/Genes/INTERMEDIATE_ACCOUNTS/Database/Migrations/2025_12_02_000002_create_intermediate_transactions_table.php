@@ -25,8 +25,6 @@ return new class extends Migration
             $table->id();
             
             // الحساب الوسيط
-            $table->foreignId('intermediate_account_id')
-                ->constrained('alabasi_intermediate_accounts')
                 ->onDelete('cascade')
                 ->comment('الحساب الوسيط');
             
@@ -50,8 +48,6 @@ return new class extends Migration
             $table->boolean('is_transferred')->default(false)->comment('هل تم الترحيل');
             
             // من أنشأ وعدّل
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
             
             $table->timestamps();
             $table->softDeletes();

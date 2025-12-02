@@ -17,13 +17,9 @@ return new class extends Migration
 
             // Khumaasiyya (البنية الخماسية) - Core Business Keys
             // holding_id
-            $table->foreignId('holding_id')->constrained('holdings')->onDelete('cascade');
             // unit_id
-            $table->foreignId('unit_id')->constrained('units')->onDelete('cascade');
             // project_id
-            $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             // partner_id - Added as a logical key for PARTNERSHIP_ACCOUNTING
-            $table->foreignId('partner_id')->constrained('alabasi_partners')->onDelete('cascade');
 
             // Calculation Data
             $table->date('calculation_date')->comment('تاريخ احتساب الأرباح');
@@ -31,8 +27,6 @@ return new class extends Migration
             $table->text('notes')->nullable()->comment('ملاحظات إضافية');
 
             // Auditing (التدقيق)
-            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
 
             // Timestamps and Soft Deletes
             $table->timestamps();

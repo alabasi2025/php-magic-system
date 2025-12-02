@@ -25,14 +25,10 @@ return new class extends Migration
             $table->id();
             
             // معاملة القبض
-            $table->foreignId('receipt_transaction_id')
-                ->constrained('alabasi_intermediate_transactions')
                 ->onDelete('cascade')
                 ->comment('معاملة القبض');
             
             // معاملة الدفع
-            $table->foreignId('payment_transaction_id')
-                ->constrained('alabasi_intermediate_transactions')
                 ->onDelete('cascade')
                 ->comment('معاملة الدفع');
             
@@ -43,8 +39,6 @@ return new class extends Migration
             $table->date('link_date')->comment('تاريخ الربط');
             
             // من أنشأ وعدّل
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
             
             $table->timestamps();
             $table->softDeletes();

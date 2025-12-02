@@ -40,9 +40,7 @@ return new class extends Migration
 
                 // مفتاح خارجي للمستخدم الذي أنشأ القالب
                 // نفترض وجود جدول 'users' قياسي
-                $table->foreignId('created_by')
                       ->nullable() // يمكن أن يكون فارغًا إذا كان القالب نظاميًا
-                      ->constrained('users')
                       ->onUpdate('cascade')
                       ->onDelete('set null')
                       ->comment('معرف المستخدم الذي أنشأ القالب');

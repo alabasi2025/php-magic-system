@@ -40,11 +40,6 @@ return new class extends Migration
             $table->index('status');
 
             // Foreign Key Constraints (Assuming standard table names: holdings, units, projects, users)
-            $table->foreign('holding_id')->references('id')->on('holdings')->onDelete('set null');
-            $table->foreign('unit_id')->references('id')->on('units')->onDelete('set null');
-            $table->foreign('project_id')->references('id')->on('projects')->onDelete('set null');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
         });
     }
 

@@ -36,12 +36,6 @@ return new class extends Migration
             $table->softDeletes(); // Soft Deletes
 
             // Foreign Keys
-            $table->foreign('holding_id')->references('id')->on('holdings')->onDelete('cascade');
-            $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
-            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
-            $table->foreign('partner_id')->references('id')->on('alabasi_partners')->onDelete('cascade');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
 
             // Indexes (الفهارس المناسبة)
             $table->index(['holding_id', 'unit_id', 'project_id'], 'profit_distributions_quinary_index');

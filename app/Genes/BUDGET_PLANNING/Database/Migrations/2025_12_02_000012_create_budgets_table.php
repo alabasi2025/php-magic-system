@@ -19,7 +19,6 @@ return new class extends Migration
             $table->date('end_date');
             $table->decimal('total_amount', 15, 2)->default(0);
             $table->enum('status', ['draft', 'active', 'closed'])->default('draft');
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();
 
             // الفهارس

@@ -35,8 +35,6 @@ return new class extends Migration
             $table->text('description')->nullable()->comment('وصف الحساب');
             
             // من أنشأ وعدّل
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('updated_by')->nullable()->constrained('users');
             
             $table->timestamps();
             $table->softDeletes();

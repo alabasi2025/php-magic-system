@@ -33,13 +33,8 @@ return new class extends Migration
 
             // Foreign Key Constraints
             // Assuming standard table names for the quintuple structure
-            $table->foreign('holding_id')->references('id')->on('holdings')->onDelete('cascade');
-            $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
-            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
 
             // Foreign Keys for Auditing (assuming 'users' table)
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
         });
     }
 

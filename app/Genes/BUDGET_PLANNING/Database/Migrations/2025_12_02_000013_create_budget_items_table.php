@@ -20,10 +20,7 @@ return new class extends Migration
             $table->id();
 
             // العمود الأجنبي: يربط البند بجدول الميزانيات (budgets)
-            // استخدام foreignId() لاتباع معايير Laravel الحديثة
-            $table->foreignId('budget_id')
                   ->comment('معرف الميزانية المرتبط بها البند')
-                  ->constrained('alabasi_budgets') // نفترض وجود جدول budgets في نفس الجين
                   ->cascadeOnDelete(); // حذف البنود عند حذف الميزانية
 
             // العمود: فئة البند (مثل: رواتب، إيجار، تسويق)

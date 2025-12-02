@@ -36,11 +36,6 @@ return new class extends Migration
             $table->index('updated_by');
 
             // Foreign Keys (افتراض وجود الجداول المرجعية)
-            $table->foreign('holding_id')->references('id')->on('holdings')->onDelete('cascade');
-            $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
-            $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
         });
     }
 
