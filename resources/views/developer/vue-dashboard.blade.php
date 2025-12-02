@@ -13,8 +13,6 @@
 
     <code-generator></code-generator>
 </div>
-@endsection
 
-@push("scripts")
-    @vite(["resources/css/app.css", "resources/js/app.js"])
-@endpush
+@vite(["resources/css/app.css", "resources/js/app.js"])
+@endsection
