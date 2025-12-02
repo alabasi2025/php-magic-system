@@ -35,7 +35,6 @@ class ProjectController extends Controller
         // جلب المشاريع مع العلاقات المطلوبة (Unit, Department, Manager, Client)
         // واستخدام withCount لحساب عدد المهام (افتراضاً بوجود علاقة tasks)
         $projects = Project::with(['unit', 'department'])
-                           ->withCount('tasks') // افتراض وجود علاقة 'tasks'
                            ->latest()
                            ->paginate(10);
 
