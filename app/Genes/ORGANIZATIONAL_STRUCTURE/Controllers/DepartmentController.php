@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Organization;
+namespace App\Genes\ORGANIZATIONAL_STRUCTURE\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Department;

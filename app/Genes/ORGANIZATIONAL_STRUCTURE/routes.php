@@ -8,10 +8,10 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Organization\HoldingController;
-use App\Http\Controllers\Organization\UnitController;
-use App\Http\Controllers\Organization\DepartmentController;
-use App\Http\Controllers\Organization\ProjectController;
+use App\Genes\ORGANIZATIONAL_STRUCTURE\Controllers\HoldingController;
+use App\Genes\ORGANIZATIONAL_STRUCTURE\Controllers\UnitController;
+use App\Genes\ORGANIZATIONAL_STRUCTURE\Controllers\DepartmentController;
+use App\Genes\ORGANIZATIONAL_STRUCTURE\Controllers\ProjectController;
 
 // Organization Structure Routes with 'organization' prefix
 Route::prefix('organization')->name('organization.')->group(function () {
