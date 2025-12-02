@@ -12,7 +12,7 @@ return [
     | All other files should reference this config value.
     |
     */
-    'number' => 'v2.8.7',
+    'number' => 'v2.9.1',
     /*
     |--------------------------------------------------------------------------
     | Version Name (Optional)
@@ -39,5 +39,5 @@ return [
     | Complete version string including name
     |
     */
-    'full' => 'SEMOP v2.8.7 - Vue.js Edition',
+    'full' => 'SEMOP v2.9.1 - Vue.js Edition',
 ];
