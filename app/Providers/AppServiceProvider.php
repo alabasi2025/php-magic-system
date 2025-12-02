@@ -41,7 +41,8 @@ class AppServiceProvider extends ServiceProvider
                 $geneViewsPath = $genesPath . '/' . $gene . '/Views';
                 
                 if (is_dir($geneViewsPath)) {
-                    $this->loadViewsFrom($geneViewsPath, strtolower($gene));
+                    // Register views without namespace to match controller usage
+                    $this->loadViewsFrom($geneViewsPath, '');
                 }
             }
         }
