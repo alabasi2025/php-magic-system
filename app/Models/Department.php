@@ -87,6 +87,14 @@ class Department extends Model
     }
 
     /**
+     * القسم الأم (alias)
+     */
+    public function parentDepartment(): BelongsTo
+    {
+        return $this->parent();
+    }
+
+    /**
      * الأقسام الفرعية
      */
     public function children(): HasMany
