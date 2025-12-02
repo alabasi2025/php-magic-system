@@ -81,3 +81,10 @@ Route::prefix('developer/ai')->name('developer.ai.')->group(function () {
     Route::post('/bug-fixer', [DeveloperController::class, 'aiBugFixer'])->name('bug-fixer');
     Route::post('/documentation', [DeveloperController::class, 'aiDocumentationGenerator'])->name('documentation');
 });
+
+// AI Code Generator UI Routes
+Route::get('/developer/ai/code-generator', [DeveloperController::class, 'getAiCodeGeneratorPage'])->name('ai.code-generator');
+Route::post('/developer/ai/code-generator', [DeveloperController::class, 'generateCrudWithAi'])->name('ai.code-generator.post');
+Route::post('/developer/ai/migration', [DeveloperController::class, 'generateMigrationWithAi'])->name('ai.migration');
+Route::post('/developer/ai/api-resource', [DeveloperController::class, 'generateApiResourceWithAi'])->name('ai.api-resource');
+Route::post('/developer/ai/tests', [DeveloperController::class, 'generateTestsWithAi'])->name('ai.tests');

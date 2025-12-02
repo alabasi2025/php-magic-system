@@ -1016,4 +1016,148 @@ class DeveloperController extends Controller
         $result = json_decode($response, true);
         return $result['choices'][0]['message']['content'] ?? 'لم يتم الحصول على رد';
     }
+
+    // ========================================
+    // AI Code Generator Methods
+    // ========================================
+
+    /**
+     * عرض صفحة مولد الأكواد بـ AI
+     */
+    public function getAiCodeGeneratorPage()
+    {
+        try {
+            return view('developer.ai-code-generator', [
+                'version' => config('version.number')
+            ]);
+        } catch (Exception $e) {
+            Log::error('AI Code Generator Page Error: ' . $e->getMessage());
+            return back()->with('error', 'حدث خطأ في تحميل صفحة مولد الأكواد');
+        }
+    }
+
+    /**
+     * توليد CRUD بـ AI
+     */
+    public function generateCrudWithAi(Request $request)
+    {
+        try {
+            $request->validate([
+                'description' => 'required|string|min:10|max:1000',
+                'model_name' => 'required|string|regex:/^[A-Z][a-zA-Z0-9]*$/',
+                'fields' => 'nullable|array',
+                'auto_save' => 'nullable|boolean'
+            ]);
+
+            $service = new \App\Services\AiCodeGeneratorService();
+            
+            $result = $service->generateCRUD(
+                $request->input('description'),
+                $request->input('model_name'),
+                $request->input('fields', [])
+            );
+
+            if ($result['success'] && $request->input('auto_save')) {
+                $saveResult = $service->saveGeneratedCode(
+                    $result['components'],
+                    $request->input('model_name')
+                );
+                $result['save_result'] = $saveResult;
+            }
+
+            return response()->json($result);
+        } catch (Exception $e) {
+            Log::error('AI CRUD Generation Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في توليد CRUD: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * توليد Migration بـ AI
+     */
+    public function generateMigrationWithAi(Request $request)
+    {
+        try {
+            $request->validate([
+                'table_name' => 'required|string|regex:/^[a-z_]+$/',
+                'description' => 'required|string|min:10|max:1000',
+                'fields' => 'nullable|array'
+            ]);
+
+            $service = new \App\Services\AiCodeGeneratorService();
+            
+            $result = $service->generateMigration(
+                $request->input('table_name'),
+                $request->input('description'),
+                $request->input('fields', [])
+            );
+
+            return response()->json($result);
+        } catch (Exception $e) {
+            Log::error('AI Migration Generation Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في توليد Migration: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * توليد API Resource بـ AI
+     */
+    public function generateApiResourceWithAi(Request $request)
+    {
+        try {
+            $request->validate([
+                'resource_name' => 'required|string|regex:/^[A-Z][a-zA-Z0-9]*$/',
+                'fields' => 'required|array|min:1'
+            ]);
+
+            $service = new \App\Services\AiCodeGeneratorService();
+            
+            $result = $service->generateApiResource(
+                $request->input('resource_name'),
+                $request->input('fields')
+            );
+
+            return response()->json($result);
+        } catch (Exception $e) {
+            Log::error('AI API Resource Generation Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في توليد API Resource: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * توليد Tests بـ AI
+     */
+    public function generateTestsWithAi(Request $request)
+    {
+        try {
+            $request->validate([
+                'model_name' => 'required|string|regex:/^[A-Z][a-zA-Z0-9]*$/',
+                'description' => 'required|string|min:10|max:1000'
+            ]);
+
+            $service = new \App\Services\AiCodeGeneratorService();
+            
+            $result = $service->generateTests(
+                $request->input('model_name'),
+                $request->input('description')
+            );
+
+            return response()->json($result);
+        } catch (Exception $e) {
+            Log::error('AI Tests Generation Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في توليد الاختبارات: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
