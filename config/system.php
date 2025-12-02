@@ -40,6 +40,42 @@ return [
     */
 
     'available_genes' => [
+        'ORGANIZATIONAL_STRUCTURE' => [
+            'name' => 'الهيكل التنظيمي',
+            'description' => 'إدارة الشركات القابضة والوحدات والأقسام والمشاريع',
+            'version' => '1.0.0',
+            'requires' => [],
+        ],
+        'INTERMEDIATE_ACCOUNTS' => [
+            'name' => 'الحسابات الوسيطة',
+            'description' => 'نظام الحسابات الوسيطة والعمليات المالية',
+            'version' => '1.0.0',
+            'requires' => ['ORGANIZATIONAL_STRUCTURE'],
+        ],
+        'CASH_BOXES' => [
+            'name' => 'الصناديق النقدية',
+            'description' => 'إدارة الصناديق النقدية والعمليات النقدية',
+            'version' => '1.0.0',
+            'requires' => ['INTERMEDIATE_ACCOUNTS'],
+        ],
+        'ACCOUNTING_REPORTS' => [
+            'name' => 'التقارير المحاسبية',
+            'description' => 'تقارير رقابية شاملة للعمليات المالية',
+            'version' => '1.0.0',
+            'requires' => ['INTERMEDIATE_ACCOUNTS'],
+        ],
+        'BUDGET_PLANNING' => [
+            'name' => 'تخطيط الميزانية',
+            'description' => 'نظام تخطيط ومراقبة الميزانيات',
+            'version' => '1.0.0',
+            'requires' => ['ORGANIZATIONAL_STRUCTURE'],
+        ],
+        'CLIENT_REQUIREMENTS' => [
+            'name' => 'متطلبات العملاء',
+            'description' => 'نظام إدارة متطلبات وطلبات العملاء',
+            'version' => '1.0.0',
+            'requires' => [],
+        ],
         'PARTNERSHIP_ACCOUNTING' => [
             'name' => 'محاسبة الشراكات',
             'description' => 'نظام محاسبة الشراكات والمشاريع المشتركة',
