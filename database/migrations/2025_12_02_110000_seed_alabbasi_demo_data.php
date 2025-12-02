@@ -24,8 +24,6 @@ return new class extends Migration
             'code' => 'ALABBASI',
             'name' => 'مجموعة العباسي القابضة',
             'name_en' => 'Al-Abbasi Holding Group',
-            'type' => 'holding',
-            'sector' => 'diversified',
             'email' => 'info@alabbasi.com.sa',
             'phone' => '+966 11 234 5678',
             'fax' => '+966 11 234 5679',
@@ -36,11 +34,11 @@ return new class extends Migration
             'postal_code' => '12211',
             'tax_number' => '300012345600003',
             'commercial_register' => '1010123456',
-            'capital' => 500000000.00,
+            'legal_form' => 'شركة مساهمة',
             'currency' => 'SAR',
             'fiscal_year_start' => '01-01',
-            'established_date' => '2010-01-01',
             'is_active' => true,
+            'notes' => 'الشركة القابضة الرئيسية لمجموعة العباسي - تأسست عام 2010',
             'created_by' => 1,
             'created_at' => now(),
             'updated_at' => now(),
@@ -187,8 +185,11 @@ return new class extends Migration
 
         // 4. إنشاء أقسام لكل محطة
         $departments = [];
-        $department_names = ['قسم المبيعات', 'قسم المحاسبة', 'قسم المخزون'];
-        $department_names_en = ['Sales Department', 'Accounting Department', 'Inventory Department'];
+        $department_types = [
+            ['name' => 'قسم المبيعات', 'name_en' => 'Sales Department', 'type' => 'sales'],
+            ['name' => 'قسم المحاسبة', 'name_en' => 'Accounting Department', 'type' => 'support'],
+            ['name' => 'قسم المخزون', 'name_en' => 'Inventory Department', 'type' => 'operational'],
+        ];
         
         foreach ($station_ids as $index => $station_id) {
             $station_code = $stations[$index]['code'];
@@ -197,9 +198,9 @@ return new class extends Migration
                     'unit_id' => $station_id,
                     'parent_id' => null,
                     'code' => $station_code . '-DEPT-' . ($i + 1),
-                    'name' => $department_names[$i],
-                    'name_en' => $department_names_en[$i],
-                    'type' => $i == 0 ? 'sales' : ($i == 1 ? 'support' : 'operational'),
+                    'name' => $department_types[$i]['name'],
+                    'name_en' => $department_types[$i]['name_en'],
+                    'type' => $department_types[$i]['type'],
                     'email' => strtolower($station_code) . '-dept' . ($i + 1) . '@alabbasi.com.sa',
                     'phone' => '+967 3 234 ' . (580 + ($index * 10) + $i),
                     'is_active' => true,
@@ -216,7 +217,6 @@ return new class extends Migration
 
         // 5. إنشاء 3 صناديق لكل محطة (9 صناديق إجمالاً)
         $cash_boxes = [];
-        $intermediate_accounts = [];
         
         foreach ($station_ids as $index => $station_id) {
             $station_code = $stations[$index]['code'];
@@ -229,6 +229,7 @@ return new class extends Migration
                     'code' => "{$station_code}-IA-{$i}",
                     'main_account_id' => null,
                     'is_active' => true,
+                    'description' => "حساب وسيط لصندوق {$i} في {$station_name}",
                     'created_by' => 1,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -236,18 +237,11 @@ return new class extends Migration
 
                 // إنشاء الصندوق
                 $cash_boxes[] = [
-                    'unit_id' => $station_id,
                     'code' => "{$station_code}-CB-{$i}",
                     'name' => "صندوق {$i} - {$station_name}",
-                    'name_en' => "Cash Box {$i} - " . $stations[$index]['name_en'],
-                    'type' => 'main',
-                    'currency' => 'YER',
-                    'opening_balance' => 100000.00,
-                    'current_balance' => 100000.00,
-                    'status' => 'active',
-                    'location' => $station_name,
+                    'balance' => 100000.00,
                     'is_active' => true,
-                    'intermediate_account_id' => $intermediate_account_id,
+                    'description' => "صندوق رقم {$i} في محطة {$station_name} - مرتبط بالحساب الوسيط {$station_code}-IA-{$i}",
                     'created_by' => 1,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -321,8 +315,8 @@ return new class extends Migration
         DB::table('alabasi_cash_boxes')->where('code', 'like', '%-CB-%')->delete();
         DB::table('alabasi_intermediate_accounts')->where('code', 'like', '%-IA-%')->delete();
         DB::table('departments')->where('code', 'like', '%-DEPT-%')->delete();
-        DB::table('units')->where('code', 'in', ['DAHMIYA', 'SABALIYA', 'GHALIL'])->delete();
-        DB::table('units')->where('code', 'in', ['ALABBASI-MAIN', 'HODEIDAH', 'MAABAR', 'SANAA'])->delete();
+        DB::table('units')->whereIn('code', ['DAHMIYA', 'SABALIYA', 'GHALIL'])->delete();
+        DB::table('units')->whereIn('code', ['ALABBASI-MAIN', 'HODEIDAH', 'MAABAR', 'SANAA'])->delete();
         DB::table('holdings')->where('code', 'ALABBASI')->delete();
 
         echo "\n❌ تم حذف البيانات التجريبية لنظام العباسي\n\n";
