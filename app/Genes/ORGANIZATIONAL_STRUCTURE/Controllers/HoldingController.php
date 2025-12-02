@@ -3,7 +3,7 @@
 namespace App\Genes\ORGANIZATIONAL_STRUCTURE\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Holding;
+use App\Genes\ORGANIZATIONAL_STRUCTURE\Models\Holding;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

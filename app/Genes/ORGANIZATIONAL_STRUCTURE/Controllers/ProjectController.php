@@ -3,9 +3,9 @@
 namespace App\Genes\ORGANIZATIONAL_STRUCTURE\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Project;
-use App\Models\Unit; // للاستخدام في العلاقات
-use App\Models\Department; // للاستخدام في العلاقات
+use App\Genes\ORGANIZATIONAL_STRUCTURE\Models\Project;
+use App\Genes\ORGANIZATIONAL_STRUCTURE\Models\Unit; // للاستخدام في العلاقات
+use App\Genes\ORGANIZATIONAL_STRUCTURE\Models\Department; // للاستخدام في العلاقات
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
