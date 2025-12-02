@@ -1551,8 +1551,7 @@ class DeveloperController extends Controller
         try {
             $data = [
                 'cache_driver' => config('cache.default'),
-                'cache_stats' => $this->getCacheStats(),
-                'cache_keys' => $this->getCacheKeys()
+                'cache_prefix' => config('cache.prefix', 'laravel_cache'),
             ];
             return view('developer.cache', $data);
         } catch (Exception $e) {
