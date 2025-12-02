@@ -1307,4 +1307,466 @@ class DeveloperController extends Controller
         return view("developer.permissions");
     }
 
+    // ========================================
+    // الخانات الفرعية الإضافية - v2.8.7
+    // ========================================
+
+    /**
+     * صفحة Debugbar
+     */
+    public function getDebugbar()
+    {
+        $data = [
+            'debugbar_enabled' => config('app.debug'),
+            'debugbar_collectors' => [
+                'queries' => 'Database Queries',
+                'routes' => 'Routes',
+                'views' => 'Views',
+                'events' => 'Events',
+                'exceptions' => 'Exceptions',
+                'logs' => 'Logs',
+                'cache' => 'Cache',
+            ]
+        ];
+        return view('developer.debugbar', $data);
+    }
+
+    /**
+     * صفحة Migrations
+     */
+    public function getMigrationsPage()
+    {
+        try {
+            $migrations = $this->getMigrations();
+            $pending = [];
+            $ran = [];
+            
+            // Get ran migrations
+            $ranMigrations = DB::table('migrations')->pluck('migration')->toArray();
+            
+            // Get all migration files
+            $migrationFiles = File::glob(database_path('migrations/*.php'));
+            
+            foreach ($migrationFiles as $file) {
+                $migrationName = str_replace('.php', '', basename($file));
+                if (in_array($migrationName, $ranMigrations)) {
+                    $ran[] = [
+                        'name' => $migrationName,
+                        'batch' => DB::table('migrations')->where('migration', $migrationName)->value('batch'),
+                        'file' => $file
+                    ];
+                } else {
+                    $pending[] = [
+                        'name' => $migrationName,
+                        'file' => $file
+                    ];
+                }
+            }
+            
+            return view('developer.migrations', [
+                'ran' => $ran,
+                'pending' => $pending,
+                'total' => count($migrationFiles)
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * صفحة Seeders
+     */
+    public function getSeedersPage()
+    {
+        try {
+            $seederFiles = File::glob(database_path('seeders/*.php'));
+            $seeders = [];
+            
+            foreach ($seederFiles as $file) {
+                $seederName = str_replace('.php', '', basename($file));
+                if ($seederName !== 'DatabaseSeeder') {
+                    $seeders[] = [
+                        'name' => $seederName,
+                        'file' => $file,
+                        'size' => File::size($file)
+                    ];
+                }
+            }
+            
+            return view('developer.seeders', [
+                'seeders' => $seeders,
+                'total' => count($seeders)
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * صفحة معلومات القاعدة
+     */
+    public function getDatabaseInfoPage()
+    {
+        return view('developer.database-info', $this->getDatabaseInfo());
+    }
+
+    /**
+     * صفحة تحسين القاعدة
+     */
+    public function getDatabaseOptimizePage()
+    {
+        try {
+            $tables = DB::select('SHOW TABLE STATUS');
+            $totalSize = 0;
+            $tableData = [];
+            
+            foreach ($tables as $table) {
+                $size = $table->Data_length + $table->Index_length;
+                $totalSize += $size;
+                $tableData[] = [
+                    'name' => $table->Name,
+                    'engine' => $table->Engine,
+                    'rows' => $table->Rows,
+                    'data_size' => $this->formatBytes($table->Data_length),
+                    'index_size' => $this->formatBytes($table->Index_length),
+                    'total_size' => $this->formatBytes($size),
+                    'collation' => $table->Collation
+                ];
+            }
+            
+            return view('developer.database-optimize', [
+                'tables' => $tableData,
+                'total_size' => $this->formatBytes($totalSize),
+                'total_tables' => count($tables)
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * تنفيذ تحسين القاعدة
+     */
+    public function runDatabaseOptimize(Request $request)
+    {
+        try {
+            $tables = Schema::getAllTables();
+            $optimized = [];
+            
+            foreach ($tables as $table) {
+                $tableName = array_values((array)$table)[0];
+                DB::statement("OPTIMIZE TABLE `{$tableName}`");
+                $optimized[] = $tableName;
+            }
+            
+            return back()->with('success', 'تم تحسين ' . count($optimized) . ' جدول بنجاح');
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * صفحة النسخ الاحتياطي
+     */
+    public function getDatabaseBackupPage()
+    {
+        try {
+            $backupPath = storage_path('app/backups');
+            if (!File::exists($backupPath)) {
+                File::makeDirectory($backupPath, 0755, true);
+            }
+            
+            $backups = [];
+            $files = File::files($backupPath);
+            
+            foreach ($files as $file) {
+                if (str_ends_with($file->getFilename(), '.sql')) {
+                    $backups[] = [
+                        'name' => $file->getFilename(),
+                        'size' => $this->formatBytes($file->getSize()),
+                        'date' => date('Y-m-d H:i:s', $file->getMTime()),
+                        'path' => $file->getPathname()
+                    ];
+                }
+            }
+            
+            return view('developer.database-backup', [
+                'backups' => $backups,
+                'total' => count($backups)
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * إنشاء نسخة احتياطية
+     */
+    public function createDatabaseBackup()
+    {
+        try {
+            $backupPath = storage_path('app/backups');
+            if (!File::exists($backupPath)) {
+                File::makeDirectory($backupPath, 0755, true);
+            }
+            
+            $filename = 'backup_' . date('Y-m-d_His') . '.sql';
+            $filepath = $backupPath . '/' . $filename;
+            
+            $database = env('DB_DATABASE');
+            $username = env('DB_USERNAME');
+            $password = env('DB_PASSWORD');
+            $host = env('DB_HOST');
+            
+            $command = "mysqldump -h {$host} -u {$username} -p{$password} {$database} > {$filepath}";
+            exec($command, $output, $returnVar);
+            
+            if ($returnVar === 0) {
+                return back()->with('success', 'تم إنشاء النسخة الاحتياطية بنجاح: ' . $filename);
+            } else {
+                return back()->with('error', 'فشل إنشاء النسخة الاحتياطية');
+            }
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * تحميل نسخة احتياطية
+     */
+    public function downloadBackup($file)
+    {
+        $filepath = storage_path('app/backups/' . $file);
+        if (File::exists($filepath)) {
+            return response()->download($filepath);
+        }
+        return back()->with('error', 'الملف غير موجود');
+    }
+
+    /**
+     * صفحة Cache
+     */
+    public function getCachePage()
+    {
+        try {
+            $data = [
+                'cache_driver' => config('cache.default'),
+                'cache_stats' => $this->getCacheStats(),
+                'cache_keys' => $this->getCacheKeys()
+            ];
+            return view('developer.cache', $data);
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * مسح جميع أنواع Cache
+     */
+    public function clearAllCache()
+    {
+        try {
+            Artisan::call('cache:clear');
+            Artisan::call('config:clear');
+            Artisan::call('route:clear');
+            Artisan::call('view:clear');
+            
+            return back()->with('success', 'تم مسح جميع أنواع الذاكرة المؤقتة بنجاح');
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * صفحة Laravel Pint
+     */
+    public function getPintPage()
+    {
+        try {
+            $pintExists = File::exists(base_path('vendor/bin/pint'));
+            return view('developer.pint', [
+                'pint_installed' => $pintExists,
+                'pint_config' => File::exists(base_path('pint.json'))
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * تشغيل Laravel Pint
+     */
+    public function runPintFormat(Request $request)
+    {
+        try {
+            $path = $request->input('path', 'app');
+            $output = [];
+            $returnVar = 0;
+            
+            exec('cd ' . base_path() . ' && ./vendor/bin/pint ' . $path, $output, $returnVar);
+            
+            return back()->with('success', 'تم تنسيق الكود بنجاح')->with('output', implode("\n", $output));
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * صفحة الاختبارات
+     */
+    public function getTestsPage()
+    {
+        try {
+            $testFiles = [];
+            $testPaths = [
+                'Feature' => base_path('tests/Feature'),
+                'Unit' => base_path('tests/Unit')
+            ];
+            
+            foreach ($testPaths as $type => $path) {
+                if (File::exists($path)) {
+                    $files = File::allFiles($path);
+                    foreach ($files as $file) {
+                        $testFiles[] = [
+                            'name' => $file->getFilename(),
+                            'type' => $type,
+                            'path' => $file->getPathname(),
+                            'size' => $this->formatBytes($file->getSize())
+                        ];
+                    }
+                }
+            }
+            
+            return view('developer.tests', [
+                'tests' => $testFiles,
+                'total' => count($testFiles)
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * تشغيل الاختبارات
+     */
+    public function executeTests(Request $request)
+    {
+        try {
+            $filter = $request->input('filter', '');
+            $output = [];
+            $returnVar = 0;
+            
+            $command = 'cd ' . base_path() . ' && php artisan test';
+            if ($filter) {
+                $command .= ' --filter=' . $filter;
+            }
+            
+            exec($command, $output, $returnVar);
+            
+            return back()->with('success', 'تم تشغيل الاختبارات')->with('output', implode("\n", $output));
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * صفحة قائمة Routes
+     */
+    public function getRoutesListPage()
+    {
+        try {
+            $routes = [];
+            foreach (\Route::getRoutes() as $route) {
+                $routes[] = [
+                    'method' => implode('|', $route->methods()),
+                    'uri' => $route->uri(),
+                    'name' => $route->getName(),
+                    'action' => $route->getActionName(),
+                    'middleware' => implode(', ', $route->middleware())
+                ];
+            }
+            
+            return view('developer.routes-list', [
+                'routes' => $routes,
+                'total' => count($routes)
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * صفحة معلومات الخادم
+     */
+    public function getServerInfoPage()
+    {
+        try {
+            $data = [
+                'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+                'php_version' => PHP_VERSION,
+                'laravel_version' => app()->version(),
+                'server_ip' => $_SERVER['SERVER_ADDR'] ?? 'Unknown',
+                'server_name' => $_SERVER['SERVER_NAME'] ?? 'Unknown',
+                'server_port' => $_SERVER['SERVER_PORT'] ?? 'Unknown',
+                'document_root' => $_SERVER['DOCUMENT_ROOT'] ?? 'Unknown',
+                'php_extensions' => get_loaded_extensions(),
+                'memory_limit' => ini_get('memory_limit'),
+                'max_execution_time' => ini_get('max_execution_time'),
+                'upload_max_filesize' => ini_get('upload_max_filesize'),
+                'post_max_size' => ini_get('post_max_size'),
+                'disk_free_space' => $this->formatBytes(disk_free_space('/')),
+                'disk_total_space' => $this->formatBytes(disk_total_space('/'))
+            ];
+            
+            return view('developer.server-info', $data);
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * صفحة عارض السجلات
+     */
+    public function getLogsViewerPage()
+    {
+        try {
+            $logPath = storage_path('logs');
+            $logFiles = [];
+            
+            if (File::exists($logPath)) {
+                $files = File::files($logPath);
+                foreach ($files as $file) {
+                    if (str_ends_with($file->getFilename(), '.log')) {
+                        $logFiles[] = [
+                            'name' => $file->getFilename(),
+                            'size' => $this->formatBytes($file->getSize()),
+                            'modified' => date('Y-m-d H:i:s', $file->getMTime()),
+                            'path' => $file->getPathname()
+                        ];
+                    }
+                }
+            }
+            
+            return view('developer.logs-viewer', [
+                'logs' => $logFiles,
+                'total' => count($logFiles)
+            ]);
+        } catch (Exception $e) {
+            return back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * دالة مساعدة لتنسيق حجم الملفات
+     */
+    private function formatBytes($bytes, $precision = 2)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+
 }
