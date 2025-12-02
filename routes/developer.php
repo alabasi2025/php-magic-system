@@ -13,9 +13,6 @@ use App\Http\Controllers\DeveloperController;
 |
 */
 
-// Dashboard
-Route::get('/developer', [DeveloperController::class, 'getDashboard'])->name('developer.dashboard');
-
 // Artisan Commands
 Route::prefix('developer/artisan')->name('developer.artisan.')->group(function () {
     Route::get('/', [DeveloperController::class, 'getArtisanCommands'])->name('index');
