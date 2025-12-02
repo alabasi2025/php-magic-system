@@ -128,3 +128,28 @@ Route::prefix('partnership')->name('partnership.')->group(function () {
     Route::get('/reports', [App\Http\Controllers\PartnershipController::class, 'reports'])->name('reports.index');
     Route::get('/settings', [App\Http\Controllers\PartnershipController::class, 'settings'])->name('settings');
 });
+
+// Organization Structure Routes
+use App\Http\Controllers\Organization\HoldingController;
+use App\Http\Controllers\Organization\UnitController;
+use App\Http\Controllers\Organization\DepartmentController;
+use App\Http\Controllers\Organization\ProjectController as OrgProjectController;
+
+Route::prefix('organization')->name('organization.')->group(function () {
+    // Holdings - الشركات القابضة
+    Route::resource('holdings', HoldingController::class);
+    
+    // Units - الوحدات
+    Route::resource('units', UnitController::class);
+    
+    // Departments - الأقسام
+    Route::resource('departments', DepartmentController::class);
+    
+    // Projects - المشاريع
+    Route::resource('projects', OrgProjectController::class);
+});
+
+// Shortcut routes (without organization prefix)
+Route::resource('holdings', HoldingController::class);
+Route::resource('units', UnitController::class);
+Route::resource('departments', DepartmentController::class);
