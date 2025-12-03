@@ -238,4 +238,7 @@ require __DIR__.'/code_metrics.php';
 require __DIR__.'/git_helper.php';
 
 // Migration Generator Routes (v3.23.0)
-require __DIR__.'/migration_generator.php';
+require __DIR__."/migration_generator.php";
+
+// Factory Generator Routes (v3.25.0)
+require __DIR__."/factory_generator.php";
