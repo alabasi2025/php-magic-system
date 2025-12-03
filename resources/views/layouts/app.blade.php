@@ -131,25 +131,30 @@
                         <span class="sidebar-text">الرئيسية</span>
                     </a>
                     
-                    <a href="{{ route('accounting.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
-                        <i class="fas fa-calculator w-6"></i>
-                        <span class="sidebar-text">المحاسبة</span>
-                    </a>
-                    
-                    <a href="{{ route('chart-of-accounts.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600">
-                        <i class="fas fa-book w-6"></i>
-                        <span class="sidebar-text">الأدلة المحاسبية المبسطة</span>
-                    </a>
-                    
-                    <a href="{{ route('intermediate-accounts.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600">
-                        <i class="fas fa-exchange-alt w-6"></i>
-                        <span class="sidebar-text">الحسابات الوسيطة</span>
-                    </a>
-                    
-                    <a href="{{ route('cash-boxes.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-green-50 text-gray-700 hover:text-green-600">
-                        <i class="fas fa-cash-register w-6"></i>
-                        <span class="sidebar-text">الصناديق النقدية</span>
-                    </a>
+                    <!-- النظام المحاسبي - Dropdown -->
+                    <div class="relative">
+                        <button onclick="toggleDropdown('accounting')" class="w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
+                            <div class="flex items-center space-x-3 space-x-reverse">
+                                <i class="fas fa-calculator w-6"></i>
+                                <span class="sidebar-text">النظام المحاسبي</span>
+                            </div>
+                            <i class="fas fa-chevron-down sidebar-text transition-transform" id="accounting-arrow"></i>
+                        </button>
+                        <div id="accounting-dropdown" class="hidden pr-6 space-y-1 mt-1">
+                            <a href="{{ route('chart-of-accounts.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 text-sm">
+                                <i class="fas fa-book w-5"></i>
+                                <span class="sidebar-text">الأدلة المحاسبية</span>
+                            </a>
+                            <a href="{{ route('intermediate-accounts.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 text-sm">
+                                <i class="fas fa-exchange-alt w-5"></i>
+                                <span class="sidebar-text">الحسابات الوسيطة</span>
+                            </a>
+                            <a href="{{ route('cash-boxes.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 text-sm">
+                                <i class="fas fa-cash-register w-5"></i>
+                                <span class="sidebar-text">الصناديق النقدية</span>
+                            </a>
+                        </div>
+                    </div>
                     
                     <a href="{{ route('customers.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
                         <i class="fas fa-users w-6"></i>
@@ -526,6 +531,20 @@
         
         function showLogs() {
             window.open('/logs', '_blank');
+        }
+        
+        // Dropdown functionality for sidebar
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id + '-dropdown');
+            const arrow = document.getElementById(id + '-arrow');
+            
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            } else {
+                dropdown.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
         }
     </script>
     
