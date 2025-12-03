@@ -2145,4 +2145,152 @@ class DeveloperController extends Controller
         }
     }
 
+    // ==================== Git Methods ====================
+    
+    public function getGitDashboard()
+    {
+        return view('developer.git.dashboard');
+    }
+    
+    public function getGitCommitPage()
+    {
+        return view('developer.git.commit');
+    }
+    
+    public function getGitHistory()
+    {
+        try {
+            $output = [];
+            exec('cd ' . base_path() . ' && git log --pretty=format:"%H|%an|%ad|%s" --date=short -20', $output);
+            
+            $commits = [];
+            foreach ($output as $line) {
+                $parts = explode('|', $line);
+                if (count($parts) === 4) {
+                    $commits[] = [
+                        'hash' => $parts[0],
+                        'author' => $parts[1],
+                        'date' => $parts[2],
+                        'message' => $parts[3]
+                    ];
+                }
+            }
+            
+            return response()->json(['commits' => $commits]);
+            
+        } catch (\Exception $e) {
+            return response()->json(['commits' => []], 500);
+        }
+    }
+    
+    public function getGitStatus()
+    {
+        try {
+            // Get current branch
+            $branch = trim(shell_exec('cd ' . base_path() . ' && git branch --show-current'));
+            
+            // Get modified files
+            $modifiedFiles = [];
+            exec('cd ' . base_path() . ' && git status --porcelain', $output);
+            foreach ($output as $line) {
+                if (!empty($line)) {
+                    $modifiedFiles[] = trim(substr($line, 3));
+                }
+            }
+            
+            // Get last commit
+            $lastCommit = trim(shell_exec('cd ' . base_path() . ' && git log -1 --pretty=format:"%s"'));
+            
+            return response()->json([
+                'branch' => $branch,
+                'modified_files' => $modifiedFiles,
+                'last_commit' => $lastCommit
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'branch' => 'unknown',
+                'modified_files' => [],
+                'last_commit' => 'N/A'
+            ], 500);
+        }
+    }
+    
+    public function gitCommit(Request $request)
+    {
+        try {
+            $message = $request->input('message');
+            
+            // Generate message if empty
+            if (empty($message)) {
+                $fileCount = 0;
+                exec('cd ' . base_path() . ' && git status --porcelain | wc -l', $output);
+                $fileCount = intval($output[0] ?? 0);
+                
+                $message = "feat: تحديث {$fileCount} ملف في النظام\n\n- تحسينات على نظام المطور\n- إضافة ميزات جديدة";
+            }
+            
+            // Git add all
+            exec('cd ' . base_path() . ' && git add .', $output, $returnCode);
+            
+            if ($returnCode !== 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'فشل git add'
+                ], 500);
+            }
+            
+            // Git commit
+            $escapedMessage = escapeshellarg($message);
+            exec('cd ' . base_path() . " && git commit -m {$escapedMessage}", $output, $returnCode);
+            
+            if ($returnCode !== 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'فشل git commit (ربما لا توجد تغييرات)'
+                ], 500);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'تم Commit بنجاح'
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function gitPush()
+    {
+        try {
+            // Get current branch
+            $branch = trim(shell_exec('cd ' . base_path() . ' && git branch --show-current'));
+            
+            // Git push
+            exec('cd ' . base_path() . " && git push origin {$branch} 2>&1", $output, $returnCode);
+            
+            if ($returnCode !== 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'فشل git push: ' . implode('\n', $output)
+                ], 500);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => "تم Push إلى فرع {$branch} بنجاح"
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

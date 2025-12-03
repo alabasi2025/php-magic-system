@@ -747,6 +747,31 @@
                                     </a>
                                 </div>
                             </div>
+                            
+                            <!-- 6. Git والنشر -->
+                            <div class="mb-2">
+                                <button onclick="toggleSubMenu('git-menu')" class="w-full flex items-center justify-between space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 text-gray-700 transition-all duration-200">
+                                    <div class="flex items-center space-x-2 space-x-reverse">
+                                        <i class="fab fa-git-alt w-5 text-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                                        <span class="sidebar-text text-sm font-medium">Git والنشر</span>
+                                    </div>
+                                    <i id="git-menu-icon" class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
+                                </button>
+                                <div id="git-menu" class="hidden mr-4 mt-1 space-y-1">
+                                    <a href="{{ route('developer.git.dashboard') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>لوحة Git</span>
+                                    </a>
+                                    <a href="{{ route('developer.git.commit') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-emerald-50 text-gray-600 hover:text-emerald-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>Commit & Push</span>
+                                    </a>
+                                    <a href="{{ route('developer.git.history') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-teal-50 text-gray-600 hover:text-teal-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>سجل التغييرات</span>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </nav>

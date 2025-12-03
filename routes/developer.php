@@ -177,6 +177,14 @@ Route::get('/developer/logs-viewer', [DeveloperController::class, 'getLogsViewer
 Route::get('/developer/logs-viewer/{file}', [DeveloperController::class, 'viewLogFile'])->name('developer.logs-viewer.file');
 Route::delete('/developer/logs-viewer/{file}', [DeveloperController::class, 'deleteLogFile'])->name('developer.logs-viewer.delete');
 
+// Git والنشر
+Route::get('/developer/git/dashboard', [DeveloperController::class, 'getGitDashboard'])->name('developer.git.dashboard');
+Route::get('/developer/git/commit', [DeveloperController::class, 'getGitCommitPage'])->name('developer.git.commit');
+Route::post('/developer/git/commit', [DeveloperController::class, 'gitCommit'])->name('developer.git.commit.post');
+Route::post('/developer/git/push', [DeveloperController::class, 'gitPush'])->name('developer.git.push');
+Route::get('/developer/git/history', [DeveloperController::class, 'getGitHistory'])->name('developer.git.history');
+Route::get('/developer/git/status', [DeveloperController::class, 'getGitStatus'])->name('developer.git.status');
+
 // Main Developer Dashboard
 Route::get('/developer', [DeveloperController::class, 'getDashboard'])->name('developer.index');
 Route::get('/developer/vue-dashboard', [DeveloperController::class, 'getVueDashboard'])->name('developer.vue-dashboard');
