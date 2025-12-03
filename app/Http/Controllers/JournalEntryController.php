@@ -13,13 +13,13 @@ class JournalEntryController extends Controller
     public function index()
     {
         $entries = JournalEntry::with('lines')->orderByDesc('date')->paginate(15);
-        return response()->json($entries);
+        return view('journal-entries.index', compact('entries'));
     }
 
     public function show($id)
     {
         $entry = JournalEntry::with('lines')->findOrFail($id);
-        return response()->json($entry);
+        return view('journal-entries.show', compact('entry'));
     }
 
     public function store(Request $request)
