@@ -125,10 +125,10 @@
                 const mockResponse = await new Promise(resolve => setTimeout(() => {
                     const mockCode = `<?php
 
-namespace Tests\\${testType === 'unit' ? 'Unit' : 'Feature'};
+namespace Tests\\\\${testType === 'unit' ? 'Unit' : 'Feature'};
 
-use PHPUnit\\Framework\\TestCase; // أو use function Pest\\test;
-use App\\Services\\CodeToTest; // مثال على الكلاس المراد اختباره
+use PHPUnit\\\\Framework\\\\TestCase; // أو use function Pest\\\\test;
+use App\\\\Services\\\\CodeToTest; // مثال على الكلاس المراد اختباره
 
 ${framework === 'phpunit' ? 'class CodeToTestTest extends TestCase' : 'test(\'it can generate a basic test\', function ()'}
 {
