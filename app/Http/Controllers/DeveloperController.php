@@ -2110,4 +2110,39 @@ class DeveloperController extends Controller
         }
     }
 
+    // عارض سجلات المهام
+    public function getTaskViewerPage()
+    {
+        return view('developer.ai.task-viewer');
+    }
+
+    public function getTaskDetails($taskId)
+    {
+        try {
+            $apiKey = \App\Models\AiSetting::get('manus_api_key');
+            
+            if (empty($apiKey)) {
+                return response()->json([
+                    'error' => 'API Key غير موجود. الرجاء إضافته في الإعدادات.'
+                ], 400);
+            }
+
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'API_KEY' => $apiKey,
+            ])->get("https://api.manus.ai/v1/tasks/{$taskId}");
+
+            if ($response->successful()) {
+                return response()->json($response->json());
+            } else {
+                return response()->json([
+                    'error' => 'Task غير موجود أو حدث خطأ في الاتصال'
+                ], $response->status());
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'خطأ في الاتصال: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

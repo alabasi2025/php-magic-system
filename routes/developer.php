@@ -136,6 +136,10 @@ Route::get('/developer/ai/settings', [DeveloperController::class, 'getAiSettings
 Route::post('/developer/ai/settings', [DeveloperController::class, 'updateAiSettings'])->name('ai.settings.post');
 Route::post('/developer/ai/test-connection', [DeveloperController::class, 'testManusConnection'])->name('ai.test-connection');
 
+// 14. عارض سجلات المهام
+Route::get('/developer/ai/task-viewer', [DeveloperController::class, 'getTaskViewerPage'])->name('ai.task-viewer');
+Route::get('/developer/ai/task/{taskId}', [DeveloperController::class, 'getTaskDetails'])->name('ai.task-details');
+
 
 // ========================================
 // الخانات الفرعية الإضافية - v2.8.8
