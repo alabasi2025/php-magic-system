@@ -15,6 +15,7 @@ use App\Http\Controllers\LoyaltyController;
 use App\Http\Controllers\InsuranceController;
 use App\Http\Controllers\GeneController;
 use App\Http\Controllers\ChartOfAccountsController;
+use App\Http\Controllers\MasterChartController;
 use App\Http\Controllers\CashBoxController;
 
 /*
@@ -42,6 +43,13 @@ Route::prefix('chart-of-accounts')->name('chart-of-accounts.')->group(function (
     Route::post('/add-account', [ChartOfAccountsController::class, 'addAccount'])->name('add-account');
     Route::put('/update-account/{id}', [ChartOfAccountsController::class, 'updateAccount'])->name('update-account');
     Route::delete('/delete-account/{id}', [ChartOfAccountsController::class, 'deleteAccount'])->name('delete-account');
+});
+
+// Master Chart Routes
+Route::prefix('master-chart')->name('master-chart.')->group(function () {
+    Route::get('/unit/{unitId}', [MasterChartController::class, 'show'])->name('show');
+    Route::get('/unit/{unitId}/intermediate', [MasterChartController::class, 'showIntermediateMaster'])->name('intermediate');
+    Route::post('/unit/{unitId}/initialize', [MasterChartController::class, 'initialize'])->name('initialize');
 });
 
 // Cash Boxes Routes
