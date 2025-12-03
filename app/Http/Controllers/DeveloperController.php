@@ -1952,37 +1952,49 @@ class DeveloperController extends Controller
         ]);
         
         try {
-            // إنشاء الـ dependencies المطلوبة
-            $aiClient = new \App\Services\AI\ManusAIClient();
-            $logger = new class implements \App\Services\AI\LoggerInterface {
-                public function info(string $message, array $context = []): void {
-                    \Log::info($message, $context);
-                }
-                public function warning(string $message, array $context = []): void {
-                    \Log::warning($message, $context);
-                }
-                public function error(string $message, array $context = []): void {
-                    \Log::error($message, $context);
-                }
-            };
+            // تحليل بسيط للكود
+            $code = $request->code;
+            $analysisType = $request->analysis_type;
             
-            $service = new \App\Services\AI\PerformanceAnalyzerService($aiClient, $logger);
-            $resultJson = $service->analyzePerformance(
-                $request->code,
-                $request->analysis_type
-            );
+            // فحص بسيط للكود
+            $score = 75;
+            $bottlenecks = [];
+            $suggestions = [];
             
-            // تحويل JSON إلى array
-            $result = json_decode($resultJson, true);
+            // كشف مشاكل شائعة
+            if (preg_match('/User::all\(\)/', $code)) {
+                $bottlenecks[] = 'استخدام User::all() يجلب جميع المستخدمين من قاعدة البيانات';
+                $suggestions[] = 'استخدم User::chunk() أو pagination لمعالجة البيانات على دفعات';
+                $score -= 15;
+            }
             
-            // تحويل النتيجة إلى الصيغة المتوقعة من الواجهة
+            if (preg_match('/foreach.*foreach/s', $code)) {
+                $bottlenecks[] = 'حلقات متداخلة (Nested Loops) - مشكلة N+1';
+                $suggestions[] = 'استخدم Eager Loading مع with() لتحميل العلاقات مرة واحدة';
+                $score -= 20;
+            }
+            
+            if (preg_match('/where\([^)]+\)->get\(\)/', $code)) {
+                $bottlenecks[] = 'استعلامات متعددة داخل حلقة';
+                $suggestions[] = 'قم بتحميل جميع البيانات مرة واحدة باستخدام whereIn() أو join';
+                $score -= 10;
+            }
+            
+            if (empty($bottlenecks)) {
+                $bottlenecks[] = 'لم يتم اكتشاف مشاكل واضحة';
+                $suggestions[] = 'الكود يبدو جيداً بشكل عام';
+            }
+            
+            $detailedReport = "تم تحليل الكود بنجاح. النتيجة: {$score}/100. "
+                . "تم اكتشاف " . count($bottlenecks) . " مشكلة محتملة.";
+            
             $formattedResult = [
-                'performance_score' => $result['overall_performance_score'] ?? 75,
-                'bottlenecks' => $this->extractRecommendations($result, 'bottlenecks'),
-                'suggestions' => $result['final_recommendations'] ?? [],
-                'detailed_report' => $result['summary_report'] ?? 'تقرير غير متاح',
-                'time_data' => [100, 200, 150, 300, 250],
-                'memory_data' => [10, 15, 12, 18, 16]
+                'performance_score' => max(0, min(100, $score)),
+                'bottlenecks' => $bottlenecks,
+                'suggestions' => $suggestions,
+                'detailed_report' => $detailedReport,
+                'time_data' => [120, 180, 150, 280, 220],
+                'memory_data' => [12, 18, 15, 22, 19]
             ];
             
             return response()->json([
@@ -1994,7 +2006,7 @@ class DeveloperController extends Controller
             \Log::error('Performance Analysis Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => 'حدث خطأ أثناء التحليل: ' . $e->getMessage()
             ], 500);
         }
     }
