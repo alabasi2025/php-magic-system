@@ -2,176 +2,173 @@
 @section('title', 'إدارة الصناديق النقدية')
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-800">إدارة الصناديق النقدية</h1>
-            <p class="text-gray-600 mt-2">إدارة وتتبع الصناديق النقدية المرتبطة بالحسابات الوسيطة</p>
+    <!-- Header with Gradient -->
+    <div class="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 rounded-2xl shadow-2xl p-8 mb-8 text-white">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold mb-2 flex items-center">
+                    <i class="fas fa-cash-register mr-3"></i>
+                    إدارة الصناديق النقدية
+                </h1>
+                <p class="text-green-100 text-lg">
+                    <i class="fas fa-link mr-2"></i>
+                    إدارة وتتبع الصناديق النقدية المرتبطة بالحسابات الوسيطة
+                </p>
+            </div>
+            <a href="{{ route('cash-boxes.create') }}" 
+               class="bg-white text-green-600 hover:bg-green-50 px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-plus mr-2"></i>إضافة صندوق جديد
+            </a>
         </div>
-        <a href="{{ route('cash-boxes.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md transition-colors">
-            <i class="fas fa-plus mr-2"></i>إضافة صندوق جديد
-        </a>
     </div>
 
     @if(session('success'))
-    <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-md">
+    <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-lg shadow-md">
         <div class="flex items-center">
-            <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
-            <p class="text-green-700">{{ session('success') }}</p>
+            <i class="fas fa-check-circle text-green-500 text-2xl mr-3"></i>
+            <p class="text-green-700 font-semibold">{{ session('success') }}</p>
         </div>
     </div>
     @endif
 
     @if(session('error'))
-    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md">
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg shadow-md">
         <div class="flex items-center">
-            <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3"></i>
-            <p class="text-red-700">{{ session('error') }}</p>
+            <i class="fas fa-exclamation-circle text-red-500 text-2xl mr-3"></i>
+            <p class="text-red-700 font-semibold">{{ session('error') }}</p>
         </div>
     </div>
     @endif
 
     @if(isset($error))
-    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md">
-        <p class="text-red-700">{{ $error }}</p>
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg shadow-md">
+        <div class="flex items-center">
+            <i class="fas fa-times-circle text-red-500 text-2xl mr-3"></i>
+            <p class="text-red-700 font-semibold">{{ $error }}</p>
+        </div>
     </div>
     @endif
 
     @if($cashBoxes->isEmpty())
-    <div class="bg-blue-50 border-l-4 border-blue-500 p-8 text-center rounded-md">
-        <i class="fas fa-cash-register text-blue-500 text-5xl mb-4"></i>
-        <p class="text-blue-700 text-xl font-semibold">لا توجد صناديق نقدية حالياً</p>
-        <p class="text-blue-600 mt-2">ابدأ بإنشاء صندوق نقدي جديد مرتبط بحساب وسيط</p>
-        <a href="{{ route('cash-boxes.create') }}" class="inline-block mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg">
-            إنشاء صندوق الآن
-        </a>
+    <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-dashed border-green-300 rounded-2xl p-12 text-center shadow-lg">
+        <div class="max-w-md mx-auto">
+            <i class="fas fa-cash-register text-green-400 text-7xl mb-6 animate-bounce"></i>
+            <h3 class="text-2xl font-bold text-green-800 mb-3">لا توجد صناديق نقدية حالياً</h3>
+            <p class="text-green-600 text-lg mb-6">ابدأ بإنشاء صندوق نقدي جديد مرتبط بحساب وسيط</p>
+            <a href="{{ route('cash-boxes.create') }}" 
+               class="inline-block bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <i class="fas fa-plus-circle mr-2"></i>إنشاء صندوق الآن
+            </a>
+        </div>
     </div>
     @else
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        الرمز
-                    </th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        اسم الصندوق
-                    </th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        الوحدة التنظيمية
-                    </th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        الحساب الوسيط
-                    </th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        الرصيد
-                    </th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        الحالة
-                    </th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        الإجراءات
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @foreach($cashBoxes as $cashBox)
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm font-mono text-gray-900 bg-gray-100 px-2 py-1 rounded">
-                            {{ $cashBox->code }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center">
-                            <div class="bg-blue-100 p-2 rounded-lg mr-3">
-                                <i class="fas fa-cash-register text-blue-600"></i>
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gradient-to-r from-green-600 to-emerald-600">
+                    <tr>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase tracking-wider">
+                            <i class="fas fa-hashtag mr-2"></i>الرمز
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase tracking-wider">
+                            <i class="fas fa-tag mr-2"></i>الاسم
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase tracking-wider">
+                            <i class="fas fa-building mr-2"></i>الوحدة
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase tracking-wider">
+                            <i class="fas fa-exchange-alt mr-2"></i>الحساب الوسيط
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase tracking-wider">
+                            <i class="fas fa-wallet mr-2"></i>الرصيد
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase tracking-wider">
+                            <i class="fas fa-toggle-on mr-2"></i>الحالة
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase tracking-wider">
+                            <i class="fas fa-cogs mr-2"></i>الإجراءات
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach($cashBoxes as $cashBox)
+                    <tr class="hover:bg-green-50 transition-colors duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">
+                                {{ $cashBox->code }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-cash-register text-green-600 ml-3"></i>
+                                <span class="text-gray-900 font-semibold">{{ $cashBox->name }}</span>
                             </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ $cashBox->name }}
-                                </div>
-                                @if($cashBox->description)
-                                <div class="text-xs text-gray-500 mt-1">
-                                    {{ Str::limit($cashBox->description, 50) }}
-                                </div>
-                                @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-gray-700">{{ $cashBox->unit->name ?? '-' }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-gray-700">{{ $cashBox->intermediateAccount->name ?? '-' }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-lg font-bold text-green-600">
+                                {{ number_format($cashBox->balance, 2) }} ريال
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($cashBox->is_active)
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold flex items-center w-fit">
+                                    <i class="fas fa-check-circle mr-1"></i>نشط
+                                </span>
+                            @else
+                                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-bold flex items-center w-fit">
+                                    <i class="fas fa-times-circle mr-1"></i>غير نشط
+                                </span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <div class="flex space-x-2 space-x-reverse">
+                                <a href="{{ route('cash-boxes.show', $cashBox->id) }}" 
+                                   class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors shadow-md hover:shadow-lg transform hover:scale-105">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ route('cash-boxes.edit', $cashBox->id) }}" 
+                                   class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg transition-colors shadow-md hover:shadow-lg transform hover:scale-105">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('cash-boxes.destroy', $cashBox->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" 
+                                            onclick="return confirm('هل أنت متأكد من حذف هذا الصندوق؟')"
+                                            class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-colors shadow-md hover:shadow-lg transform hover:scale-105">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">
-                            {{ $cashBox->unit ? $cashBox->unit->name : 'غير محدد' }}
-                        </div>
-                        @if($cashBox->unit)
-                        <div class="text-xs text-gray-500">
-                            {{ $cashBox->unit->code }}
-                        </div>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4">
-                        @if($cashBox->intermediateAccount)
-                        <div class="text-sm text-gray-900">
-                            {{ $cashBox->intermediateAccount->name }}
-                        </div>
-                        <div class="text-xs text-gray-500">
-                            {{ $cashBox->intermediateAccount->code }}
-                        </div>
-                        @else
-                        <span class="text-xs text-red-500">غير مرتبط</span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm font-semibold {{ $cashBox->balance >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                            {{ number_format($cashBox->balance, 2) }} ريال
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @if($cashBox->is_active)
-                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            <i class="fas fa-check-circle mr-1"></i> نشط
-                        </span>
-                        @else
-                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                            <i class="fas fa-times-circle mr-1"></i> غير نشط
-                        </span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div class="flex items-center space-x-2 space-x-reverse">
-                            <a href="{{ route('cash-boxes.show', $cashBox->id) }}" 
-                               class="text-blue-600 hover:text-blue-900 transition-colors" 
-                               title="عرض">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{{ route('cash-boxes.edit', $cashBox->id) }}" 
-                               class="text-yellow-600 hover:text-yellow-900 transition-colors" 
-                               title="تعديل">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{ route('cash-boxes.destroy', $cashBox->id) }}" 
-                                  method="POST" 
-                                  class="inline"
-                                  onsubmit="return confirm('هل أنت متأكد من حذف هذا الصندوق؟');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" 
-                                        class="text-red-600 hover:text-red-900 transition-colors" 
-                                        title="حذف">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- Pagination -->
+    @if($cashBoxes->hasPages())
     <div class="mt-6">
         {{ $cashBoxes->links() }}
     </div>
     @endif
+    @endif
 </div>
+
+<style>
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+.animate-bounce {
+    animation: bounce 2s infinite;
+}
+</style>
 @endsection
