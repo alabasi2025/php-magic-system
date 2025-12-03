@@ -1,0 +1,695 @@
+<?php
+
+/**
+ * 🧬 Gene: SeederGeneratorService
+ * 
+ * خدمة توليد الـ Seeders بشكل ذكي
+ * 
+ * @version 1.0.0
+ * @since 2025-12-03
+ * @category Services
+ * @package App\Services
+ */
+
+namespace App\Services;
+
+use App\Models\SeederGeneration;
+use App\Models\SeederTemplate;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+
+class SeederGeneratorService
+{
+    /**
+     * مسار مجلد الـ seeders
+     */
+    protected string $seedersPath;
+
+    /**
+     * خدمة الذكاء الاصطناعي
+     */
+    protected SeederAIService $aiService;
+
+    /**
+     * Constructor
+     */
+    public function __construct(SeederAIService $aiService)
+    {
+        $this->seedersPath = database_path('seeders');
+        $this->aiService = $aiService;
+    }
+
+    /**
+     * توليد seeder من وصف نصي
+     */
+    public function generateFromText(
+        string $description,
+        string $inputMethod = 'web',
+        ?int $userId = null
+    ): SeederGeneration {
+        // تحليل الوصف النصي
+        $parsed = $this->parseTextDescription($description);
+        
+        // إنشاء سجل في قاعدة البيانات
+        $generation = SeederGeneration::create([
+            'name' => $parsed['name'],
+            'description' => $description,
+            'table_name' => $parsed['table_name'],
+            'model_name' => $parsed['model_name'],
+            'count' => $parsed['count'],
+            'input_method' => $inputMethod,
+            'input_data' => $parsed,
+            'generated_content' => '',
+            'use_ai' => $parsed['use_ai'] ?? false,
+            'ai_provider' => $parsed['ai_provider'] ?? null,
+            'status' => SeederGeneration::STATUS_DRAFT,
+            'created_by' => $userId,
+        ]);
+
+        // توليد المحتوى
+        $content = $this->buildSeederContent($parsed);
+        
+        // حفظ المحتوى
+        $generation->update([
+            'generated_content' => $content,
+            'status' => SeederGeneration::STATUS_GENERATED,
+        ]);
+
+        return $generation;
+    }
+
+    /**
+     * توليد seeder من JSON Schema
+     */
+    public function generateFromJson(
+        array $schema,
+        string $inputMethod = 'json',
+        ?int $userId = null
+    ): SeederGeneration {
+        // التحقق من صحة الـ schema
+        $this->validateJsonSchema($schema);
+        
+        // إنشاء سجل في قاعدة البيانات
+        $generation = SeederGeneration::create([
+            'name' => $schema['name'] ?? $this->generateSeederName($schema['table_name']),
+            'description' => $schema['description'] ?? null,
+            'table_name' => $schema['table_name'],
+            'model_name' => $schema['model_name'] ?? $this->getModelName($schema['table_name']),
+            'count' => $schema['count'] ?? 10,
+            'input_method' => $inputMethod,
+            'input_data' => $schema,
+            'generated_content' => '',
+            'use_ai' => $schema['use_ai'] ?? false,
+            'ai_provider' => $schema['ai_provider'] ?? null,
+            'status' => SeederGeneration::STATUS_DRAFT,
+            'created_by' => $userId,
+        ]);
+
+        // توليد المحتوى
+        $content = $this->buildSeederFromJson($schema);
+        
+        // حفظ المحتوى
+        $generation->update([
+            'generated_content' => $content,
+            'status' => SeederGeneration::STATUS_GENERATED,
+        ]);
+
+        return $generation;
+    }
+
+    /**
+     * توليد seeder من قالب جاهز
+     */
+    public function generateFromTemplate(
+        int $templateId,
+        ?int $count = null,
+        string $inputMethod = 'template',
+        ?int $userId = null
+    ): SeederGeneration {
+        // الحصول على القالب
+        $template = SeederTemplate::findOrFail($templateId);
+        
+        // زيادة عداد الاستخدام
+        $template->incrementUsage();
+        
+        // استخدام schema القالب
+        $schema = $template->schema;
+        $schema['count'] = $count ?? $template->default_count;
+        $schema['table_name'] = $template->table_name;
+        $schema['model_name'] = $template->model_name;
+        
+        // توليد من JSON
+        return $this->generateFromJson($schema, $inputMethod, $userId);
+    }
+
+    /**
+     * توليد seeder من جدول موجود (Reverse Engineering)
+     */
+    public function generateFromTable(
+        string $tableName,
+        int $count = 10,
+        string $inputMethod = 'reverse',
+        ?int $userId = null
+    ): SeederGeneration {
+        // الحصول على بنية الجدول
+        $columns = $this->getTableColumns($tableName);
+        
+        // بناء schema من الأعمدة
+        $schema = [
+            'table_name' => $tableName,
+            'model_name' => $this->getModelName($tableName),
+            'count' => $count,
+            'columns' => $this->mapColumnsToSchema($columns),
+        ];
+        
+        // توليد من JSON
+        return $this->generateFromJson($schema, $inputMethod, $userId);
+    }
+
+    /**
+     * تحليل الوصف النصي
+     */
+    protected function parseTextDescription(string $description): array
+    {
+        $parsed = [
+            'name' => '',
+            'table_name' => '',
+            'model_name' => '',
+            'count' => 10,
+            'columns' => [],
+            'use_ai' => false,
+        ];
+
+        // استخراج اسم الجدول
+        if (preg_match('/جدول\s+(\w+)/u', $description, $matches)) {
+            $parsed['table_name'] = $matches[1];
+        } elseif (preg_match('/table\s+(\w+)/i', $description, $matches)) {
+            $parsed['table_name'] = $matches[1];
+        }
+
+        // استخراج العدد
+        if (preg_match('/(\d+)\s+(سجل|منتج|مستخدم|طلب|عنصر)/u', $description, $matches)) {
+            $parsed['count'] = (int) $matches[1];
+        } elseif (preg_match('/(\d+)\s+(record|product|user|order|item)/i', $description, $matches)) {
+            $parsed['count'] = (int) $matches[1];
+        }
+
+        // توليد الأسماء
+        if ($parsed['table_name']) {
+            $parsed['name'] = $this->generateSeederName($parsed['table_name']);
+            $parsed['model_name'] = $this->getModelName($parsed['table_name']);
+        }
+
+        // استخراج الأعمدة (بسيط)
+        $parsed['columns'] = $this->extractColumnsFromText($description);
+
+        return $parsed;
+    }
+
+    /**
+     * استخراج الأعمدة من النص
+     */
+    protected function extractColumnsFromText(string $description): array
+    {
+        $columns = [];
+        
+        // أنماط شائعة
+        $patterns = [
+            'name' => ['اسم', 'name'],
+            'email' => ['بريد', 'ايميل', 'email'],
+            'phone' => ['هاتف', 'جوال', 'phone'],
+            'price' => ['سعر', 'price'],
+            'description' => ['وصف', 'description'],
+            'image' => ['صورة', 'image'],
+            'title' => ['عنوان', 'title'],
+            'content' => ['محتوى', 'content'],
+            'status' => ['حالة', 'status'],
+        ];
+
+        foreach ($patterns as $column => $keywords) {
+            foreach ($keywords as $keyword) {
+                if (stripos($description, $keyword) !== false) {
+                    $columns[$column] = $this->getDefaultColumnType($column);
+                    break;
+                }
+            }
+        }
+
+        return $columns;
+    }
+
+    /**
+     * الحصول على نوع العمود الافتراضي
+     */
+    protected function getDefaultColumnType(string $column): array
+    {
+        $types = [
+            'name' => ['type' => 'name'],
+            'email' => ['type' => 'email', 'unique' => true],
+            'phone' => ['type' => 'phone'],
+            'price' => ['type' => 'price', 'min' => 10, 'max' => 10000],
+            'description' => ['type' => 'text', 'sentences' => 3],
+            'image' => ['type' => 'imageUrl'],
+            'title' => ['type' => 'sentence'],
+            'content' => ['type' => 'paragraph'],
+            'status' => ['type' => 'enum', 'values' => ['active', 'inactive']],
+        ];
+
+        return $types[$column] ?? ['type' => 'text'];
+    }
+
+    /**
+     * بناء محتوى الـ Seeder
+     */
+    protected function buildSeederContent(array $parsed): string
+    {
+        $className = $this->getSeederClassName($parsed['table_name']);
+        $modelName = $parsed['model_name'];
+        $tableName = $parsed['table_name'];
+        $count = $parsed['count'];
+        
+        $content = "<?php\n\n";
+        $content .= "namespace Database\\Seeders;\n\n";
+        $content .= "use Illuminate\\Database\\Seeder;\n";
+        $content .= "use App\\Models\\{$modelName};\n";
+        $content .= "use Faker\\Factory as Faker;\n";
+        
+        // إضافة Hash إذا كان هناك password
+        if (isset($parsed['columns']['password'])) {
+            $content .= "use Illuminate\\Support\\Facades\\Hash;\n";
+        }
+        
+        $content .= "\n/**\n";
+        $content .= " * 🧬 Seeder: {$className}\n";
+        $content .= " * \n";
+        $content .= " * توليد بيانات وهمية لجدول {$tableName}\n";
+        $content .= " * \n";
+        $content .= " * @version 1.0.0\n";
+        $content .= " * @since " . date('Y-m-d') . "\n";
+        $content .= " */\n";
+        $content .= "class {$className} extends Seeder\n";
+        $content .= "{\n";
+        $content .= "    public function run(): void\n";
+        $content .= "    {\n";
+        $content .= "        \$faker = Faker::create('ar_SA');\n\n";
+        $content .= "        for (\$i = 0; \$i < {$count}; \$i++) {\n";
+        $content .= "            {$modelName}::create([\n";
+        
+        // إضافة الأعمدة
+        foreach ($parsed['columns'] as $column => $config) {
+            $fakerCode = $this->getFakerCode($column, $config);
+            $content .= "                '{$column}' => {$fakerCode}, // {$this->getColumnComment($column)}\n";
+        }
+        
+        $content .= "            ]);\n";
+        $content .= "        }\n";
+        $content .= "    }\n";
+        $content .= "}\n";
+
+        return $content;
+    }
+
+    /**
+     * بناء Seeder من JSON Schema
+     */
+    protected function buildSeederFromJson(array $schema): string
+    {
+        $className = $this->getSeederClassName($schema['table_name']);
+        $modelName = $schema['model_name'];
+        $tableName = $schema['table_name'];
+        $count = $schema['count'];
+        $columns = $schema['columns'] ?? [];
+        
+        $content = "<?php\n\n";
+        $content .= "namespace Database\\Seeders;\n\n";
+        $content .= "use Illuminate\\Database\\Seeder;\n";
+        $content .= "use App\\Models\\{$modelName};\n";
+        $content .= "use Faker\\Factory as Faker;\n";
+        
+        // التحقق من الحاجة لـ Hash
+        $needsHash = false;
+        foreach ($columns as $column => $config) {
+            if (($config['type'] ?? '') === 'password') {
+                $needsHash = true;
+                break;
+            }
+        }
+        
+        if ($needsHash) {
+            $content .= "use Illuminate\\Support\\Facades\\Hash;\n";
+        }
+        
+        // التحقق من الحاجة لـ Foreign Keys
+        $foreignKeys = [];
+        foreach ($columns as $column => $config) {
+            if (($config['type'] ?? '') === 'foreignKey') {
+                $foreignModel = $config['model'] ?? null;
+                if ($foreignModel && !in_array($foreignModel, $foreignKeys)) {
+                    $foreignKeys[] = $foreignModel;
+                }
+            }
+        }
+        
+        foreach ($foreignKeys as $foreignModel) {
+            $content .= "use App\\Models\\{$foreignModel};\n";
+        }
+        
+        $content .= "\n/**\n";
+        $content .= " * 🧬 Seeder: {$className}\n";
+        $content .= " * \n";
+        $content .= " * توليد بيانات وهمية لجدول {$tableName}\n";
+        $content .= " * \n";
+        $content .= " * @version 1.0.0\n";
+        $content .= " * @since " . date('Y-m-d') . "\n";
+        $content .= " */\n";
+        $content .= "class {$className} extends Seeder\n";
+        $content .= "{\n";
+        $content .= "    public function run(): void\n";
+        $content .= "    {\n";
+        
+        // Locale
+        $locale = $schema['locale'] ?? 'ar_SA';
+        $content .= "        \$faker = Faker::create('{$locale}');\n";
+        
+        // الحصول على IDs للـ Foreign Keys
+        foreach ($foreignKeys as $foreignModel) {
+            $varName = Str::camel($foreignModel) . 'Ids';
+            $content .= "        \${$varName} = {$foreignModel}::pluck('id')->toArray();\n";
+        }
+        
+        $content .= "\n";
+        $content .= "        for (\$i = 0; \$i < {$count}; \$i++) {\n";
+        $content .= "            {$modelName}::create([\n";
+        
+        // إضافة الأعمدة
+        foreach ($columns as $column => $config) {
+            $fakerCode = $this->getFakerCodeFromConfig($column, $config);
+            $content .= "                '{$column}' => {$fakerCode}, // {$this->getColumnComment($column)}\n";
+        }
+        
+        $content .= "            ]);\n";
+        $content .= "        }\n";
+        $content .= "    }\n";
+        $content .= "}\n";
+
+        return $content;
+    }
+
+    /**
+     * الحصول على كود Faker من التكوين
+     */
+    protected function getFakerCodeFromConfig(string $column, array $config): string
+    {
+        $type = $config['type'] ?? 'text';
+        
+        switch ($type) {
+            case 'name':
+                return '$faker->name';
+            
+            case 'firstName':
+                return '$faker->firstName';
+            
+            case 'lastName':
+                return '$faker->lastName';
+            
+            case 'email':
+                $unique = $config['unique'] ?? false;
+                return $unique ? '$faker->unique()->safeEmail' : '$faker->safeEmail';
+            
+            case 'username':
+                return '$faker->userName';
+            
+            case 'password':
+                return "Hash::make('password')";
+            
+            case 'phone':
+                $nullable = $config['nullable'] ?? false;
+                return $nullable ? '$faker->optional()->phoneNumber' : '$faker->phoneNumber';
+            
+            case 'address':
+                return '$faker->address';
+            
+            case 'city':
+                return '$faker->city';
+            
+            case 'country':
+                return '$faker->country';
+            
+            case 'number':
+                $min = $config['min'] ?? 1;
+                $max = $config['max'] ?? 100;
+                return "\$faker->numberBetween({$min}, {$max})";
+            
+            case 'float':
+            case 'price':
+                $decimals = $config['decimals'] ?? 2;
+                $min = $config['min'] ?? 0;
+                $max = $config['max'] ?? 1000;
+                return "\$faker->randomFloat({$decimals}, {$min}, {$max})";
+            
+            case 'boolean':
+                $default = $config['default'] ?? null;
+                if ($default !== null) {
+                    return $default ? 'true' : 'false';
+                }
+                return '$faker->boolean';
+            
+            case 'date':
+                return '$faker->date()';
+            
+            case 'dateTime':
+                return '$faker->dateTime()';
+            
+            case 'time':
+                return '$faker->time()';
+            
+            case 'text':
+                $length = $config['length'] ?? 200;
+                return "\$faker->text({$length})";
+            
+            case 'paragraph':
+                return '$faker->paragraph';
+            
+            case 'sentence':
+                return '$faker->sentence';
+            
+            case 'word':
+                return '$faker->word';
+            
+            case 'slug':
+                return '$faker->slug';
+            
+            case 'url':
+                return '$faker->url';
+            
+            case 'imageUrl':
+                $width = $config['width'] ?? 640;
+                $height = $config['height'] ?? 480;
+                $category = $config['category'] ?? 'products';
+                return "\$faker->imageUrl({$width}, {$height}, '{$category}')";
+            
+            case 'uuid':
+                return '$faker->uuid';
+            
+            case 'enum':
+                $values = $config['values'] ?? ['active', 'inactive'];
+                $valuesStr = "'" . implode("', '", $values) . "'";
+                return "\$faker->randomElement([{$valuesStr}])";
+            
+            case 'foreignKey':
+                $model = $config['model'] ?? 'User';
+                $varName = Str::camel($model) . 'Ids';
+                return "\$faker->randomElement(\${$varName})";
+            
+            default:
+                return '$faker->text(100)';
+        }
+    }
+
+    /**
+     * الحصول على كود Faker (طريقة بسيطة)
+     */
+    protected function getFakerCode(string $column, array $config): string
+    {
+        return $this->getFakerCodeFromConfig($column, $config);
+    }
+
+    /**
+     * الحصول على تعليق العمود
+     */
+    protected function getColumnComment(string $column): string
+    {
+        $comments = [
+            'name' => 'الاسم',
+            'email' => 'البريد الإلكتروني',
+            'password' => 'كلمة المرور',
+            'phone' => 'رقم الهاتف',
+            'address' => 'العنوان',
+            'city' => 'المدينة',
+            'country' => 'الدولة',
+            'price' => 'السعر',
+            'description' => 'الوصف',
+            'image' => 'الصورة',
+            'title' => 'العنوان',
+            'content' => 'المحتوى',
+            'status' => 'الحالة',
+            'user_id' => 'معرف المستخدم',
+        ];
+
+        return $comments[$column] ?? $column;
+    }
+
+    /**
+     * حفظ الـ Seeder كملف
+     */
+    public function saveToFile(SeederGeneration $generation): string
+    {
+        $fileName = $generation->getSeederFileName();
+        $filePath = $this->seedersPath . '/' . $fileName;
+        
+        File::put($filePath, $generation->generated_content);
+        
+        return $filePath;
+    }
+
+    /**
+     * تنفيذ الـ Seeder
+     */
+    public function execute(SeederGeneration $generation): array
+    {
+        try {
+            $startTime = microtime(true);
+            
+            // حفظ الملف أولاً
+            $this->saveToFile($generation);
+            
+            // تنفيذ الـ Seeder
+            $className = $generation->getSeederClassName();
+            $seeder = app("Database\\Seeders\\{$className}");
+            $seeder->run();
+            
+            $executionTime = microtime(true) - $startTime;
+            
+            // حساب عدد السجلات المنشأة
+            $recordsCreated = $generation->count;
+            
+            // تسجيل النجاح
+            $generation->recordExecution($executionTime, $recordsCreated);
+            
+            return [
+                'success' => true,
+                'execution_time' => $executionTime,
+                'records_created' => $recordsCreated,
+            ];
+        } catch (\Exception $e) {
+            $executionTime = microtime(true) - $startTime;
+            
+            // تسجيل الفشل
+            $generation->recordFailure($e->getMessage(), $executionTime);
+            
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'execution_time' => $executionTime,
+            ];
+        }
+    }
+
+    /**
+     * التحقق من صحة JSON Schema
+     */
+    protected function validateJsonSchema(array $schema): void
+    {
+        if (!isset($schema['table_name'])) {
+            throw new \InvalidArgumentException('table_name is required in schema');
+        }
+    }
+
+    /**
+     * الحصول على أعمدة الجدول
+     */
+    protected function getTableColumns(string $tableName): array
+    {
+        return DB::getSchemaBuilder()->getColumnListing($tableName);
+    }
+
+    /**
+     * تحويل الأعمدة إلى Schema
+     */
+    protected function mapColumnsToSchema(array $columns): array
+    {
+        $schema = [];
+        
+        foreach ($columns as $column) {
+            // تخطي الأعمدة الافتراضية
+            if (in_array($column, ['id', 'created_at', 'updated_at', 'deleted_at'])) {
+                continue;
+            }
+            
+            $schema[$column] = $this->guessColumnType($column);
+        }
+        
+        return $schema;
+    }
+
+    /**
+     * تخمين نوع العمود
+     */
+    protected function guessColumnType(string $column): array
+    {
+        if (str_contains($column, 'email')) {
+            return ['type' => 'email', 'unique' => true];
+        }
+        
+        if (str_contains($column, 'password')) {
+            return ['type' => 'password'];
+        }
+        
+        if (str_contains($column, 'phone')) {
+            return ['type' => 'phone'];
+        }
+        
+        if (str_contains($column, 'price') || str_contains($column, 'amount')) {
+            return ['type' => 'price'];
+        }
+        
+        if (str_contains($column, 'image') || str_contains($column, 'photo')) {
+            return ['type' => 'imageUrl'];
+        }
+        
+        if (str_contains($column, '_id')) {
+            $model = str_replace('_id', '', $column);
+            $model = str_replace('_', '', ucwords($model, '_'));
+            return ['type' => 'foreignKey', 'model' => $model];
+        }
+        
+        return ['type' => 'text'];
+    }
+
+    /**
+     * توليد اسم الـ Seeder
+     */
+    protected function generateSeederName(string $tableName): string
+    {
+        return $this->getSeederClassName($tableName);
+    }
+
+    /**
+     * الحصول على اسم كلاس الـ Seeder
+     */
+    protected function getSeederClassName(string $tableName): string
+    {
+        $name = str_replace('_', '', ucwords($tableName, '_'));
+        return "{$name}Seeder";
+    }
+
+    /**
+     * الحصول على اسم الـ Model
+     */
+    protected function getModelName(string $tableName): string
+    {
+        return str_replace('_', '', ucwords(Str::singular($tableName), '_'));
+    }
+}
