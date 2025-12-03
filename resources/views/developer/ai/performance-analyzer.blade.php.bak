@@ -207,92 +207,34 @@
         const analyzeBtn = document.getElementById('analyze-btn');
         const codeInput = document.getElementById('code-input');
 
-        // إرسال النموذج عبر AJAX
+        // محاكاة إرسال النموذج
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const code = codeInput.value.trim();
-            if (code.length < 10) {
-                alert('{{ $isRtl ? "يرجى إدخال كود يحتوي على 10 أحرف على الأقل" : "Please enter code with at least 10 characters" }}');
-                return;
-            }
-
             analyzeBtn.disabled = true;
             analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2 ml-2"></i> {{ $isRtl ? 'جاري التحليل...' : 'Analyzing...' }}';
             resultsCard.classList.add('hidden');
             errorCard.classList.add('hidden');
 
-            // إرسال الطلب عبر fetch API
-            fetch('{{ route('ai-tools.performance-analyzer.analyze') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content || '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    code: code,
-                    language: 'PHP'
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
+            // محاكاة عملية التحليل (تستغرق 2 ثانية)
+            setTimeout(() => {
                 analyzeBtn.disabled = false;
                 analyzeBtn.innerHTML = '<i class="fas fa-cogs mr-2 ml-2"></i> {{ $texts['analyze_button'] }}';
 
-                if (data.success || data.status === 'success') {
-                    // عرض النتائج
-                    const result = data.data || data;
-                    updateResults(result);
-                    resultsCard.classList.remove('hidden');
-                    resultsCard.scrollIntoView({ behavior: 'smooth' });
-                    renderChart();
-                } else {
+                // محاكاة نجاح أو فشل التحليل بناءً على محتوى الكود
+                const code = codeInput.value.trim();
+                if (code.includes('error') || code.length < 10) {
                     errorCard.classList.remove('hidden');
+                    resultsCard.classList.add('hidden');
+                } else {
+                    // عرض النتائج
+                    resultsCard.classList.remove('hidden');
+                    // التمرير إلى النتائج
+                    resultsCard.scrollIntoView({ behavior: 'smooth' });
+                    // تحديث بيانات الرسم البياني (محاكاة)
+                    renderChart();
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                analyzeBtn.disabled = false;
-                analyzeBtn.innerHTML = '<i class="fas fa-cogs mr-2 ml-2"></i> {{ $texts['analyze_button'] }}';
-                errorCard.classList.remove('hidden');
-            });
+            }, 2000);
         });
-
-        // دالة لتحديث النتائج في الصفحة
-        function updateResults(data) {
-            // تحديث السرعة
-            if (data.speed) {
-                document.getElementById('result-speed').textContent = data.speed;
-            }
-            // تحديث التعقيد
-            if (data.complexity) {
-                document.getElementById('result-complexity').textContent = data.complexity;
-            }
-            // تحديث Bottlenecks
-            if (data.bottlenecks && data.bottlenecks.length > 0) {
-                const bottlenecksList = document.getElementById('bottlenecks-list');
-                bottlenecksList.innerHTML = '';
-                data.bottlenecks.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = 'flex items-start';
-                    li.innerHTML = `<i class="fas fa-times-circle text-red-500 mt-1 mr-2 ml-2"></i><span>${item}</span>`;
-                    bottlenecksList.appendChild(li);
-                });
-            }
-            // تحديث Suggestions
-            if (data.suggestions && data.suggestions.length > 0) {
-                const suggestionsList = document.getElementById('suggestions-list');
-                suggestionsList.innerHTML = '';
-                data.suggestions.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = 'flex items-start';
-                    li.innerHTML = `<i class="fas fa-check-circle text-blue-500 mt-1 mr-2 ml-2"></i><span>${item}</span>`;
-                    suggestionsList.appendChild(li);
-                });
-                document.getElementById('result-suggestions-count').textContent = data.suggestions.length;
-            }
-        }
 
         // دالة محاكاة عرض الرسم البياني (تتطلب Chart.js)
         function renderChart() {
