@@ -589,51 +589,51 @@
                                         <i class="far fa-circle text-xs"></i>
                                         <span>مولد الأكواد</span>
                                     </a>
-                                    <a href="{{ route('ai.code-refactor') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>تحسين الكود</span>
                                     </a>
-                                    <a href="{{ route('ai.code-review') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>مراجعة الكود</span>
                                     </a>
-                                    <a href="{{ route('ai.bug-detector') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>كشف الأخطاء</span>
                                     </a>
-                                    <a href="{{ route('ai.documentation-generator') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>توليد التوثيق</span>
                                     </a>
-                                    <a href="{{ route('ai.test-generator') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-teal-50 text-gray-600 hover:text-teal-600 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-teal-50 text-gray-600 hover:text-teal-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>مولد الاختبارات</span>
                                     </a>
-                                    <a href="{{ route('ai.performance-analyzer') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-orange-50 text-gray-600 hover:text-orange-600 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-orange-50 text-gray-600 hover:text-orange-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>تحليل الأداء</span>
                                     </a>
-                                    <a href="{{ route('ai.security-scanner') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>فحص الأمان</span>
                                     </a>
-                                    <a href="{{ route('ai.api-generator') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>مولد API</span>
                                     </a>
-                                    <a href="{{ route('ai.database-optimizer') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-cyan-50 text-gray-600 hover:text-cyan-600 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-cyan-50 text-gray-600 hover:text-cyan-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>محسن قاعدة البيانات</span>
                                     </a>
-                                    <a href="{{ route('ai.code-translator') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>مترجم الأكواد</span>
                                     </a>
-                                    <a href="{{ route('ai.assistant') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>المساعد الذكي</span>
                                     </a>
-                                    <a href="{{ route('ai.settings') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gray-50 text-gray-600 hover:text-gray-800 transition-colors text-sm">
+                                    <a href="#" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gray-50 text-gray-600 hover:text-gray-800 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>إعدادات AI</span>
                                     </a>
