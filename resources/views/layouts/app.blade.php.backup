@@ -164,240 +164,40 @@
                         </div>
                     </div>
                     
-                    <!-- العملاء - Dropdown -->
-                    <div class="relative">
-                        <button onclick="toggleDropdown('customers')" class="w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition duration-150">
-                            <div class="flex items-center space-x-3 space-x-reverse">
-                                <i class="fas fa-users w-6"></i>
-                                <span class="sidebar-text">العملاء</span>
-                            </div>
-                            <i class="fas fa-chevron-down sidebar-text transition-transform" id="customers-arrow"></i>
-                        </button>
-                        <div id="customers-dropdown" class="hidden pr-6 space-y-1 mt-1">
-                            <a href="{{ route('customers.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 text-sm">
-                                <i class="fas fa-list-alt w-5"></i>
-                                <span class="sidebar-text">قائمة العملاء</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 text-sm">
-                                <i class="fas fa-user-plus w-5"></i>
-                                <span class="sidebar-text">إضافة عميل جديد</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 text-sm">
-                                <i class="fas fa-layer-group w-5"></i>
-                                <span class="sidebar-text">مجموعات العملاء</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 text-sm">
-                                <i class="fas fa-history w-5"></i>
-                                <span class="sidebar-text">سجل النشاط</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 text-sm">
-                                <i class="fas fa-chart-bar w-5"></i>
-                                <span class="sidebar-text">تقارير العملاء</span>
-                            </a>
-                        </div>
-                    </div>
+                    <a href="{{ route('customers.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
+                        <i class="fas fa-users w-6"></i>
+                        <span class="sidebar-text">العملاء</span>
+                    </a>
                     
-                    <!-- المخزون - Dropdown -->
-                    <div class="relative">
-                        <button onclick="toggleDropdown('inventory')" class="w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-green-50 text-gray-700 hover:text-green-600 transition duration-150">
-                            <div class="flex items-center space-x-3 space-x-reverse">
-                                <i class="fas fa-box w-6"></i>
-                                <span class="sidebar-text">المخزون</span>
-                            </div>
-                            <i class="fas fa-chevron-down sidebar-text transition-transform" id="inventory-arrow"></i>
-                        </button>
-                        <div id="inventory-dropdown" class="hidden pr-6 space-y-1 mt-1">
-                            <a href="{{ route('inventory.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 text-sm">
-                                <i class="fas fa-boxes w-5"></i>
-                                <span class="sidebar-text">المنتجات</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 text-sm">
-                                <i class="fas fa-warehouse w-5"></i>
-                                <span class="sidebar-text">المستودعات</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 text-sm">
-                                <i class="fas fa-exchange-alt w-5"></i>
-                                <span class="sidebar-text">حركة المخزون</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 text-sm">
-                                <i class="fas fa-barcode w-5"></i>
-                                <span class="sidebar-text">الجرد</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 text-sm">
-                                <i class="fas fa-chart-pie w-5"></i>
-                                <span class="sidebar-text">تقارير المخزون</span>
-                            </a>
-                        </div>
-                    </div>
+                    <a href="{{ route('inventory.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
+                        <i class="fas fa-box w-6"></i>
+                        <span class="sidebar-text">المخزون</span>
+                    </a>
                     
-                    <!-- المشتريات - Dropdown -->
-                    <div class="relative">
-                        <button onclick="toggleDropdown('purchases')" class="w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-orange-50 text-gray-700 hover:text-orange-600 transition duration-150">
-                            <div class="flex items-center space-x-3 space-x-reverse">
-                                <i class="fas fa-shopping-cart w-6"></i>
-                                <span class="sidebar-text">المشتريات</span>
-                            </div>
-                            <i class="fas fa-chevron-down sidebar-text transition-transform" id="purchases-arrow"></i>
-                        </button>
-                        <div id="purchases-dropdown" class="hidden pr-6 space-y-1 mt-1">
-                            <a href="{{ route('purchases.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-orange-50 text-gray-600 hover:text-orange-600 text-sm">
-                                <i class="fas fa-file-invoice-dollar w-5"></i>
-                                <span class="sidebar-text">فواتير الشراء</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 text-sm">
-                                <i class="fas fa-clipboard-list w-5"></i>
-                                <span class="sidebar-text">طلبات الشراء</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 text-sm">
-                                <i class="fas fa-truck w-5"></i>
-                                <span class="sidebar-text">الموردين</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 text-sm">
-                                <i class="fas fa-undo w-5"></i>
-                                <span class="sidebar-text">مرتجعات المشتريات</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 text-sm">
-                                <i class="fas fa-chart-line w-5"></i>
-                                <span class="sidebar-text">تقارير المشتريات</span>
-                            </a>
-                        </div>
-                    </div>
+                    <a href="{{ route('purchases.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
+                        <i class="fas fa-shopping-cart w-6"></i>
+                        <span class="sidebar-text">المشتريات</span>
+                    </a>
                     
-                    <!-- المبيعات - Dropdown -->
-                    <div class="relative">
-                        <button onclick="toggleDropdown('sales')" class="w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-teal-50 text-gray-700 hover:text-teal-600 transition duration-150">
-                            <div class="flex items-center space-x-3 space-x-reverse">
-                                <i class="fas fa-chart-line w-6"></i>
-                                <span class="sidebar-text">المبيعات</span>
-                            </div>
-                            <i class="fas fa-chevron-down sidebar-text transition-transform" id="sales-arrow"></i>
-                        </button>
-                        <div id="sales-dropdown" class="hidden pr-6 space-y-1 mt-1">
-                            <a href="{{ route('sales.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-teal-50 text-gray-600 hover:text-teal-600 text-sm">
-                                <i class="fas fa-file-invoice w-5"></i>
-                                <span class="sidebar-text">فواتير المبيعات</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 text-sm">
-                                <i class="fas fa-file-contract w-5"></i>
-                                <span class="sidebar-text">عروض الأسعار</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 text-sm">
-                                <i class="fas fa-receipt w-5"></i>
-                                <span class="sidebar-text">نقاط البيع</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 text-sm">
-                                <i class="fas fa-redo w-5"></i>
-                                <span class="sidebar-text">مرتجعات المبيعات</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 text-sm">
-                                <i class="fas fa-chart-area w-5"></i>
-                                <span class="sidebar-text">تقارير المبيعات</span>
-                            </a>
-                        </div>
-                    </div>
+                    <a href="{{ route('sales.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
+                        <i class="fas fa-chart-line w-6"></i>
+                        <span class="sidebar-text">المبيعات</span>
+                    </a>
                     
-                    <!-- الموارد البشرية - Dropdown -->
-                    <div class="relative">
-                        <button onclick="toggleDropdown('hr')" class="w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 transition duration-150">
-                            <div class="flex items-center space-x-3 space-x-reverse">
-                                <i class="fas fa-user-tie w-6"></i>
-                                <span class="sidebar-text">الموارد البشرية</span>
-                            </div>
-                            <i class="fas fa-chevron-down sidebar-text transition-transform" id="hr-arrow"></i>
-                        </button>
-                        <div id="hr-dropdown" class="hidden pr-6 space-y-1 mt-1">
-                            <a href="{{ route('hr.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 text-sm">
-                                <i class="fas fa-users w-5"></i>
-                                <span class="sidebar-text">الموظفين</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 text-sm">
-                                <i class="fas fa-money-bill-wave w-5"></i>
-                                <span class="sidebar-text">الرواتب</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 text-sm">
-                                <i class="fas fa-clock w-5"></i>
-                                <span class="sidebar-text">الحضور والانصراف</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 text-sm">
-                                <i class="fas fa-calendar-alt w-5"></i>
-                                <span class="sidebar-text">الإجازات</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 text-sm">
-                                <i class="fas fa-user-graduate w-5"></i>
-                                <span class="sidebar-text">التدريب</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 text-sm">
-                                <i class="fas fa-chart-bar w-5"></i>
-                                <span class="sidebar-text">تقارير الموارد البشرية</span>
-                            </a>
-                        </div>
-                    </div>
+                    <a href="{{ route('hr.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
+                        <i class="fas fa-user-tie w-6"></i>
+                        <span class="sidebar-text">الموارد البشرية</span>
+                    </a>
                     
-                    <!-- التصنيع - Dropdown -->
-                    <div class="relative">
-                        <button onclick="toggleDropdown('manufacturing')" class="w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gray-50 text-gray-700 hover:text-gray-600 transition duration-150">
-                            <div class="flex items-center space-x-3 space-x-reverse">
-                                <i class="fas fa-industry w-6"></i>
-                                <span class="sidebar-text">التصنيع</span>
-                            </div>
-                            <i class="fas fa-chevron-down sidebar-text transition-transform" id="manufacturing-arrow"></i>
-                        </button>
-                        <div id="manufacturing-dropdown" class="hidden pr-6 space-y-1 mt-1">
-                            <a href="{{ route('manufacturing.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gray-50 text-gray-600 hover:text-gray-600 text-sm">
-                                <i class="fas fa-tasks w-5"></i>
-                                <span class="sidebar-text">أوامر الإنتاج</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 text-sm">
-                                <i class="fas fa-cubes w-5"></i>
-                                <span class="sidebar-text">المواد الخام</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 text-sm">
-                                <i class="fas fa-cogs w-5"></i>
-                                <span class="sidebar-text">خطوط الإنتاج</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 text-sm">
-                                <i class="fas fa-clipboard-check w-5"></i>
-                                <span class="sidebar-text">مراقبة الجودة</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 text-sm">
-                                <i class="fas fa-chart-line w-5"></i>
-                                <span class="sidebar-text">تقارير الإنتاج</span>
-                            </a>
-                        </div>
-                    </div>
+                    <a href="{{ route('manufacturing.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
+                        <i class="fas fa-industry w-6"></i>
+                        <span class="sidebar-text">التصنيع</span>
+                    </a>
                     
-                    <!-- الأصول - Dropdown -->
-                    <div class="relative">
-                        <button onclick="toggleDropdown('assets')" class="w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600 transition duration-150">
-                            <div class="flex items-center space-x-3 space-x-reverse">
-                                <i class="fas fa-archive w-6"></i>
-                                <span class="sidebar-text">الأصول</span>
-                            </div>
-                            <i class="fas fa-chevron-down sidebar-text transition-transform" id="assets-arrow"></i>
-                        </button>
-                        <div id="assets-dropdown" class="hidden pr-6 space-y-1 mt-1">
-                            <a href="{{ route('assets.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 text-sm">
-                                <i class="fas fa-building w-5"></i>
-                                <span class="sidebar-text">الأصول الثابتة</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 text-sm">
-                                <i class="fas fa-tools w-5"></i>
-                                <span class="sidebar-text">الصيانة</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 text-sm">
-                                <i class="fas fa-chart-line-down w-5"></i>
-                                <span class="sidebar-text">الاستهلاك</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 text-sm">
-                                <i class="fas fa-exchange-alt w-5"></i>
-                                <span class="sidebar-text">النقل والتحويل</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 text-sm">
-                                <i class="fas fa-file-alt w-5"></i>
-                                <span class="sidebar-text">تقارير الأصول</span>
-                            </a>
-                        </div>
-                    </div>
+                    <a href="{{ route('assets.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
+                        <i class="fas fa-archive w-6"></i>
+                        <span class="sidebar-text">الأصول</span>
+                    </a>
                     
                     <a href="{{ route('loyalty.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
                         <i class="fas fa-star w-6"></i>
