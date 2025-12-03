@@ -1,361 +1,304 @@
+@php
+    // تحديد اللغة والاتجاه (افتراضياً العربية RTL)
+    // يجب أن يتم تحديد اللغة الفعلية من إعدادات التطبيق أو الجلسة
+    $lang = 'ar'; // app()->getLocale() ?? 'ar';
+    $isRtl = $lang === 'ar';
+    $dir = $isRtl ? 'rtl' : 'ltr';
+    $align = $isRtl ? 'text-right' : 'text-left';
+    $alignOpposite = $isRtl ? 'text-left' : 'text-right';
 
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>محلل الأداء</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
-    <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-        }
-        .loader {
-            border-top-color: #3498db;
-            -webkit-animation: spin 1s linear infinite;
-            animation: spin 1s linear infinite;
-        }
-        @-webkit-keyframes spin {
-            0% { -webkit-transform: rotate(0deg); }
-            100% { -webkit-transform: rotate(360deg); }
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body class="bg-gray-100 text-gray-800">
+    // النصوص المستخدمة لدعم اللغة العربية والإنجليزية
+    $texts = [
+        'title' => $isRtl ? 'محلل الأداء المدعوم بالذكاء الاصطناعي' : 'AI-Powered Performance Analyzer',
+        'input_title' => $isRtl ? 'إدخال الكود للتحليل' : 'Code Input for Analysis',
+        'input_placeholder' => $isRtl ? 'الصق كود PHP, JavaScript, SQL, إلخ هنا...' : 'Paste your PHP, JavaScript, SQL, etc. code here...',
+        'analyze_button' => $isRtl ? 'تحليل الكود' : 'Analyze Code',
+        'results_title' => $isRtl ? 'نتائج التحليل' : 'Analysis Results',
+        'speed' => $isRtl ? 'السرعة المقدرة' : 'Estimated Speed',
+        'bottlenecks' => $isRtl ? 'نقاط الاختناق (Bottlenecks)' : 'Bottlenecks',
+        'suggestions' => $isRtl ? 'اقتراحات التحسين' : 'Optimization Suggestions',
+        'chart_title' => $isRtl ? 'الرسم البياني للأداء' : 'Performance Chart',
+        'error_title' => $isRtl ? 'خطأ في التحليل' : 'Analysis Error',
+        'error_message' => $isRtl ? 'حدث خطأ أثناء محاولة تحليل الكود. يرجى التحقق من الكود والمحاولة مرة أخرى.' : 'An error occurred while trying to analyze the code. Please check the code and try again.',
+    ];
+@endphp
 
-    <div class="container mx-auto p-8">
-        <h1 class="text-4xl font-bold text-center mb-8">محلل أداء الكود</h1>
+{{--
+    ملف Blade View: resources/views/developer/ai/performance-analyzer.blade.php
+    الغرض: واجهة مستخدم متكاملة لتحليل أداء الكود باستخدام الذكاء الاصطناعي (Manus AI).
+    التقنيات: Laravel Blade, Tailwind CSS, Font Awesome, JavaScript (للتفاعل).
+    المتطلبات: تصميم عصري، دعم الوضع الداكن، دعم RTL/LTR، رسوم بيانية.
+    ملاحظة: يفترض وجود ملف تخطيط رئيسي (layouts.app) يتضمن Tailwind CSS و Font Awesome.
+--}}
 
-        
-        <!-- قسم الإدخال والتحكم -->
-        <div class="bg-white p-6 rounded-lg shadow-xl mb-8">
-            <h2 class="text-2xl font-semibold mb-4 border-b pb-2">1. إدخال الكود والتحكم</h2>
+@extends('layouts.app')
 
-            <!-- اختيار نوع التحليل -->
-            <div class="mb-4">
-                <label for="analysis-type" class="block text-lg font-medium text-gray-700 mb-2">نوع التحليل المطلوب:</label>
-                <select id="analysis-type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50">
-                    <option value="speed">تحليل السرعة والأداء العام</option>
-                    <option value="bottlenecks">تحديد نقاط الاختناق (Bottlenecks)</option>
-                    <option value="memory">استهلاك الذاكرة والموارد</option>
-                    <option value="queries">تحليل استعلامات قواعد البيانات (Queries)</option>
-                </select>
-            </div>
+@section('title', $texts['title'])
 
-            <!-- إدخال الكود -->
-            <div class="mb-6">
-                <label for="code-input" class="block text-lg font-medium text-gray-700 mb-2">الكود المراد تحليله (يفضل PHP):</label>
-                <textarea id="code-input" rows="15" class="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="الصق كود PHP هنا..."></textarea>
-            </div>
+@section('content')
+<div class="container mx-auto p-4 sm:p-6 lg:p-8" dir="{{ $dir }}">
+    {{-- عنوان الصفحة --}}
+    <h1 class="text-3xl font-extrabold mb-6 text-gray-900 dark:text-white {{ $align }}">
+        <i class="fas fa-rocket mr-3 ml-3"></i>
+        {{ $texts['title'] }}
+    </h1>
 
-            <!-- زر التحليل -->
-            <div class="flex justify-center">
-                <button id="analyze-btn" class="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10 transition duration-150 ease-in-out">
-                    <i class="fas fa-cogs ml-2"></i>
-                    <span>تحليل الكود</span>
-                    <div id="loading-spinner" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6 ml-3 hidden"></div>
+    {{-- بطاقة الإدخال والتحليل --}}
+    <div id="input-card" class="bg-white dark:bg-gray-800 shadow-2xl rounded-xl p-6 md:p-8 mb-8 transition duration-300 ease-in-out">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-200 {{ $align }}">
+            <i class="fas fa-code mr-2 ml-2"></i>
+            {{ $texts['input_title'] }}
+        </h2>
+
+        <form id="analysis-form" action="#" method="POST">
+            @csrf
+            {{-- حقل إدخال الكود --}}
+            <textarea
+                id="code-input"
+                name="code"
+                rows="15"
+                class="w-full p-4 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-mono text-sm resize-none"
+                placeholder="{{ $texts['input_placeholder'] }}"
+                required
+            ></textarea>
+
+            {{-- زر التحليل --}}
+            <div class="mt-6 {{ $alignOpposite }}">
+                <button
+                    type="submit"
+                    id="analyze-btn"
+                    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg transition duration-150 ease-in-out disabled:opacity-50"
+                >
+                    <i class="fas fa-cogs mr-2 ml-2"></i>
+                    {{ $texts['analyze_button'] }}
                 </button>
+            </div>
+        </form>
+    </div>
+
+    {{-- بطاقة نتائج التحليل (مخفية افتراضياً) --}}
+    <div id="results-card" class="hidden bg-white dark:bg-gray-800 shadow-2xl rounded-xl p-6 md:p-8 mb-8 transition duration-300 ease-in-out">
+        <h2 class="text-2xl font-semibold mb-6 text-green-600 dark:text-green-400 {{ $align }}">
+            <i class="fas fa-chart-line mr-2 ml-2"></i>
+            {{ $texts['results_title'] }}
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {{-- ملخص السرعة --}}
+            <div class="bg-green-50 dark:bg-gray-700 p-4 rounded-lg shadow-md border-l-4 border-green-500">
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400 {{ $align }}">{{ $texts['speed'] }}</p>
+                <p id="result-speed" class="text-3xl font-bold text-green-600 dark:text-green-400 mt-1 {{ $align }}">95%</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-2 {{ $align }}"><i class="fas fa-bolt"></i> {{ $isRtl ? 'أداء ممتاز' : 'Excellent Performance' }}</p>
+            </div>
+
+            {{-- ملخص نقاط الاختناق --}}
+            <div class="bg-red-50 dark:bg-gray-700 p-4 rounded-lg shadow-md border-l-4 border-red-500">
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400 {{ $align }}">{{ $texts['bottlenecks'] }}</p>
+                <p id="result-bottlenecks-count" class="text-3xl font-bold text-red-600 dark:text-red-400 mt-1 {{ $align }}">3</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-2 {{ $align }}"><i class="fas fa-exclamation-triangle"></i> {{ $isRtl ? 'نقاط حرجة تحتاج لمعالجة' : 'Critical points need attention' }}</p>
+            </div>
+
+            {{-- ملخص الاقتراحات --}}
+            <div class="bg-blue-50 dark:bg-gray-700 p-4 rounded-lg shadow-md border-l-4 border-blue-500">
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400 {{ $align }}">{{ $texts['suggestions'] }}</p>
+                <p id="result-suggestions-count" class="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-1 {{ $align }}">7</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-2 {{ $align }}"><i class="fas fa-lightbulb"></i> {{ $isRtl ? 'اقتراحات لتحسين الكفاءة' : 'Suggestions for efficiency' }}</p>
             </div>
         </div>
 
-        
-        <!-- قسم عرض النتائج -->
-        <div id="results-section" class="bg-white p-6 rounded-lg shadow-xl" style="display: none;">
-            <h2 class="text-2xl font-semibold mb-6 border-b pb-2">2. نتائج التحليل</h2>
-
-            <!-- Performance Score & Export Button -->
-            <div class="flex justify-between items-center mb-6">
-                <div class="text-center">
-                    <p class="text-xl font-medium text-gray-600">نقاط الأداء</p>
-                    <p id="performance-score" class="text-6xl font-bold text-green-600">--</p>
-                </div>
-                <button id="export-btn" class="flex items-center px-6 py-2 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition duration-150 ease-in-out">
-                    <i class="fas fa-file-pdf ml-2"></i>
-                    <span>تصدير التقرير (PDF)</span>
-                </button>
+        {{-- تفاصيل النتائج --}}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {{-- نقاط الاختناق --}}
+            <div class="bg-gray-50 dark:bg-gray-700 p-5 rounded-lg shadow-inner">
+                <h3 class="text-xl font-semibold mb-3 text-red-600 dark:text-red-400 {{ $align }}">
+                    <i class="fas fa-bug mr-2 ml-2"></i>
+                    {{ $texts['bottlenecks'] }}
+                </h3>
+                <ul id="bottlenecks-list" class="space-y-3 text-gray-700 dark:text-gray-300 {{ $align }}">
+                    <li class="flex items-start">
+                        <i class="fas fa-times-circle text-red-500 mt-1 mr-2 ml-2"></i>
+                        <span>{{ $isRtl ? 'استخدام استعلامات قاعدة بيانات غير مُحسّنة (N+1 Problem).' : 'Unoptimized database queries (N+1 Problem).' }}</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-times-circle text-red-500 mt-1 mr-2 ml-2"></i>
+                        <span>{{ $isRtl ? 'حلقة تكرارية كبيرة بدون استخدام التخزين المؤقت (Caching).' : 'Large loop without proper caching.' }}</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-times-circle text-red-500 mt-1 mr-2 ml-2"></i>
+                        <span>{{ $isRtl ? 'استدعاء دالة مكلفة داخل حلقة.' : 'Expensive function call inside a loop.' }}</span>
+                    </li>
+                </ul>
             </div>
 
-            <!-- Bottlenecks & Suggestions -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div class="p-4 border border-red-300 rounded-lg bg-red-50">
-                    <h3 class="text-xl font-semibold text-red-700 mb-3 flex items-center">
-                        <i class="fas fa-exclamation-triangle ml-2"></i>
-                        نقاط الاختناق المكتشفة (Bottlenecks)
-                    </h3>
-                    <ul id="bottlenecks-list" class="list-disc pr-5 text-red-600 space-y-2">
-                        <li>لا توجد نقاط اختناق بعد.</li>
-                    </ul>
-                </div>
-                <div class="p-4 border border-green-300 rounded-lg bg-green-50">
-                    <h3 class="text-xl font-semibold text-green-700 mb-3 flex items-center">
-                        <i class="fas fa-lightbulb ml-2"></i>
-                        اقتراحات التحسين
-                    </h3>
-                    <ul id="suggestions-list" class="list-disc pr-5 text-green-600 space-y-2">
-                        <li>ابدأ التحليل لعرض الاقتراحات.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Performance Charts -->
-            <div class="mb-6">
-                <h3 class="text-xl font-semibold mb-3 border-b pb-2">الرسوم البيانية للأداء</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gray-50 p-4 rounded-lg shadow">
-                        <p class="text-center font-medium mb-2">توزيع وقت التنفيذ (مللي ثانية)</p>
-                        <canvas id="timeChart"></canvas>
-                    </div>
-                    <div class="bg-gray-50 p-4 rounded-lg shadow">
-                        <p class="text-center font-medium mb-2">استهلاك الذاكرة (ميغابايت)</p>
-                        <canvas id="memoryChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Detailed Report -->
-            <div class="mb-4">
-                <h3 class="text-xl font-semibold mb-3 border-b pb-2">التقرير المفصل</h3>
-                <div class="bg-gray-50 p-4 rounded-lg border">
-                    <pre id="detailed-report" class="language-php text-sm whitespace-pre-wrap"><code>التقرير المفصل سيظهر هنا بعد التحليل.</code></pre>
-                </div>
+            {{-- اقتراحات التحسين --}}
+            <div class="bg-gray-50 dark:bg-gray-700 p-5 rounded-lg shadow-inner">
+                <h3 class="text-xl font-semibold mb-3 text-blue-600 dark:text-blue-400 {{ $align }}">
+                    <i class="fas fa-magic mr-2 ml-2"></i>
+                    {{ $texts['suggestions'] }}
+                </h3>
+                <ul id="suggestions-list" class="space-y-3 text-gray-700 dark:text-gray-300 {{ $align }}">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-blue-500 mt-1 mr-2 ml-2"></i>
+                        <span>{{ $isRtl ? 'استخدم Eager Loading (with) لحل مشكلة N+1.' : 'Use Eager Loading (with) to solve the N+1 problem.' }}</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-blue-500 mt-1 mr-2 ml-2"></i>
+                        <span>{{ $isRtl ? 'طبق التخزين المؤقت (Redis/Memcached) للبيانات المتكررة.' : 'Apply caching (Redis/Memcached) for repetitive data.' }}</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-blue-500 mt-1 mr-2 ml-2"></i>
+                        <span>{{ $isRtl ? 'استبدل الدالة المكلفة بدالة أكثر كفاءة أو قم بتحسينها.' : 'Replace the expensive function with a more efficient one or optimize it.' }}</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-blue-500 mt-1 mr-2 ml-2"></i>
+                        <span>{{ $isRtl ? 'استخدم الـ Queues للعمليات التي تستغرق وقتاً طويلاً.' : 'Use Queues for long-running operations.' }}</span>
+                    </li>
+                </ul>
             </div>
         </div>
 
-        
-        <!-- شيفرة JavaScript -->
-        <script>
-            // محاكاة بيانات النتائج
-            const mockResults = {
-                score: 85,
-                bottlenecks: [
-                    "استعلام قاعدة بيانات بطيء في السطر 45.",
-                    "حلقة تكرارية غير فعالة في الدالة 'processData'."
-                ],
-                suggestions: [
-                    "استخدم التخزين المؤقت (Caching) لنتائج الاستعلامات المتكررة.",
-                    "استبدل الحلقة التكرارية بـ array_map أو array_filter لتحسين الأداء.",
-                    "تأكد من استخدام الفهارس (Indexes) المناسبة في قاعدة البيانات."
-                ],
-                detailedReport: "تقرير مفصل:\n- وقت التنفيذ: 1500 مللي ثانية\n- استهلاك الذاكرة الأقصى: 48 ميغابايت\n- عدد استعلامات قاعدة البيانات: 12\n- تفاصيل إضافية عن كل خطوة...",
-                timeData: [300, 500, 150, 700, 250],
-                memoryData: [12, 18, 10, 25, 15]
-            };
+        {{-- قسم الرسوم البيانية --}}
+        <div class="mt-8 bg-gray-50 dark:bg-gray-700 p-5 rounded-lg shadow-inner">
+            <h3 class="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200 {{ $align }}">
+                <i class="fas fa-chart-pie mr-2 ml-2"></i>
+                {{ $texts['chart_title'] }}
+            </h3>
+            {{-- Placeholder للرسم البياني (يفترض استخدام مكتبة مثل Chart.js) --}}
+            <div class="h-64">
+                <canvas id="performanceChart" class="w-full h-full"></canvas>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 {{ $align }}">
+                {{ $isRtl ? 'ملاحظة: هذا الرسم البياني يتطلب مكتبة JavaScript خارجية (مثل Chart.js) ليتم عرضه بشكل صحيح.' : 'Note: This chart requires an external JavaScript library (e.g., Chart.js) to render correctly.' }}
+            </p>
+        </div>
 
-            const analyzeBtn = document.getElementById('analyze-btn');
-            const loadingSpinner = document.getElementById('loading-spinner');
-            const resultsSection = document.getElementById('results-section');
-            const codeInput = document.getElementById('code-input');
-            const analysisType = document.getElementById('analysis-type');
-            const performanceScore = document.getElementById('performance-score');
-            const bottlenecksList = document.getElementById('bottlenecks-list');
-            const suggestionsList = document.getElementById('suggestions-list');
-            const detailedReport = document.getElementById('detailed-report');
-            const exportBtn = document.getElementById('export-btn');
+        {{-- زر تحليل جديد --}}
+        <div class="mt-8 {{ $alignOpposite }}">
+            <button
+                onclick="document.getElementById('results-card').classList.add('hidden'); document.getElementById('input-card').scrollIntoView({ behavior: 'smooth' });"
+                class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg shadow-lg transition duration-150 ease-in-out"
+            >
+                <i class="fas fa-redo mr-2 ml-2"></i>
+                {{ $isRtl ? 'تحليل كود جديد' : 'Analyze New Code' }}
+            </button>
+        </div>
+    </div>
 
-            let timeChart, memoryChart;
+    {{-- بطاقة معالجة الأخطاء (مخفية افتراضياً) --}}
+    <div id="error-card" class="hidden bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-400 text-red-700 dark:text-red-200 p-4 rounded-lg shadow-md" role="alert">
+        <div class="flex items-center">
+            <div class="py-1"><i class="fas fa-exclamation-circle fa-lg mr-3 ml-3"></i></div>
+            <div>
+                <p class="font-bold {{ $align }}">{{ $texts['error_title'] }}</p>
+                <p class="text-sm {{ $align }}">{{ $texts['error_message'] }}</p>
+            </div>
+        </div>
+    </div>
 
-            // تهيئة الرسوم البيانية
-            function initCharts() {
-                const timeCtx = document.getElementById('timeChart').getContext('2d');
-                timeChart = new Chart(timeCtx, {
+</div>
+
+{{-- قسم JavaScript للتفاعل (محاكاة بسيطة) --}}
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('analysis-form');
+        const resultsCard = document.getElementById('results-card');
+        const errorCard = document.getElementById('error-card');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const codeInput = document.getElementById('code-input');
+
+        // محاكاة إرسال النموذج
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2 ml-2"></i> {{ $isRtl ? 'جاري التحليل...' : 'Analyzing...' }}';
+            resultsCard.classList.add('hidden');
+            errorCard.classList.add('hidden');
+
+            // محاكاة عملية التحليل (تستغرق 2 ثانية)
+            setTimeout(() => {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="fas fa-cogs mr-2 ml-2"></i> {{ $texts['analyze_button'] }}';
+
+                // محاكاة نجاح أو فشل التحليل بناءً على محتوى الكود
+                const code = codeInput.value.trim();
+                if (code.includes('error') || code.length < 10) {
+                    errorCard.classList.remove('hidden');
+                    resultsCard.classList.add('hidden');
+                } else {
+                    // عرض النتائج
+                    resultsCard.classList.remove('hidden');
+                    // التمرير إلى النتائج
+                    resultsCard.scrollIntoView({ behavior: 'smooth' });
+                    // تحديث بيانات الرسم البياني (محاكاة)
+                    renderChart();
+                }
+            }, 2000);
+        });
+
+        // دالة محاكاة عرض الرسم البياني (تتطلب Chart.js)
+        function renderChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            // التأكد من أن Chart.js متاح (يفترض أنه تم تضمينه في layouts.app)
+            if (typeof Chart !== 'undefined') {
+                new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: ['الخطوة 1', 'الخطوة 2', 'الخطوة 3', 'الخطوة 4', 'الخطوة 5'],
+                        labels: ['{{ $isRtl ? 'السرعة' : 'Speed' }}', '{{ $isRtl ? 'الذاكرة' : 'Memory' }}', '{{ $isRtl ? 'الاستعلامات' : 'Queries' }}', '{{ $isRtl ? 'التعقيد' : 'Complexity' }}'],
                         datasets: [{
-                            label: 'وقت التنفيذ (مللي ثانية)',
-                            data: mockResults.timeData,
-                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
+                            label: '{{ $isRtl ? 'نقاط الأداء' : 'Performance Score' }}',
+                            data: [95, 80, 70, 85], // بيانات محاكاة
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(255, 159, 64, 0.8)',
+                                'rgba(255, 99, 132, 0.8)',
+                                'rgba(54, 162, 235, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(255, 159, 64, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)'
+                            ],
                             borderWidth: 1
                         }]
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         scales: {
                             y: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: '{{ $isRtl ? 'النسبة المئوية' : 'Percentage' }}'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: '{{ $isRtl ? 'right' : 'left' }}'
                             }
                         }
                     }
                 });
-
-                const memoryCtx = document.getElementById('memoryChart').getContext('2d');
-                memoryChart = new Chart(memoryCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['الخطوة 1', 'الخطوة 2', 'الخطوة 3', 'الخطوة 4', 'الخطوة 5'],
-                        datasets: [{
-                            label: 'استهلاك الذاكرة (ميغابايت)',
-                            data: mockResults.memoryData,
-                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
+            } else {
+                console.error('Chart.js library is not loaded. Performance chart cannot be rendered.');
             }
-
-            // تحديث الرسوم البيانية
-            function updateCharts(timeData, memoryData) {
-                timeChart.data.datasets[0].data = timeData;
-                memoryChart.data.datasets[0].data = memoryData;
-                timeChart.update();
-                memoryChart.update();
-            }
-
-            // تحديث واجهة المستخدم بالنتائج
-            function updateUI(results) {
-                // تحديث نقاط الأداء
-                performanceScore.textContent = results.score;
-                performanceScore.className = performanceScore.className.replace(/text-(red|yellow|green)-\d{3}/, '');
-                if (results.score >= 80) {
-                    performanceScore.classList.add('text-green-600');
-                } else if (results.score >= 50) {
-                    performanceScore.classList.add('text-yellow-600');
-                } else {
-                    performanceScore.classList.add('text-red-600');
-                }
-
-                // تحديث نقاط الاختناق
-                bottlenecksList.innerHTML = '';
-                results.bottlenecks.forEach(item => {
-                    const li = document.createElement('li');
-                    li.textContent = item;
-                    bottlenecksList.appendChild(li);
-                });
-
-                // تحديث الاقتراحات
-                suggestionsList.innerHTML = '';
-                results.suggestions.forEach(item => {
-                    const li = document.createElement('li');
-                    li.textContent = item;
-                    suggestionsList.appendChild(li);
-                });
-
-                // تحديث التقرير المفصل وتلوين الأكواد
-                detailedReport.innerHTML = `<code class="language-php">${results.detailedReport}</code>`;
-                Prism.highlightElement(detailedReport.querySelector('code'));
-
-                // تحديث الرسوم البيانية
-                updateCharts(results.timeData, results.memoryData);
-
-                // إظهار قسم النتائج
-                resultsSection.style.display = 'block';
-            }
-
-            // محاكاة عملية التحليل (AJAX)
-            analyzeBtn.addEventListener('click', () => {
-                const code = codeInput.value;
-                const type = analysisType.value;
-
-                if (!code.trim()) {
-                    alert('الرجاء إدخال الكود المراد تحليله.');
-                    return;
-                }
-
-                // تفعيل حالة التحميل
-                analyzeBtn.disabled = true;
-                loadingSpinner.classList.remove('hidden');
-                analyzeBtn.querySelector('span').textContent = 'جاري التحليل...';
-
-                // إرسال طلب AJAX إلى الـ backend
-                fetch('/developer/ai/performance-analyzer', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({
-                        code: code,
-                        analysis_type: type
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // تحويل النتائج من الـ API إلى الصيغة المطلوبة
-                        const results = {
-                            score: data.data.performance_score || 75,
-                            bottlenecks: data.data.bottlenecks || ['لم يتم اكتشاف نقاط اختناق'],
-                            suggestions: data.data.suggestions || ['لا توجد اقتراحات حالياً'],
-                            detailedReport: data.data.detailed_report || 'تقرير مفصل غير متاح',
-                            timeData: data.data.time_data || [100, 200, 150, 300, 250],
-                            memoryData: data.data.memory_data || [10, 15, 12, 18, 16]
-                        };
-                        updateUI(results);
-                    } else {
-                        alert('حدث خطأ: ' + (data.error || 'خطأ غير محدد'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('حدث خطأ أثناء التحليل. الرجاء المحاولة مرة أخرى.');
-                })
-                .finally(() => {
-                    // تعطيل حالة التحميل
-                    analyzeBtn.disabled = false;
-                    loadingSpinner.classList.add('hidden');
-                    analyzeBtn.querySelector('span').textContent = 'تحليل الكود';
-                });
-            });
-
-            // محاكاة زر التصدير
-            exportBtn.addEventListener('click', () => {
-                alert('تم محاكاة تصدير التقرير إلى PDF.');
-                // هنا يمكن إضافة منطق لتصدير محتوى الصفحة أو طلب تقرير PDF من الـ backend
-            });
-
-            // تهيئة محرر الكود (محاكاة تلوين الأكواد عند التحميل الأولي)
-            codeInput.value = `<?php
-
-// مثال على كود PHP غير فعال
-function processData($data) {
-    $result = [];
-    // حلقة تكرارية غير فعالة
-    for ($i = 0; $i < count($data); $i++) {
-        // استعلام قاعدة بيانات بطيء (محاكاة)
-        $dbResult = DB::query("SELECT * FROM items WHERE id = " . $data[$i]); // السطر 45
-        if ($dbResult) {
-            $result[] = $dbResult;
         }
-    }
-    return $result;
-}
 
-$largeArray = range(1, 1000);
-processData($largeArray);
+        // محاكاة تفعيل الوضع الداكن (افتراضياً يتم التحكم به عبر نظام Laravel/Tailwind)
+        // يمكن إضافة منطق تبديل الوضع الداكن هنا إذا لم يكن مدمجاً في التخطيط الرئيسي
+        // مثال:
+        // if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        //     document.documentElement.classList.add('dark');
+        // } else {
+        //     document.documentElement.classList.remove('dark');
+        // }
+    });
+</script>
+@endpush
 
-?>`;
-            
-            // تهيئة الرسوم البيانية عند تحميل الصفحة
-            window.onload = initCharts;
-
-        </script>
-
-
-
-
-    </div>
-
-</body>
-</html>
-</html>
+@endsection

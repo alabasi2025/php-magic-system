@@ -2,281 +2,170 @@
 
 namespace App\Services\AI;
 
-use Exception;
-use JsonException;
-use Psr\Log\LoggerInterface;
+use OpenAI\Client;
+use Throwable;
 
 /**
  * @class PerformanceAnalyzerService
- * @brief خدمة تحليل أداء الكود البرمجي باستخدام واجهة Manus AI.
+ * @package App\Services\AI
  *
- * توفر هذه الخدمة مجموعة من الأدوات لتحليل جوانب مختلفة من أداء الكود
- * مثل السرعة، استهلاك الذاكرة، نقاط الاختناق، وتحليل استعلامات قواعد البيانات.
- * يتم استخدام Manus AI لتحليل الكود وإصدار تقارير مفصلة.
- *
- * ملاحظة: تم افتراض وجود فئة ManusAIClient للاتصال بواجهة Manus AI
- * وواجهة LoggerInterface لتسجيل الأحداث.
+ * خدمة متكاملة لتحليل أداء الكود باستخدام OpenAI API.
+ * تتضمن تحليل سرعة الكود، كشف الاختناقات (Bottlenecks)، واقتراحات التحسين.
  */
 class PerformanceAnalyzerService
 {
-    private ManusAIClient $aiClient;
-    private LoggerInterface $logger;
-
-    // تعريف ثابت لـ Prompt يحدد الهيكل المطلوب لنتائج الذكاء الاصطناعي
-    private const JSON_SCHEMA_PROMPT = 'يجب أن تكون الإجابة بصيغة JSON فقط، وتتبع الهيكل التالي: {"score": int, "summary": string, "details": array, "recommendations": array}.';
+    /**
+     * @var Client
+     */
+    protected Client $openai;
 
     /**
-     * الدالة البانية للخدمة.
+     * PerformanceAnalyzerService constructor.
      *
-     * @param ManusAIClient $aiClient عميل الاتصال بواجهة Manus AI.
-     * @param LoggerInterface $logger واجهة تسجيل الأحداث (Logging).
+     * @param Client $openai عميل OpenAI API المحقون.
      */
-    public function __construct(ManusAIClient $aiClient, LoggerInterface $logger)
+    public function __construct(Client $openai)
     {
-        $this->aiClient = $aiClient;
-        $this->logger = $logger;
+        $this->openai = $openai;
     }
 
     /**
-     * دالة مساعدة للاتصال بواجهة Manus AI وتحليل الكود.
+     * تحليل أداء جزء من الكود وتقديم تقرير شامل.
      *
-     * @param string $code الكود البرمجي المراد تحليله.
-     * @param string $prompt التعليمات الموجهة لنموذج الذكاء الاصطناعي.
-     * @param string $analysisType نوع التحليل (مثل: bottlenecks, speed, memory).
-     * @return array نتيجة التحليل بصيغة مصفوفة PHP.
+     * @param string $code الكود المراد تحليله.
+     * @param string $language لغة البرمجة للكود (مثل 'PHP', 'JavaScript').
+     * @param string $locale اللغة المطلوبة للتقرير ('ar' أو 'en').
+     * @return array تقرير التحليل الشامل.
+     * @throws Throwable
      */
-    private function callAIAnalysis(string $code, string $prompt, string $analysisType): array
+    /**
+     * تحليل أداء جزء من الكود وتقديم تقرير شامل.
+     *
+     * @param string $code الكود المراد تحليله.
+     * @param string $language لغة البرمجة للكود (مثل 'PHP', 'JavaScript').
+     * @param string $locale اللغة المطلوبة للتقرير ('ar' أو 'en').
+     * @return array تقرير التحليل الشامل.
+     * @throws Throwable
+     */
+    public function analyze(string $code, string $language = 'PHP', string $locale = 'ar'): array
     {
-        $fullPrompt = "أنت محلل أداء كود برمجي خبير. قم بتحليل الكود التالي: \n\n```\n{$code}\n```\n\n بناءً على التعليمات: {$prompt} \n\n" . self::JSON_SCHEMA_PROMPT;
+        $prompt = $this->buildAnalysisPrompt($code, $language, $locale);
 
         try {
-            // افتراض أن aiClient->analyze() ترجع سلسلة JSON
-            $jsonResponse = $this->aiClient->analyze($fullPrompt);
-            $result = json_decode($jsonResponse, true, 512, JSON_THROW_ON_ERROR);
+            $response = $this->openai->chat()->create([
+                'model' => 'gpt-4.1-mini', // استخدام النموذج المطلوب
+                'messages' => [
+                    ['role' => 'system', 'content' => $this->getSystemPrompt($locale)],
+                    ['role' => 'user', 'content' => $prompt],
+                ],
+                'response_format' => ['type' => 'json_object'],
+            ]);
 
-            // التحقق من وجود Performance Score
-            if (!isset($result['score']) || !is_int($result['score'])) {
-                $this->logger->warning("AI response for {$analysisType} missing valid score.", ['response' => $result]);
-                $result['score'] = 0; // تعيين قيمة افتراضية
+            $content = $response->choices[0]->message->content;
+            $report = json_decode($content, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                // محاولة استخراج JSON من النص إذا لم يكن JSON خالصاً
+                return $this->handleNonJsonOutput($content, $locale);
             }
 
-            return $result;
+            return $report;
 
-        } catch (JsonException $e) {
-            $this->logger->error("Failed to decode AI JSON response for {$analysisType}: " . $e->getMessage(), ['response' => $jsonResponse ?? 'N/A']);
-            return $this->handleError("فشل في تحليل استجابة الذكاء الاصطناعي.", $analysisType);
-        } catch (Exception $e) {
-            $this->logger->error("AI client error during {$analysisType} analysis: " . $e->getMessage());
-            return $this->handleError("خطأ في الاتصال بواجهة Manus AI.", $analysisType);
+        } catch (Throwable $e) {
+            $errorMessage = $e->getMessage();
+            $errorDetails = $locale === 'ar' ?
+                "حدث خطأ أثناء الاتصال بخدمة الذكاء الاصطناعي أو معالجة الطلب: {$errorMessage}" :
+                "An error occurred while connecting to the AI service or processing the request: {$errorMessage}";
+
+            return [
+                'status' => 'failed',
+                'message' => $errorDetails,
+                'error_type' => get_class($e),
+                'code' => $e->getCode(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null,
+            ];
         }
     }
 
     /**
-     * دالة مساعدة لمعالجة الأخطاء وإرجاع هيكل موحد.
+     * بناء موجه التحليل (Prompt) لـ OpenAI.
      *
-     * @param string $message رسالة الخطأ.
-     * @param string $type نوع التحليل الذي فشل.
-     * @return array هيكل نتيجة الخطأ.
+     * @param string $code
+     * @param string $language
+     * @param string $locale
+     * @return string
      */
-    private function handleError(string $message, string $type): array
+    protected function buildAnalysisPrompt(string $code, string $language, string $locale): string
     {
+        $langText = $locale === 'ar' ? 'باللغة العربية' : 'in English';
+        $requirements = $locale === 'ar' ?
+            "قم بتحليل الكود التالي ($language) وقدّم تقريراً شاملاً بصيغة JSON $langText. يجب أن يتضمن التقرير:
+            1. تحليل تعقيد الوقت (Time Complexity Analysis).
+            2. كشف الاختناقات (Bottlenecks) والمشاكل المحتملة.
+            3. اقتراحات تحسين مفصلة (Detailed Improvement Suggestions).
+            4. تقرير أداء شامل (Comprehensive Performance Report) يوضح التقييم العام.
+            الكود المراد تحليله:" :
+            "Analyze the following code ($language) and provide a comprehensive report in JSON format $langText. The report must include:
+            1. Time Complexity Analysis.
+            2. Bottleneck detection and potential issues.
+            3. Detailed Improvement Suggestions.
+            4. A Comprehensive Performance Report showing the overall assessment.
+            The code to analyze:";
+
+        return $requirements . "\n\n```{$language}\n{$code}\n```";
+    }
+
+    /**
+     * الحصول على موجه النظام (System Prompt) لتعريف دور الذكاء الاصطناعي.
+     *
+     * @param string $locale
+     * @return string
+     */
+    protected function getSystemPrompt(string $locale): string
+    {
+        $jsonSchema = '{
+            "overall_assessment": "string",
+            "time_complexity_analysis": "string",
+            "bottlenecks": ["string"],
+            "improvement_suggestions": ["string"],
+            "detailed_report": "string",
+            "status": "success"
+        }';
+
+        if ($locale === 'ar') {
+            return "أنت محلل أداء كود خبير ومحترف. مهمتك هي تحليل الكود بدقة وتقديم تقرير مفصل وشامل بصيغة JSON فقط. يجب أن يكون الإخراج بصيغة JSON التالية: $jsonSchema";
+        }
+
+        return "You are an expert and professional code performance analyzer. Your task is to accurately analyze the code and provide a detailed and comprehensive report in JSON format ONLY. The output must follow this JSON schema: $jsonSchema";
+    }
+
+    /**
+     * معالجة حالة عدم الحصول على JSON صالح من الرد.
+     *
+     * @param string $content
+     * @param string $locale
+     * @return array
+     */
+    protected function handleNonJsonOutput(string $content, string $locale): array
+    {
+        $message = $locale === 'ar' ?
+            'فشل في تحليل استجابة الذكاء الاصطناعي. الرد الخام:' :
+            'Failed to parse AI response. Raw response:';
+
+        // محاولة استخراج كتلة JSON من الرد الخام
+        if (preg_match('/```json\s*(\{.*\})\s*```/s', $content, $matches)) {
+            $jsonContent = $matches[1];
+            $report = json_decode($jsonContent, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $report;
+            }
+        }
+
         return [
-            'score' => 0,
-            'summary' => "فشل التحليل: {$message}",
-            'details' => ["النوع الفاشل: {$type}"],
-            'recommendations' => ["الرجاء مراجعة سجلات الأخطاء (Logs) لمزيد من التفاصيل."],
-            'status' => 'error'
+            'status' => 'failed',
+            'message' => $message,
+            'raw_response' => $content,
+            'error_details' => $locale === 'ar' ? 'الرد لم يكن بصيغة JSON صالحة.' : 'Response was not a valid JSON object.',
         ];
-    }
-
-    /**
-     * تحليل شامل لأداء الكود.
-     *
-     * يقوم بتجميع نتائج التحليلات الفرعية (نقاط الاختناق، السرعة، الذاكرة، الاستعلامات).
-     *
-     * @param string $code الكود البرمجي المراد تحليله.
-     * @param string $type نوع الكود (مثل: php, javascript, sql).
-     * @return string نتيجة التحليل الشامل بصيغة JSON.
-     */
-    public function analyzePerformance(string $code, string $type): string
-    {
-        $this->logger->info("Starting comprehensive performance analysis for type: {$type}.");
-
-        $bottlenecks = $this->detectBottlenecks($code, false);
-        $speed = $this->analyzeSpeed($code, false);
-        $memory = $this->analyzeMemory($code, false);
-        $queries = $this->analyzeQueries($code, false);
-
-        $analysis = [
-            'type' => $type,
-            'bottlenecks' => json_decode($bottlenecks, true),
-            'speed' => json_decode($speed, true),
-            'memory' => json_decode($memory, true),
-            'queries' => json_decode($queries, true),
-        ];
-
-        // حساب Performance Score الإجمالي
-        $totalScore = 0;
-        $count = 0;
-        foreach (['bottlenecks', 'speed', 'memory', 'queries'] as $key) {
-            if (isset($analysis[$key]['score'])) {
-                $totalScore += $analysis[$key]['score'];
-                $count++;
-            }
-        }
-        $overallScore = $count > 0 ? (int) round($totalScore / $count) : 0;
-        $analysis['overall_score'] = $overallScore;
-
-        return $this->generateReport($analysis);
-    }
-
-    /**
-     * كشف نقاط الاختناق (Bottlenecks) في الكود.
-     *
-     * @param string $code الكود البرمجي المراد تحليله.
-     * @param bool $returnJson هل يجب إرجاع النتيجة كـ JSON مباشرة؟ (افتراضي: true).
-     * @return string|array نتيجة التحليل بصيغة JSON أو مصفوفة PHP.
-     */
-    public function detectBottlenecks(string $code, bool $returnJson = true): string|array
-    {
-        $prompt = "قم بتحديد وتحليل جميع نقاط الاختناق المحتملة (Bottlenecks) في الكود. ركز على الحلقات المتداخلة، العمليات ذات التعقيد الزمني العالي (مثل O(n^2))، والعمليات التي تستهلك موارد بشكل غير فعال. اقترح تحسينات محددة.";
-        $result = $this->callAIAnalysis($code, $prompt, 'bottlenecks');
-        $result['analysis_type'] = 'Bottlenecks Detection';
-
-        return $returnJson ? json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : $result;
-    }
-
-    /**
-     * تحليل السرعة (Speed Analysis) للكود.
-     *
-     * @param string $code الكود البرمجي المراد تحليله.
-     * @param bool $returnJson هل يجب إرجاع النتيجة كـ JSON مباشرة؟ (افتراضي: true).
-     * @return string|array نتيجة التحليل بصيغة JSON أو مصفوفة PHP.
-     */
-    public function analyzeSpeed(string $code, bool $returnJson = true): string|array
-    {
-        $prompt = "قم بتحليل كفاءة الكود من حيث السرعة والتعقيد الزمني (Time Complexity). حدد الأجزاء التي يمكن تسريعها باستخدام خوارزميات أو هياكل بيانات أكثر كفاءة. أعطِ تقديراً للتعقيد الزمني العام (Big O Notation).";
-        $result = $this->callAIAnalysis($code, $prompt, 'speed');
-        $result['analysis_type'] = 'Speed Analysis';
-
-        return $returnJson ? json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : $result;
-    }
-
-    /**
-     * تحليل الذاكرة (Memory Analysis) للكود.
-     *
-     * @param string $code الكود البرمجي المراد تحليله.
-     * @param bool $returnJson هل يجب إرجاع النتيجة كـ JSON مباشرة؟ (افتراضي: true).
-     * @return string|array نتيجة التحليل بصيغة JSON أو مصفوفة PHP.
-     */
-    public function analyzeMemory(string $code, bool $returnJson = true): string|array
-    {
-        $prompt = "قم بتحليل استهلاك الذاكرة (Memory Consumption) للكود. حدد أي تسريبات محتملة للذاكرة (Memory Leaks) أو استخدام غير فعال للمتغيرات والمصفوفات الكبيرة. اقترح طرقاً لتقليل البصمة الذاكرية (Memory Footprint).";
-        $result = $this->callAIAnalysis($code, $prompt, 'memory');
-        $result['analysis_type'] = 'Memory Analysis';
-
-        return $returnJson ? json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : $result;
-    }
-
-    /**
-     * تحليل الاستعلامات (Queries Analysis) ضمن الكود.
-     *
-     * @param string $code الكود البرمجي المراد تحليله.
-     * @param bool $returnJson هل يجب إرجاع النتيجة كـ JSON مباشرة؟ (افتراضي: true).
-     * @return string|array نتيجة التحليل بصيغة JSON أو مصفوفة PHP.
-     */
-    public function analyzeQueries(string $code, bool $returnJson = true): string|array
-    {
-        $prompt = "إذا كان الكود يحتوي على استعلامات قواعد بيانات (SQL, NoSQL)، قم بتحليل كفاءتها. ابحث عن مشكلات مثل استعلامات N+1، الاستعلامات غير المفهرسة، أو الاستعلامات التي تجلب بيانات أكثر من اللازم. اقترح تحسينات على الاستعلامات.";
-        $result = $this->callAIAnalysis($code, $prompt, 'queries');
-        $result['analysis_type'] = 'Queries Analysis';
-
-        return $returnJson ? json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : $result;
-    }
-
-    /**
-     * توليد تقرير مفصل بناءً على نتائج التحليل المجمعة.
-     *
-     * @param array $analysis مصفوفة تحتوي على نتائج التحليلات الفرعية.
-     * @return string التقرير النهائي بصيغة JSON منظمة.
-     */
-    public function generateReport(array $analysis): string
-    {
-        $this->logger->info("Generating final performance report.");
-
-        $report = [
-            'component_name' => 'Performance Analyzer Service Report',
-            'overall_performance_score' => $analysis['overall_score'] ?? 0,
-            'code_type' => $analysis['type'] ?? 'N/A',
-            'summary_report' => "تقرير شامل لأداء الكود. النتيجة الإجمالية هي {$analysis['overall_score']} من 100.",
-            'detailed_analysis' => [
-                'bottlenecks' => $analysis['bottlenecks'] ?? $this->handleError('No data', 'bottlenecks'),
-                'speed' => $analysis['speed'] ?? $this->handleError('No data', 'speed'),
-                'memory' => $analysis['memory'] ?? $this->handleError('No data', 'memory'),
-                'queries' => $analysis['queries'] ?? $this->handleError('No data', 'queries'),
-            ],
-            'final_recommendations' => $this->compileRecommendations($analysis),
-            'timestamp' => date('Y-m-d H:i:s'),
-        ];
-
-        try {
-            return json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            $this->logger->error("Failed to encode final report to JSON: " . $e->getMessage());
-            return json_encode($this->handleError("فشل في توليد التقرير النهائي.", 'Report Generation'));
-        }
-    }
-
-    /**
-     * تجميع التوصيات من جميع التحليلات الفرعية.
-     *
-     * @param array $analysis مصفوفة تحتوي على نتائج التحليلات الفرعية.
-     * @return array قائمة موحدة بالتوصيات.
-     */
-    private function compileRecommendations(array $analysis): array
-    {
-        $recommendations = [];
-        foreach (['bottlenecks', 'speed', 'memory', 'queries'] as $key) {
-            if (isset($analysis[$key]['recommendations']) && is_array($analysis[$key]['recommendations'])) {
-                $recommendations = array_merge($recommendations, $analysis[$key]['recommendations']);
-            }
-        }
-        // إزالة التوصيات المكررة
-        return array_values(array_unique($recommendations));
     }
 }
-
-// ملاحظة: يجب تعريف فئة ManusAIClient وواجهة LoggerInterface في بيئة العمل الفعلية.
-// لغرض هذا المثال، نفترض وجود تعريفات بسيطة لهما لتجنب أخطاء التحميل.
-
-/**
- * فئة وهمية لتمثيل عميل Manus AI.
- * في بيئة العمل الحقيقية، يجب أن تحتوي على منطق الاتصال بـ API.
- */
-class ManusAIClient
-{
-    public function analyze(string $prompt): string
-    {
-        // منطق وهمي: إرجاع استجابة JSON صالحة
-        // في التطبيق الحقيقي، سيتم استدعاء واجهة برمجة تطبيقات Manus AI هنا
-        $mockResponse = [
-            'score' => rand(60, 95),
-            'summary' => 'تحليل مبدئي ممتاز، الكود منظم ولكن هناك مجال للتحسين.',
-            'details' => ['تم تحديد حلقة واحدة يمكن تحسينها.'],
-            'recommendations' => ['استبدال حلقة foreach بـ array_map لتحسين الأداء.'],
-        ];
-        return json_encode($mockResponse);
-    }
-}
-
-/**
- * واجهة وهمية لتمثيل Logger.
- * في بيئة العمل الحقيقية، سيتم استخدام PSR-3 Logger.
- */
-interface LoggerInterface
-{
-    public function info(string $message, array $context = []): void;
-    public function warning(string $message, array $context = []): void;
-    public function error(string $message, array $context = []): void;
-}
-// نهاية الملف
