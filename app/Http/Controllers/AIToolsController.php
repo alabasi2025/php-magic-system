@@ -51,7 +51,7 @@ class AIToolsController extends Controller
      */
     public function performanceAnalyzer()
     {
-        return view('ai-tools.performance-analyzer');
+        return view('developer.ai.performance-analyzer');
     }
 
     /**

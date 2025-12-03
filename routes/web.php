@@ -218,4 +218,7 @@ Route::prefix('ai-tools')->name('ai-tools.')->group(function () {
     Route::get('/error-analyzer', [App\Http\Controllers\AIToolsController::class, 'errorAnalyzer'])->name('error-analyzer');
     Route::get('/project-planning-assistant', [App\Http\Controllers\AIToolsController::class, 'projectPlanningAssistant'])->name('project-planning-assistant');
     Route::get('/productivity-analyzer', [App\Http\Controllers\AIToolsController::class, 'productivityAnalyzer'])->name('productivity-analyzer');
+    
+    // Performance Analyzer API
+    Route::post('/performance-analyzer/analyze', [App\Http\Controllers\DeveloperController::class, 'analyzePerformanceWithAi'])->name('performance-analyzer.analyze');
 });

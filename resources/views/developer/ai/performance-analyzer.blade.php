@@ -50,7 +50,7 @@
             {{ $texts['input_title'] }}
         </h2>
 
-        <form id="analysis-form" action="#" method="POST">
+        <form id="analysis-form" action="{{ route('ai-tools.performance-analyzer.analyze') }}" method="POST">
             @csrf
             {{-- حقل إدخال الكود --}}
             <textarea
