@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Services\AI\PerformanceAnalyzerService;
+use App\Services\AI\CodeTranslatorService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 use Exception;
 
 /**
@@ -26,15 +28,26 @@ class DeveloperController extends Controller
     protected $analyzerService;
 
     /**
+     * خدمة ترجمة الأكواد.
+     * The code translator service instance.
+     *
+     * @var CodeTranslatorService
+     */
+    protected $translatorService;
+
+    /**
      * إنشاء مثيل جديد للمتحكم.
      * Create a new controller instance.
      *
      * @param PerformanceAnalyzerService $analyzerService
      * @return void
      */
-    public function __construct(PerformanceAnalyzerService $analyzerService)
-    {
+    public function __construct(
+        PerformanceAnalyzerService $analyzerService,
+        CodeTranslatorService $translatorService
+    ) {
         $this->analyzerService = $analyzerService;
+        $this->translatorService = $translatorService;
     }
 
     /**
@@ -115,5 +128,112 @@ class DeveloperController extends Controller
                 'db_migration' => 'Manage database migrations.',
             ],
         ], 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    // ========================================
+    // Code Translator Methods - v3.15.0
+    // ========================================
+
+    /**
+     * عرض صفحة مترجم الأكواد
+     * Display the code translator page
+     *
+     * @return \Illuminate\View\View
+     */
+    public function getAiCodeTranslatorPage()
+    {
+        return view('developer.ai.code-translator', [
+            'title' => 'Code Translator - مترجم الأكواد',
+            'version' => 'v3.15.0',
+            'supported_languages' => $this->translatorService->getSupportedLanguages(),
+        ]);
+    }
+
+    /**
+     * ترجمة الكود باستخدام الذكاء الاصطناعي
+     * Translate code using AI
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function translateCodeWithAi(Request $request): JsonResponse
+    {
+        try {
+            // التحقق من صحة المدخلات
+            $validator = Validator::make($request->all(), [
+                'code' => 'required|string|min:5',
+                'from_language' => 'required|string|in:php,python,javascript,java,csharp,typescript',
+                'to_language' => 'required|string|in:php,python,javascript,java,csharp,typescript',
+                'action' => 'required|string|in:translate,detect,validate,compare',
+            ], [
+                'code.required' => 'حقل الكود مطلوب',
+                'code.min' => 'يجب أن يحتوي الكود على 5 أحرف على الأقل',
+                'from_language.required' => 'لغة المصدر مطلوبة',
+                'from_language.in' => 'لغة المصدر غير مدعومة',
+                'to_language.required' => 'لغة الهدف مطلوبة',
+                'to_language.in' => 'لغة الهدف غير مدعومة',
+                'action.required' => 'الإجراء مطلوب',
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $validated = $validator->validated();
+            $action = $validated['action'];
+
+            // تنفيذ الإجراء المطلوب
+            $result = match($action) {
+                'translate' => $this->translatorService->translateCode(
+                    $validated['code'],
+                    $validated['from_language'],
+                    $validated['to_language']
+                ),
+                'detect' => $this->translatorService->detectLanguage($validated['code']),
+                'validate' => $this->translatorService->validateSyntax(
+                    $validated['code'],
+                    $validated['from_language']
+                ),
+                'compare' => $this->translatorService->compareTranslations(
+                    $validated['code'],
+                    $request->input('translated_code', ''),
+                    $validated['from_language'],
+                    $validated['to_language']
+                ),
+                default => ['success' => false, 'error' => 'إجراء غير معروف']
+            };
+
+            if ($result['success']) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'تمت العملية بنجاح',
+                    'data' => $result,
+                ], 200, [], JSON_UNESCAPED_UNICODE);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $result['error'] ?? 'حدث خطأ أثناء العملية',
+                ], 400, [], JSON_UNESCAPED_UNICODE);
+            }
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطأ في التحقق من صحة المدخلات',
+                'errors' => $e->errors(),
+            ], 422, [], JSON_UNESCAPED_UNICODE);
+
+        } catch (Exception $e) {
+            Log::error('Code Translation Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'حدث خطأ غير متوقع أثناء الترجمة',
+                'details' => $e->getMessage(),
+            ], 500, [], JSON_UNESCAPED_UNICODE);
+        }
     }
 }
