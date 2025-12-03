@@ -136,11 +136,15 @@
                         <button onclick="toggleDropdown('accounting')" class="w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
                             <div class="flex items-center space-x-3 space-x-reverse">
                                 <i class="fas fa-calculator w-6"></i>
-                                <span class="sidebar-text">النظام المحاسبي</span>
+                                <span class="sidebar-text">النظام المالي</span>
                             </div>
                             <i class="fas fa-chevron-down sidebar-text transition-transform" id="accounting-arrow"></i>
                         </button>
                         <div id="accounting-dropdown" class="hidden pr-6 space-y-1 mt-1">
+                            <a href="{{ route('accounting.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 text-sm">
+                                <i class="fas fa-calculator w-5"></i>
+                                <span class="sidebar-text">المحاسبة</span>
+                            </a>
                             <a href="{{ route('chart-of-accounts.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 text-sm">
                                 <i class="fas fa-book w-5"></i>
                                 <span class="sidebar-text">الأدلة المحاسبية</span>
