@@ -79,12 +79,61 @@ Route::prefix('developer/ai')->name('developer.ai.')->group(function () {
     Route::post('/documentation', [DeveloperController::class, 'aiDocumentationGenerator'])->name('documentation');
 });
 
-// AI Code Generator UI Routes
+// ========================================
+// AI Tools - أدوات الذكاء الاصطناعي (13 أداة)
+// ========================================
+
+// 1. مولد الأكواد
 Route::get('/developer/ai/code-generator', [DeveloperController::class, 'getAiCodeGeneratorPage'])->name('ai.code-generator');
 Route::post('/developer/ai/code-generator', [DeveloperController::class, 'generateCrudWithAi'])->name('ai.code-generator.post');
-Route::post('/developer/ai/migration', [DeveloperController::class, 'generateMigrationWithAi'])->name('ai.migration');
-Route::post('/developer/ai/api-resource', [DeveloperController::class, 'generateApiResourceWithAi'])->name('ai.api-resource');
-Route::post('/developer/ai/tests', [DeveloperController::class, 'generateTestsWithAi'])->name('ai.tests');
+
+// 2. تحسين الكود
+Route::get('/developer/ai/code-refactor', [DeveloperController::class, 'getAiCodeRefactorPage'])->name('ai.code-refactor');
+Route::post('/developer/ai/code-refactor', [DeveloperController::class, 'refactorCodeWithAi'])->name('ai.code-refactor.post');
+
+// 3. مراجعة الكود
+Route::get('/developer/ai/code-review', [DeveloperController::class, 'getAiCodeReviewPage'])->name('ai.code-review');
+Route::post('/developer/ai/code-review', [DeveloperController::class, 'reviewCodeWithAi'])->name('ai.code-review.post');
+
+// 4. كشف الأخطاء
+Route::get('/developer/ai/bug-detector', [DeveloperController::class, 'getAiBugDetectorPage'])->name('ai.bug-detector');
+Route::post('/developer/ai/bug-detector', [DeveloperController::class, 'detectBugsWithAi'])->name('ai.bug-detector.post');
+
+// 5. توليد التوثيق
+Route::get('/developer/ai/documentation-generator', [DeveloperController::class, 'getAiDocumentationGeneratorPage'])->name('ai.documentation-generator');
+Route::post('/developer/ai/documentation-generator', [DeveloperController::class, 'generateDocumentationWithAi'])->name('ai.documentation-generator.post');
+
+// 6. مولد الاختبارات
+Route::get('/developer/ai/test-generator', [DeveloperController::class, 'getAiTestGeneratorPage'])->name('ai.test-generator');
+Route::post('/developer/ai/test-generator', [DeveloperController::class, 'generateTestsWithAi'])->name('ai.test-generator.post');
+
+// 7. تحليل الأداء
+Route::get('/developer/ai/performance-analyzer', [DeveloperController::class, 'getAiPerformanceAnalyzerPage'])->name('ai.performance-analyzer');
+Route::post('/developer/ai/performance-analyzer', [DeveloperController::class, 'analyzePerformanceWithAi'])->name('ai.performance-analyzer.post');
+
+// 8. فحص الأمان
+Route::get('/developer/ai/security-scanner', [DeveloperController::class, 'getAiSecurityScannerPage'])->name('ai.security-scanner');
+Route::post('/developer/ai/security-scanner', [DeveloperController::class, 'scanSecurityWithAi'])->name('ai.security-scanner.post');
+
+// 9. مولد API
+Route::get('/developer/ai/api-generator', [DeveloperController::class, 'getAiApiGeneratorPage'])->name('ai.api-generator');
+Route::post('/developer/ai/api-generator', [DeveloperController::class, 'generateApiWithAi'])->name('ai.api-generator.post');
+
+// 10. محسن قاعدة البيانات
+Route::get('/developer/ai/database-optimizer', [DeveloperController::class, 'getAiDatabaseOptimizerPage'])->name('ai.database-optimizer');
+Route::post('/developer/ai/database-optimizer', [DeveloperController::class, 'optimizeDatabaseWithAi'])->name('ai.database-optimizer.post');
+
+// 11. مترجم الأكواد
+Route::get('/developer/ai/code-translator', [DeveloperController::class, 'getAiCodeTranslatorPage'])->name('ai.code-translator');
+Route::post('/developer/ai/code-translator', [DeveloperController::class, 'translateCodeWithAi'])->name('ai.code-translator.post');
+
+// 12. المساعد الذكي
+Route::get('/developer/ai/assistant', [DeveloperController::class, 'getAiAssistantPage'])->name('ai.assistant');
+Route::post('/developer/ai/assistant', [DeveloperController::class, 'chatWithAiAssistant'])->name('ai.assistant.post');
+
+// 13. إعدادات AI
+Route::get('/developer/ai/settings', [DeveloperController::class, 'getAiSettingsPage'])->name('ai.settings');
+Route::post('/developer/ai/settings', [DeveloperController::class, 'updateAiSettings'])->name('ai.settings.post');
 
 
 // ========================================

@@ -570,7 +570,7 @@
                         <div id="developerMenu" class="hidden mt-2 mr-6 space-y-1">
                             
                             <!-- لوحة التحكم -->
-                            <a href="{{ route('developer.dashboard') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 text-gray-600 hover:text-purple-600 transition-all duration-200">
+                            <a href="{{ route('developer.index') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 text-gray-600 hover:text-purple-600 transition-all duration-200">
                                 <i class="fas fa-tachometer-alt w-5 text-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
                                 <span class="sidebar-text text-sm font-medium">لوحة التحكم</span>
                             </a>

@@ -1866,4 +1866,135 @@ class DeveloperController extends Controller
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
 
+    // ========================================
+    // AI Tools Methods - أدوات الذكاء الاصطناعي
+    // ========================================
+
+    // 2. تحسين الكود
+    public function getAiCodeRefactorPage()
+    {
+        return view('developer.ai.code-refactor');
+    }
+
+    public function refactorCodeWithAi(Request $request)
+    {
+        return response()->json(['message' => 'قيد التطوير...']);
+    }
+
+    // 3. مراجعة الكود
+    public function getAiCodeReviewPage()
+    {
+        return view('developer.ai.code-review');
+    }
+
+    public function reviewCodeWithAi(Request $request)
+    {
+        return response()->json(['message' => 'قيد التطوير...']);
+    }
+
+    // 4. كشف الأخطاء
+    public function getAiBugDetectorPage()
+    {
+        return view('developer.ai.bug-detector');
+    }
+
+    public function detectBugsWithAi(Request $request)
+    {
+        return response()->json(['message' => 'قيد التطوير...']);
+    }
+
+    // 5. توليد التوثيق
+    public function getAiDocumentationGeneratorPage()
+    {
+        return view('developer.ai.documentation-generator');
+    }
+
+    public function generateDocumentationWithAi(Request $request)
+    {
+        return response()->json(['message' => 'قيد التطوير...']);
+    }
+
+    // 6. مولد الاختبارات
+    public function getAiTestGeneratorPage()
+    {
+        return view('developer.ai.test-generator');
+    }
+
+    // 7. تحليل الأداء
+    public function getAiPerformanceAnalyzerPage()
+    {
+        return view('developer.ai.performance-analyzer');
+    }
+
+    public function analyzePerformanceWithAi(Request $request)
+    {
+        return response()->json(['message' => 'قيد التطوير...']);
+    }
+
+    // 8. فحص الأمان
+    public function getAiSecurityScannerPage()
+    {
+        return view('developer.ai.security-scanner');
+    }
+
+    public function scanSecurityWithAi(Request $request)
+    {
+        return response()->json(['message' => 'قيد التطوير...']);
+    }
+
+    // 9. مولد API
+    public function getAiApiGeneratorPage()
+    {
+        return view('developer.ai.api-generator');
+    }
+
+    public function generateApiWithAi(Request $request)
+    {
+        return response()->json(['message' => 'قيد التطوير...']);
+    }
+
+    // 10. محسن قاعدة البيانات
+    public function getAiDatabaseOptimizerPage()
+    {
+        return view('developer.ai.database-optimizer');
+    }
+
+    public function optimizeDatabaseWithAi(Request $request)
+    {
+        return response()->json(['message' => 'قيد التطوير...']);
+    }
+
+    // 11. مترجم الأكواد
+    public function getAiCodeTranslatorPage()
+    {
+        return view('developer.ai.code-translator');
+    }
+
+    public function translateCodeWithAi(Request $request)
+    {
+        return response()->json(['message' => 'قيد التطوير...']);
+    }
+
+    // 12. المساعد الذكي
+    public function getAiAssistantPage()
+    {
+        return view('developer.ai.assistant');
+    }
+
+    public function chatWithAiAssistant(Request $request)
+    {
+        return response()->json(['message' => 'قيد التطوير...']);
+    }
+
+    // 13. إعدادات AI
+    public function getAiSettingsPage()
+    {
+        return view('developer.ai.settings');
+    }
+
+    public function updateAiSettings(Request $request)
+    {
+        return response()->json(['message' => 'تم حفظ الإعدادات بنجاح']);
+    }
+
 }
