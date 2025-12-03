@@ -99,6 +99,7 @@ Route::prefix('developer')->name('developer.')->group(function () {
     Route::get('/', [App\Http\Controllers\DeveloperController::class, 'index'])->name('index');
     Route::post('/migrations/run', [App\Http\Controllers\DeveloperController::class, 'runMigrations'])->name('migrations.run');
     Route::post('/seeders/run', [App\Http\Controllers\DeveloperController::class, 'runSeeders'])->name('seeders.run');
+    Route::post('/seeders/run-all', [App\Http\Controllers\DeveloperController::class, 'runAllSeeders'])->name('seeders.run-all');
     Route::get('/database/info', [App\Http\Controllers\DeveloperController::class, 'databaseInfo'])->name('database.info');
     Route::post('/database/optimize', [App\Http\Controllers\DeveloperController::class, 'optimizeDatabase'])->name('database.optimize');
     Route::post('/database/backup', [App\Http\Controllers\DeveloperController::class, 'backupDatabase'])->name('database.backup');

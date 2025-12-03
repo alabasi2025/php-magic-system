@@ -1249,6 +1249,19 @@ class DeveloperController extends Controller
                 ], 400);
             }
             
+            // التحقق من وجود الملف
+            $seederPath = database_path('seeders/' . $seederClass . '.php');
+            if (!File::exists($seederPath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Seeder غير موجود: ' . $seederClass
+                ], 404);
+            }
+            
+            // تسجيل بداية التشغيل
+            $startTime = microtime(true);
+            Log::info('بدء تشغيل Seeder: ' . $seederClass);
+            
             // Run the seeder
             Artisan::call('db:seed', [
                 '--class' => $seederClass,
@@ -1256,16 +1269,57 @@ class DeveloperController extends Controller
             ]);
             
             $output = Artisan::output();
+            $duration = round(microtime(true) - $startTime, 2);
+            
+            Log::info('انتهى تشغيل Seeder: ' . $seederClass . ' في ' . $duration . ' ثانية');
             
             return response()->json([
                 'success' => true,
-                'message' => 'تم تشغيل Seeder بنجاح',
-                'output' => $output
+                'message' => 'تم تشغيل Seeder بنجاح في ' . $duration . ' ثانية',
+                'output' => $output,
+                'duration' => $duration
             ]);
         } catch (Exception $e) {
+            Log::error('خطأ في تشغيل Seeder: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'حدث خطأ: ' . $e->getMessage()
+                'message' => 'حدث خطأ: ' . $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null
+            ], 500);
+        }
+    }
+
+    /**
+     * تشغيل جميع Seeders
+     */
+    public function runAllSeeders(Request $request)
+    {
+        try {
+            $startTime = microtime(true);
+            Log::info('بدء تشغيل جميع Seeders');
+            
+            // تشغيل DatabaseSeeder الذي يستدعي جميع Seeders
+            Artisan::call('db:seed', [
+                '--force' => true
+            ]);
+            
+            $output = Artisan::output();
+            $duration = round(microtime(true) - $startTime, 2);
+            
+            Log::info('انتهى تشغيل جميع Seeders في ' . $duration . ' ثانية');
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تشغيل جميع Seeders بنجاح في ' . $duration . ' ثانية',
+                'output' => $output,
+                'duration' => $duration
+            ]);
+        } catch (Exception $e) {
+            Log::error('خطأ في تشغيل جميع Seeders: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ: ' . $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null
             ], 500);
         }
     }
