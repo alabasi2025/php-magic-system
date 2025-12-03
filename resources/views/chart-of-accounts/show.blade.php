@@ -145,7 +145,7 @@
                     <i class="fas fa-layer-group text-indigo-600 ml-1"></i>
                     نوع الحساب <span class="text-red-500">*</span>
                 </label>
-                <select name="is_parent" id="is_parent" required onchange="toggleAccountTypeFields()" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                <select name="is_parent" id="is_parent" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                     <option value="">-- اختر النوع --</option>
                     <option value="1">حساب رئيسي (للترتيب الشجري فقط)</option>
                     <option value="0">حساب فرعي (الحساب النهائي)</option>
@@ -159,7 +159,7 @@
                     <i class="fas fa-tag text-indigo-600 ml-1"></i>
                     نوع الحساب الفرعي <span class="text-red-500">*</span>
                 </label>
-                <select name="account_type" id="account_type" onchange="toggleIntermediateField()" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                <select name="account_type" id="account_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                     <option value="">-- اختر النوع --</option>
                     <option value="general">حساب عام</option>
                     <option value="cash_box">صندوق</option>
@@ -266,6 +266,21 @@ function toggleIntermediateField() {
         intermediateForField.classList.add('hidden');
     }
 }
+
+// Add event listeners when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listener for is_parent select
+    const isParentSelect = document.getElementById('is_parent');
+    if (isParentSelect) {
+        isParentSelect.addEventListener('change', toggleAccountTypeFields);
+    }
+    
+    // Event listener for account_type select
+    const accountTypeSelect = document.getElementById('account_type');
+    if (accountTypeSelect) {
+        accountTypeSelect.addEventListener('change', toggleIntermediateField);
+    }
+});
 
 // Submit form
 document.getElementById('addAccountForm').addEventListener('submit', async function(e) {
