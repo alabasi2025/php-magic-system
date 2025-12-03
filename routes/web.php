@@ -18,6 +18,7 @@ use App\Http\Controllers\ChartOfAccountsController;
 use App\Http\Controllers\MasterChartController;
 use App\Http\Controllers\CashBoxController;
 use App\Http\Controllers\IntermediateAccountController;
+use App\Http\Controllers\JournalEntryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -168,6 +169,17 @@ Route::prefix('partnership')->name('partnership.')->group(function () {
     Route::get('/profits', [App\Http\Controllers\PartnershipController::class, 'profits'])->name('profits.index');
     Route::get('/reports', [App\Http\Controllers\PartnershipController::class, 'reports'])->name('reports.index');
     Route::get('/settings', [App\Http\Controllers\PartnershipController::class, 'settings'])->name('settings');
+});
+
+// Journal Entries Routes (Accounting Vouchers)
+Route::prefix('journal-entries')->name('journal-entries.')->group(function () {
+    Route::get('/', [JournalEntryController::class, 'index'])->name('index');
+    Route::get('/create', [JournalEntryController::class, 'create'])->name('create');
+    Route::post('/', [JournalEntryController::class, 'store'])->name('store');
+    Route::get('/{id}', [JournalEntryController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [JournalEntryController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [JournalEntryController::class, 'update'])->name('update');
+    Route::delete('/{id}', [JournalEntryController::class, 'destroy'])->name('destroy');
 });
 
 // Intermediate Accounts Routes

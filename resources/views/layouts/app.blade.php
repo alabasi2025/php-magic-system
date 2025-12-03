@@ -157,6 +157,10 @@
                                 <i class="fas fa-cash-register w-5"></i>
                                 <span class="sidebar-text">الصناديق النقدية</span>
                             </a>
+                            <a href="{{ route('journal-entries.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 text-sm">
+                                <i class="fas fa-file-invoice w-5"></i>
+                                <span class="sidebar-text">القيود المحاسبية</span>
+                            </a>
                         </div>
                     </div>
                     
