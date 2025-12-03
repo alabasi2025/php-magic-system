@@ -62,7 +62,7 @@
 | 19 | Controller Generator | مولد Controllers | v3.27.0 | ✅ منجز |
 | 20 | Middleware Generator | مولد Middleware | v3.28.0 | 📋 قادم |
 | 21 | Request Generator | مولد Form Requests | v3.29.0 | 📋 قادم |
-| 22 | Resource Generator | مولد API Resources | v3.30.0 | 📋 قادم |
+| 22 | Resource Generator | مولد API Resources | v3.30.0 | ✅ منجز |
 | 23 | Policy Generator | مولد Policies | v3.31.0 | 📋 قادم |
 | 24 | Event Generator | مولد Events | v3.32.0 | 📋 قادم |
 | 25 | Listener Generator | مولد Listeners | v3.33.0 | 📋 قادم |

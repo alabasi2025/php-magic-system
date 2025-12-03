@@ -245,3 +245,6 @@ require __DIR__."/factory_generator.php";
 
 // Middleware Generator Routes
 require __DIR__."/middleware_generator.php";
+
+// Resource Generator Routes (v3.30.0)
+require __DIR__."/resource_generator.php";
