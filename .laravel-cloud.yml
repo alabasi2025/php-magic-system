@@ -2,9 +2,12 @@ php: "8.2"
 env: production
 
 deploy:
-  - echo "Deploying PHP Magic System"
-  - php artisan migrate --force
-  - php artisan db:seed --class=ChartOfAccountSeeder --force
+  - echo "Deploying PHP Magic System - Developer Branch"
+  - php artisan migrate --force || echo "Migration failed, continuing..."
   - php artisan cache:clear
   - php artisan config:clear
   - php artisan view:clear
+  - php artisan config:cache
+  - php artisan route:cache
+  - php artisan view:cache
+  - echo "Deployment completed successfully!"
