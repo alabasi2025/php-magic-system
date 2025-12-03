@@ -233,3 +233,6 @@ Route::prefix('ai-tools')->name('ai-tools.')->group(function () {
 
 // Code Metrics Routes (v3.21.0)
 require __DIR__.'/code_metrics.php';
+
+// Git Helper Routes (v3.22.0)
+require __DIR__.'/git_helper.php';
