@@ -286,4 +286,39 @@ class ChartAccount extends Model
     {
         return number_format($this->balance, 2);
     }
+
+    /**
+     * Get the linked cash box (if intermediate_for = 'cash_boxes')
+     */
+    public function cashBox()
+    {
+        return $this->hasOne(CashBox::class, 'intermediate_account_id');
+    }
+
+    /**
+     * Get the linked bank (if intermediate_for = 'banks')
+     */
+    public function bank()
+    {
+        // Will be implemented when Bank model is created
+        return null;
+    }
+
+    /**
+     * Get the linked wallet (if intermediate_for = 'wallets')
+     */
+    public function wallet()
+    {
+        // Will be implemented when Wallet model is created
+        return null;
+    }
+
+    /**
+     * Get the linked ATM (if intermediate_for = 'atms')
+     */
+    public function atm()
+    {
+        // Will be implemented when ATM model is created
+        return null;
+    }
 }
