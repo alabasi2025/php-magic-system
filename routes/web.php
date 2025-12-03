@@ -230,3 +230,6 @@ Route::prefix('ai-tools')->name('ai-tools.')->group(function () {
     // Refactoring Tool (Task 11 - v3.19.0)
     Route::get('/refactoring-tool', [App\Http\Controllers\RefactoringToolController::class, 'index'])->name('refactoring-tool');
 });
+
+// Code Metrics Routes (v3.21.0)
+require __DIR__.'/code_metrics.php';
