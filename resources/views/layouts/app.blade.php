@@ -587,6 +587,17 @@
                                 </div>
                             </div>
                             
+                            <!-- أدوات الذكاء الاصطناعي -->
+                            <div class="mb-3">
+                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">الذكاء الاصطناعي</span>
+                                <div class="mt-1 space-y-1">
+                                    <a href="{{ route('ai-tools.dashboard') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-colors">
+                                        <i class="fas fa-brain w-5 text-sm"></i>
+                                        <span class="sidebar-text text-sm">أدوات الذكاء الاصطناعي</span>
+                                    </a>
+                                </div>
+                            </div>
+                            
                             <!-- أدوات قاعدة البيانات -->
                             <div class="mb-3">
                                 <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">قاعدة البيانات</span>

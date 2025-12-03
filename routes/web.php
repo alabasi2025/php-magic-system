@@ -201,3 +201,21 @@ Route::prefix('intermediate-accounts')->name('intermediate-accounts.')->group(fu
 // See: app/Genes/ORGANIZATIONAL_STRUCTURE/routes.php
 
 
+
+// AI Tools Routes
+Route::prefix('ai-tools')->name('ai-tools.')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\AIToolsController::class, 'dashboard'])->name('dashboard');
+    Route::get('/code-assistant', [App\Http\Controllers\AIToolsController::class, 'codeAssistant'])->name('code-assistant');
+    Route::get('/design-to-code', [App\Http\Controllers\AIToolsController::class, 'designToCode'])->name('design-to-code');
+    Route::get('/nlp-code-generator', [App\Http\Controllers\AIToolsController::class, 'nlpCodeGenerator'])->name('nlp-code-generator');
+    Route::get('/performance-analyzer', [App\Http\Controllers\AIToolsController::class, 'performanceAnalyzer'])->name('performance-analyzer');
+    Route::get('/security-scanner', [App\Http\Controllers\AIToolsController::class, 'securityScanner'])->name('security-scanner');
+    Route::get('/code-refactoring', [App\Http\Controllers\AIToolsController::class, 'codeRefactoring'])->name('code-refactoring');
+    Route::get('/code-review-assistant', [App\Http\Controllers\AIToolsController::class, 'codeReviewAssistant'])->name('code-review-assistant');
+    Route::get('/interactive-doc-generator', [App\Http\Controllers\AIToolsController::class, 'interactiveDocGenerator'])->name('interactive-doc-generator');
+    Route::get('/project-chatbot', [App\Http\Controllers\AIToolsController::class, 'projectChatbot'])->name('project-chatbot');
+    Route::get('/advanced-test-generator', [App\Http\Controllers\AIToolsController::class, 'advancedTestGenerator'])->name('advanced-test-generator');
+    Route::get('/error-analyzer', [App\Http\Controllers\AIToolsController::class, 'errorAnalyzer'])->name('error-analyzer');
+    Route::get('/project-planning-assistant', [App\Http\Controllers\AIToolsController::class, 'projectPlanningAssistant'])->name('project-planning-assistant');
+    Route::get('/productivity-analyzer', [App\Http\Controllers\AIToolsController::class, 'productivityAnalyzer'])->name('productivity-analyzer');
+});
