@@ -38,7 +38,7 @@ return new class extends Migration
                 'asset',             // أصل
                 'liability',         // التزام
                 'equity'             // حقوق ملكية
-            ])->default('general')->after('is_parent')->comment('نوع الحساب');
+            ])->nullable()->after('is_parent')->comment('نوع الحساب - null للحسابات الرئيسية');
             
             if (!Schema::hasColumn('chart_accounts', 'intermediate_for')) {
                 $table->enum('intermediate_for', [
