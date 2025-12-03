@@ -245,3 +245,6 @@ require __DIR__."/factory_generator.php";
 
 // Middleware Generator Routes
 require __DIR__."/middleware_generator.php";
+
+// Policy Generator Routes (v3.31.0) - Task 23/100
+require __DIR__."/policy_generator.php";
