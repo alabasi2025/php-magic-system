@@ -146,6 +146,11 @@
                         <span class="sidebar-text">الحسابات الوسيطة</span>
                     </a>
                     
+                    <a href="{{ route('cash-boxes.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-green-50 text-gray-700 hover:text-green-600">
+                        <i class="fas fa-cash-register w-6"></i>
+                        <span class="sidebar-text">الصناديق النقدية</span>
+                    </a>
+                    
                     <a href="{{ route('customers.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
                         <i class="fas fa-users w-6"></i>
                         <span class="sidebar-text">العملاء</span>
