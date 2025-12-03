@@ -6,6 +6,8 @@ use App\Models\ChartOfAccount;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class ChartOfAccountController extends Controller
@@ -24,52 +26,164 @@ class ChartOfAccountController extends Controller
     public function index(Request $request)
     {
         try {
+            // التحقق من وجود الجداول المطلوبة
+            $this->checkRequiredTables();
+            
             $query = ChartOfAccount::with(['unit', 'parent', 'children'])
                 ->latest();
 
-        // تصفية حسب الوحدة
-        if ($request->filled('unit_id')) {
-            $query->where('unit_id', $request->unit_id);
-        }
+            // تصفية حسب الوحدة
+            if ($request->filled('unit_id')) {
+                $query->where('unit_id', $request->unit_id);
+            }
 
-        // تصفية حسب نوع الحساب
-        if ($request->filled('account_type')) {
-            $query->where('account_type', $request->account_type);
-        }
+            // تصفية حسب نوع الحساب
+            if ($request->filled('account_type')) {
+                $query->where('account_type', $request->account_type);
+            }
 
-        // تصفية حسب النوع التحليلي
-        if ($request->filled('analytical_type')) {
-            $query->where('analytical_type', $request->analytical_type);
-        }
+            // تصفية حسب النوع التحليلي
+            if ($request->filled('analytical_type')) {
+                $query->where('analytical_type', $request->analytical_type);
+            }
 
-        // تصفية حسب المستوى (رئيسي/فرعي)
-        if ($request->filled('account_level')) {
-            $query->where('account_level', $request->account_level);
-        }
+            // تصفية حسب المستوى (رئيسي/فرعي)
+            if ($request->filled('account_level')) {
+                $query->where('account_level', $request->account_level);
+            }
 
-        // البحث
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('code', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%")
-                  ->orWhere('name_en', 'like', "%{$search}%");
-            });
-        }
+            // البحث
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('code', 'like', "%{$search}%")
+                      ->orWhere('name', 'like', "%{$search}%")
+                      ->orWhere('name_en', 'like', "%{$search}%");
+                });
+            }
 
             $accounts = $query->paginate(20);
             $units = Unit::active()->get();
 
             return view('chart-of-accounts.index', compact('accounts', 'units'));
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // خطأ في قاعدة البيانات
+            return $this->handleDatabaseError($e);
         } catch (\Exception $e) {
-            // إذا كان الجدول غير موجود، عرض رسالة واضحة
+            // أي خطأ آخر
+            return $this->handleGeneralError($e);
+        }
+    }
+
+    /**
+     * التحقق من وجود الجداول المطلوبة
+     */
+    private function checkRequiredTables()
+    {
+        // فحص جدول units
+        if (!Schema::hasTable('units')) {
+            throw new \Exception('جدول الوحدات (units) غير موجود في قاعدة البيانات. يرجى تشغيل: php artisan migrate');
+        }
+
+        // فحص جدول chart_of_accounts
+        if (!Schema::hasTable('chart_of_accounts')) {
+            throw new \Exception('جدول دليل الحسابات (chart_of_accounts) غير موجود في قاعدة البيانات. يرجى تشغيل: php artisan migrate');
+        }
+
+        // فحص وجود بيانات في جدول units
+        $unitsCount = DB::table('units')->count();
+        if ($unitsCount === 0) {
+            throw new \Exception('لا توجد وحدات في النظام. يرجى إنشاء وحدة واحدة على الأقل قبل استخدام دليل الحسابات.');
+        }
+    }
+
+    /**
+     * معالجة أخطاء قاعدة البيانات
+     */
+    private function handleDatabaseError(\Illuminate\Database\QueryException $e)
+    {
+        $errorCode = $e->getCode();
+        $errorMessage = $e->getMessage();
+
+        // تحديد نوع الخطأ
+        if (str_contains($errorMessage, "Table") && str_contains($errorMessage, "doesn't exist")) {
+            $tableName = $this->extractTableName($errorMessage);
+            
             return response()->view('errors.setup-required', [
                 'title' => 'دليل الحسابات',
-                'message' => 'جدول دليل الحسابات غير موجود في قاعدة البيانات.',
-                'instructions' => 'يرجى الذهاب إلى نظام المطور > Migrations وتشغيل migrations.',
-                'error' => $e->getMessage()
+                'message' => "جدول {$tableName} غير موجود في قاعدة البيانات.",
+                'instructions' => $this->getMigrationInstructions(),
+                'error' => $errorMessage,
+                'solution' => 'تشغيل Migrations'
             ], 500);
         }
+
+        // خطأ عام في قاعدة البيانات
+        return response()->view('errors.database-error', [
+            'title' => 'خطأ في قاعدة البيانات',
+            'message' => 'حدث خطأ أثناء الاتصال بقاعدة البيانات.',
+            'error' => config('app.debug') ? $errorMessage : 'يرجى الاتصال بمسؤول النظام',
+            'code' => $errorCode
+        ], 500);
+    }
+
+    /**
+     * معالجة الأخطاء العامة
+     */
+    private function handleGeneralError(\Exception $e)
+    {
+        $errorMessage = $e->getMessage();
+
+        // إذا كانت رسالة الخطأ تحتوي على تعليمات واضحة
+        if (str_contains($errorMessage, 'php artisan migrate') || 
+            str_contains($errorMessage, 'غير موجود') ||
+            str_contains($errorMessage, 'لا توجد وحدات')) {
+            
+            return response()->view('errors.setup-required', [
+                'title' => 'دليل الحسابات',
+                'message' => $errorMessage,
+                'instructions' => $this->getMigrationInstructions(),
+                'error' => $errorMessage,
+                'solution' => 'إعداد النظام'
+            ], 500);
+        }
+
+        // خطأ عام
+        return response()->view('errors.general', [
+            'title' => 'حدث خطأ',
+            'message' => 'حدث خطأ غير متوقع.',
+            'error' => config('app.debug') ? $errorMessage : 'يرجى الاتصال بمسؤول النظام'
+        ], 500);
+    }
+
+    /**
+     * استخراج اسم الجدول من رسالة الخطأ
+     */
+    private function extractTableName($errorMessage)
+    {
+        preg_match("/Table '.*\.(.*)' doesn't exist/", $errorMessage, $matches);
+        return $matches[1] ?? 'غير معروف';
+    }
+
+    /**
+     * الحصول على تعليمات تشغيل Migrations
+     */
+    private function getMigrationInstructions()
+    {
+        return [
+            'عبر Laravel Cloud Dashboard:' => [
+                '1. اذهب إلى: https://cloud.laravel.com',
+                '2. افتح مشروع: php-magic-system',
+                '3. اذهب إلى: Deployments',
+                '4. انقر على: Run Command',
+                '5. اكتب: php artisan migrate',
+                '6. انقر على: Run'
+            ],
+            'عبر Terminal (إذا كان لديك وصول):' => [
+                'php artisan migrate'
+            ]
+        ];
     }
 
     /**
@@ -77,12 +191,18 @@ class ChartOfAccountController extends Controller
      */
     public function create()
     {
-        $units = Unit::active()->get();
-        $parentAccounts = ChartOfAccount::active()
-            ->parentAccounts()
-            ->get();
+        try {
+            $this->checkRequiredTables();
+            
+            $units = Unit::active()->get();
+            $parentAccounts = ChartOfAccount::active()
+                ->parentAccounts()
+                ->get();
 
-        return view('chart-of-accounts.create', compact('units', 'parentAccounts'));
+            return view('chart-of-accounts.create', compact('units', 'parentAccounts'));
+        } catch (\Exception $e) {
+            return $this->handleGeneralError($e);
+        }
     }
 
     /**
@@ -236,19 +356,25 @@ class ChartOfAccountController extends Controller
      */
     public function tree(Request $request)
     {
-        $unitId = $request->get('unit_id');
+        try {
+            $this->checkRequiredTables();
+            
+            $unitId = $request->get('unit_id');
 
-        $query = ChartOfAccount::with('allChildren')
-            ->rootAccounts()
-            ->active();
+            $query = ChartOfAccount::with('allChildren')
+                ->rootAccounts()
+                ->active();
 
-        if ($unitId) {
-            $query->where('unit_id', $unitId);
+            if ($unitId) {
+                $query->where('unit_id', $unitId);
+            }
+
+            $accounts = $query->get();
+            $units = Unit::active()->get();
+
+            return view('chart-of-accounts.tree', compact('accounts', 'units'));
+        } catch (\Exception $e) {
+            return $this->handleGeneralError($e);
         }
-
-        $accounts = $query->get();
-        $units = Unit::active()->get();
-
-        return view('chart-of-accounts.tree', compact('accounts', 'units'));
     }
 }
