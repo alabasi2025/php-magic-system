@@ -1,5 +1,35 @@
 # Changelog - SEMOP
 
+## [v3.14.0] - 2024-12-03 - Security Scanner Edition
+
+### ✨ Added
+- ✅ **فاحص الأمان الذكي (Security Scanner)** - نظام شامل لفحص الكود واكتشاف الثغرات الأمنية
+  - 8 أنواع فحوصات أمنية: SQL Injection, XSS, CSRF, Permissions, File Upload, Authentication, Encryption, Input Validation
+  - نظام حساب درجة الأمان (0-100)
+  - 3 أوضاع فحص: كود مباشر، ملف، مجلد كامل
+  - واجهة احترافية مع Tailwind CSS
+  - اقتراحات إصلاح فورية ومحددة
+  - توصيات وإرشادات شاملة
+  
+- ✅ **الملفات المضافة**
+  - app/Services/SecurityScanner.php - الخدمة الرئيسية
+  - app/Http/Controllers/SecurityScannerController.php - المعالج
+  - resources/views/developer/ai/security-scanner.blade.php - الواجهة
+  - tests/Feature/SecurityScannerTest.php - 13 اختبار شامل
+  - SECURITY_SCANNER_TEST_REPORT.md - تقرير الاختبار
+
+### 🔧 Updated
+- ✅ تحديث routes/web.php (6 مسارات جديدة)
+- ✅ تحديث VERSION من v2.13.0 إلى v3.14.0
+
+### 📝 Technical Details
+- Task: 6/100
+- Commit: 1b9393ee
+- Release: https://github.com/alabasi2025/php-magic-system/releases/tag/v3.14.0
+- Files Changed: 7 files, 2119 insertions, 24 deletions
+
+---
+
 ## [v2.8.3] - 2025-11-30 - Complete Genes System Edition
 
 ### Added
