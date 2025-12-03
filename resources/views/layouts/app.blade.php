@@ -141,6 +141,11 @@
                         <span class="sidebar-text">الأدلة المحاسبية المبسطة</span>
                     </a>
                     
+                    <a href="{{ route('intermediate-accounts.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600">
+                        <i class="fas fa-exchange-alt w-6"></i>
+                        <span class="sidebar-text">الحسابات الوسيطة</span>
+                    </a>
+                    
                     <a href="{{ route('customers.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
                         <i class="fas fa-users w-6"></i>
                         <span class="sidebar-text">العملاء</span>
