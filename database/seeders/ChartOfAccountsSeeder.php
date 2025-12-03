@@ -29,7 +29,7 @@ class ChartOfAccountsSeeder extends Seeder
             'unit_id' => $unit->id,
             'code' => 'EMP',
             'name' => 'دليل أعمال الموظفين',
-            'type' => 'employees',
+            'type' => 'payroll',
             'description' => 'دليل محاسبي مبسط لإدارة حسابات الموظفين والرواتب والمستحقات',
             'color' => '#3B82F6',
             'icon' => 'fa-user-tie',
