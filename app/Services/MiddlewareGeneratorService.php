@@ -2,991 +2,526 @@
 
 namespace App\Services;
 
+use App\Exceptions\MiddlewareGenerationException;
+use App\Services\AI\ManusAIClient;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
+use InvalidArgumentException;
+use Throwable;
 
 /**
- * 🛡️ Middleware Generator Service v3.28.0
- * 
- * خدمة توليد Middleware بشكل ذكي ومتقدم
- * 
- * @version 3.28.0
- * @since 2025-12-03
- * @category Services
+ * MiddlewareGeneratorService
+ *
+ * الخدمة الرئيسية لتوليد Middleware في Laravel.
+ * تدعم أنماط متعددة (Authentication, Authorization, Logging, Rate Limiting, CORS, Custom).
+ *
+ * The main service for generating Laravel Middleware.
+ * Supports multiple patterns (Authentication, Authorization, Logging, Rate Limiting, CORS, Custom).
+ *
  * @package App\Services
+ * @version v3.28.0
  * @author Manus AI
  */
 class MiddlewareGeneratorService
 {
-    /**
-     * أنواع Middleware المدعومة
-     */
-    const TYPES = [
-        'auth' => 'Authentication Middleware',
-        'permission' => 'Permission/Authorization Middleware',
-        'rate_limit' => 'Rate Limiting Middleware',
-        'logging' => 'Request Logging Middleware',
-        'cors' => 'CORS Middleware',
-        'validation' => 'Request Validation Middleware',
-        'cache' => 'Response Cache Middleware',
-        'transform' => 'Request/Response Transformation Middleware',
-        'security' => 'Security Headers Middleware',
-        'custom' => 'Custom Middleware',
-    ];
+    // ثوابت لأنواع Middleware المدعومة
+    // Constants for supported middleware types
+    public const TYPE_AUTHENTICATION = 'authentication';
+    public const TYPE_AUTHORIZATION = 'authorization';
+    public const TYPE_LOGGING = 'logging';
+    public const TYPE_RATE_LIMIT = 'rate_limit';
+    public const TYPE_CORS = 'cors';
+    public const TYPE_CUSTOM = 'custom';
 
     /**
-     * مسار حفظ Middleware
+     * @var ManusAIClient عميل Manus AI للتكامل مع الذكاء الاصطناعي.
+     *                    Manus AI client for AI integration.
      */
-    protected string $middlewarePath = 'app/Http/Middleware';
+    protected ManusAIClient $aiClient;
 
     /**
-     * مسار حفظ القوالب
-     */
-    protected string $templatesPath = 'app/Templates/Middleware';
-
-    /**
-     * توليد Middleware من وصف نصي
+     * المسار الأساسي لـ Middleware.
+     * The base path for middleware.
      *
-     * @param string $description
-     * @param array $options
-     * @return array
+     * @var string
      */
-    public function generateFromText(string $description, array $options = []): array
+    protected string $middlewarePath = 'app/Http/Middleware/';
+
+    /**
+     * المسار الاحتياطي للملفات المولدة.
+     * The backup path for generated files.
+     *
+     * @var string
+     */
+    protected string $backupPath = 'storage/app/generated/middlewares/';
+
+    /**
+     * MiddlewareGeneratorService constructor.
+     *
+     * @param ManusAIClient $aiClient عميل Manus AI.
+     */
+    public function __construct(ManusAIClient $aiClient)
     {
-        // تحليل الوصف لاستخراج المعلومات
-        $analysis = $this->analyzeDescription($description);
-
-        // تحديد نوع Middleware
-        $type = $options['type'] ?? $analysis['type'] ?? 'custom';
-
-        // توليد اسم Middleware
-        $name = $options['name'] ?? $analysis['name'] ?? $this->generateName($description);
-
-        // توليد المحتوى
-        $content = $this->generateContent($name, $type, $description, $options);
-
-        return [
-            'name' => $name,
-            'type' => $type,
-            'description' => $description,
-            'content' => $content,
-            'path' => $this->getFilePath($name),
-            'namespace' => 'App\\Http\\Middleware',
-            'created_at' => now()->toDateTimeString(),
-        ];
+        $this->aiClient = $aiClient;
     }
 
     /**
-     * توليد Middleware من JSON Schema
+     * توليد Middleware جديد بناءً على النوع المحدد.
+     * Generates a new Middleware based on the specified type.
      *
-     * @param array $schema
-     * @return array
+     * @param string $name اسم Middleware (مثال: CheckApiAuth).
+     *                     The name of the middleware (e.g., CheckApiAuth).
+     * @param string $type نوع Middleware.
+     *                     The type of the middleware.
+     * @param array<string, mixed> $options خيارات إضافية للتوليد.
+     *                                      Additional generation options.
+     * @return string المسار الكامل للملف الذي تم إنشاؤه.
+     *                The full path to the created file.
+     * @throws MiddlewareGenerationException إذا فشل التوليد أو كان النوع غير مدعوم.
+     *                                       If generation fails or the type is unsupported.
      */
-    public function generateFromJson(array $schema): array
+    public function generateMiddleware(string $name, string $type, array $options = []): string
     {
-        $name = $schema['name'] ?? 'CustomMiddleware';
-        $type = $schema['type'] ?? 'custom';
-        $description = $schema['description'] ?? 'Custom middleware';
-        $options = $schema['options'] ?? [];
+        $name = $this->formatMiddlewareName($name);
+        $type = strtolower($type);
 
-        $content = $this->generateContent($name, $type, $description, $options);
+        try {
+            $content = match ($type) {
+                self::TYPE_AUTHENTICATION => $this->generateAuthMiddleware($name, $options),
+                self::TYPE_AUTHORIZATION => $this->generateAuthorizationMiddleware($name, $options),
+                self::TYPE_LOGGING => $this->generateLoggingMiddleware($name, $options),
+                self::TYPE_RATE_LIMIT => $this->generateRateLimitMiddleware($name, $options),
+                self::TYPE_CORS => $this->generateCorsMiddleware($name, $options),
+                self::TYPE_CUSTOM => $this->generateCustomMiddleware($name, $options['description'] ?? '', $options),
+                default => throw new InvalidArgumentException("نوع Middleware غير مدعوم: {$type}. Unsupported middleware type: {$type}."),
+            };
 
-        return [
-            'name' => $name,
-            'type' => $type,
-            'description' => $description,
-            'content' => $content,
-            'path' => $this->getFilePath($name),
-            'namespace' => 'App\\Http\\Middleware',
-            'created_at' => now()->toDateTimeString(),
-        ];
+            $filePath = $this->getMiddlewareFilePath($name);
+            $this->writeFile($filePath, $content);
+
+            // حفظ نسخة احتياطية
+            // Save backup copy
+            $this->saveBackup($name, $content);
+
+            return $filePath;
+        } catch (InvalidArgumentException $e) {
+            throw new MiddlewareGenerationException("خطأ في المدخلات: " . $e->getMessage(), 0, $e);
+        } catch (Throwable $e) {
+            throw new MiddlewareGenerationException("فشل توليد Middleware '{$name}': " . $e->getMessage(), 0, $e);
+        }
     }
 
     /**
-     * توليد Middleware من قالب
+     * معاينة محتوى Middleware دون حفظه.
+     * Preview the middleware content without saving it.
      *
-     * @param string $templateName
-     * @param array $variables
-     * @return array
+     * @param string $name اسم Middleware.
+     * @param string $type نوع Middleware.
+     * @param array<string, mixed> $options خيارات إضافية.
+     * @return string محتوى Middleware.
+     * @throws MiddlewareGenerationException
      */
-    public function generateFromTemplate(string $templateName, array $variables = []): array
+    public function previewMiddleware(string $name, string $type, array $options = []): string
     {
-        $templatePath = base_path("{$this->templatesPath}/{$templateName}.php");
+        $name = $this->formatMiddlewareName($name);
+        $type = strtolower($type);
 
-        if (!File::exists($templatePath)) {
-            throw new \Exception("Template not found: {$templateName}");
+        try {
+            return match ($type) {
+                self::TYPE_AUTHENTICATION => $this->generateAuthMiddleware($name, $options),
+                self::TYPE_AUTHORIZATION => $this->generateAuthorizationMiddleware($name, $options),
+                self::TYPE_LOGGING => $this->generateLoggingMiddleware($name, $options),
+                self::TYPE_RATE_LIMIT => $this->generateRateLimitMiddleware($name, $options),
+                self::TYPE_CORS => $this->generateCorsMiddleware($name, $options),
+                self::TYPE_CUSTOM => $this->generateCustomMiddleware($name, $options['description'] ?? '', $options),
+                default => throw new InvalidArgumentException("نوع Middleware غير مدعوم: {$type}"),
+            };
+        } catch (Throwable $e) {
+            throw new MiddlewareGenerationException("فشل معاينة Middleware: " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * توليد Authentication Middleware.
+     * Generates an Authentication middleware.
+     *
+     * @param string $name اسم Middleware.
+     * @param array<string, mixed> $options الخيارات.
+     * @return string محتوى ملف Middleware.
+     */
+    protected function generateAuthMiddleware(string $name, array $options): string
+    {
+        $guard = $options['guard'] ?? 'web';
+        $tokenType = $options['token_type'] ?? 'Bearer';
+        $redirectRoute = $options['redirect_route'] ?? 'login';
+
+        $prompt = "Generate a Laravel Authentication Middleware named {$name}. " .
+                  "Requirements:\n" .
+                  "- Check authentication using guard: {$guard}\n" .
+                  "- Token type: {$tokenType}\n" .
+                  "- Redirect to '{$redirectRoute}' on failure for web, return 401 JSON for API\n" .
+                  "- Include proper error handling\n" .
+                  "- Add PHPDoc comments in Arabic and English\n" .
+                  "- Follow Laravel best practices\n" .
+                  "- Include namespace: App\\Http\\Middleware\n" .
+                  "- Use proper type hints\n\n" .
+                  "Options: " . json_encode($options, JSON_UNESCAPED_UNICODE) . "\n\n" .
+                  "Generate complete, production-ready code.";
+
+        return $this->callAIForContent($prompt);
+    }
+
+    /**
+     * توليد Authorization Middleware.
+     * Generates an Authorization middleware.
+     *
+     * @param string $name اسم Middleware.
+     * @param array<string, mixed> $options الخيارات.
+     * @return string محتوى ملف Middleware.
+     */
+    protected function generateAuthorizationMiddleware(string $name, array $options): string
+    {
+        $permission = $options['permission'] ?? null;
+        $role = $options['role'] ?? null;
+        $ability = $options['ability'] ?? null;
+
+        $requirements = [];
+        if ($permission) $requirements[] = "- Check permission: {$permission}";
+        if ($role) $requirements[] = "- Check role: {$role}";
+        if ($ability) $requirements[] = "- Check ability: {$ability}";
+
+        $requirementsText = implode("\n", $requirements);
+
+        $prompt = "Generate a Laravel Authorization Middleware named {$name}. " .
+                  "Requirements:\n" .
+                  "{$requirementsText}\n" .
+                  "- Return 403 Forbidden if unauthorized\n" .
+                  "- Support both web and API responses\n" .
+                  "- Include proper error messages\n" .
+                  "- Add PHPDoc comments in Arabic and English\n" .
+                  "- Follow Laravel best practices\n" .
+                  "- Include namespace: App\\Http\\Middleware\n" .
+                  "- Use proper type hints\n\n" .
+                  "Options: " . json_encode($options, JSON_UNESCAPED_UNICODE) . "\n\n" .
+                  "Generate complete, production-ready code.";
+
+        return $this->callAIForContent($prompt);
+    }
+
+    /**
+     * توليد Logging Middleware.
+     * Generates a Logging middleware.
+     *
+     * @param string $name اسم Middleware.
+     * @param array<string, mixed> $options الخيارات.
+     * @return string محتوى ملف Middleware.
+     */
+    protected function generateLoggingMiddleware(string $name, array $options): string
+    {
+        $logChannel = $options['log_channel'] ?? 'daily';
+        $logLevel = $options['log_level'] ?? 'info';
+        $includeRequest = $options['include_request'] ?? true;
+        $includeResponse = $options['include_response'] ?? true;
+
+        $prompt = "Generate a Laravel Logging Middleware named {$name}. " .
+                  "Requirements:\n" .
+                  "- Log to channel: {$logChannel}\n" .
+                  "- Log level: {$logLevel}\n" .
+                  "- Include request data: " . ($includeRequest ? 'yes' : 'no') . "\n" .
+                  "- Include response data: " . ($includeResponse ? 'yes' : 'no') . "\n" .
+                  "- Log request method, URL, IP, user agent\n" .
+                  "- Log response status and duration\n" .
+                  "- Mask sensitive data (passwords, tokens)\n" .
+                  "- Add PHPDoc comments in Arabic and English\n" .
+                  "- Follow Laravel best practices\n" .
+                  "- Include namespace: App\\Http\\Middleware\n" .
+                  "- Use proper type hints\n\n" .
+                  "Options: " . json_encode($options, JSON_UNESCAPED_UNICODE) . "\n\n" .
+                  "Generate complete, production-ready code.";
+
+        return $this->callAIForContent($prompt);
+    }
+
+    /**
+     * توليد Rate Limiting Middleware.
+     * Generates a Rate Limiting middleware.
+     *
+     * @param string $name اسم Middleware.
+     * @param array<string, mixed> $options الخيارات.
+     * @return string محتوى ملف Middleware.
+     */
+    protected function generateRateLimitMiddleware(string $name, array $options): string
+    {
+        $maxAttempts = $options['max_attempts'] ?? 60;
+        $decayMinutes = $options['decay_minutes'] ?? 1;
+        $key = $options['key'] ?? 'ip';
+
+        $prompt = "Generate a Laravel Rate Limiting Middleware named {$name}. " .
+                  "Requirements:\n" .
+                  "- Maximum attempts: {$maxAttempts}\n" .
+                  "- Decay time: {$decayMinutes} minutes\n" .
+                  "- Rate limit key: {$key} (IP address or User ID)\n" .
+                  "- Return 429 Too Many Requests when exceeded\n" .
+                  "- Include X-RateLimit headers (Limit, Remaining, Reset)\n" .
+                  "- Use Laravel's RateLimiter facade\n" .
+                  "- Add PHPDoc comments in Arabic and English\n" .
+                  "- Follow Laravel best practices\n" .
+                  "- Include namespace: App\\Http\\Middleware\n" .
+                  "- Use proper type hints\n\n" .
+                  "Options: " . json_encode($options, JSON_UNESCAPED_UNICODE) . "\n\n" .
+                  "Generate complete, production-ready code.";
+
+        return $this->callAIForContent($prompt);
+    }
+
+    /**
+     * توليد CORS Middleware.
+     * Generates a CORS middleware.
+     *
+     * @param string $name اسم Middleware.
+     * @param array<string, mixed> $options الخيارات.
+     * @return string محتوى ملف Middleware.
+     */
+    protected function generateCorsMiddleware(string $name, array $options): string
+    {
+        $allowedOrigins = $options['allowed_origins'] ?? ['*'];
+        $allowedMethods = $options['allowed_methods'] ?? ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'];
+        $allowedHeaders = $options['allowed_headers'] ?? ['Content-Type', 'Authorization', 'X-Requested-With'];
+
+        $originsText = is_array($allowedOrigins) ? implode(', ', $allowedOrigins) : $allowedOrigins;
+        $methodsText = is_array($allowedMethods) ? implode(', ', $allowedMethods) : $allowedMethods;
+        $headersText = is_array($allowedHeaders) ? implode(', ', $allowedHeaders) : $allowedHeaders;
+
+        $prompt = "Generate a Laravel CORS Middleware named {$name}. " .
+                  "Requirements:\n" .
+                  "- Allowed origins: {$originsText}\n" .
+                  "- Allowed methods: {$methodsText}\n" .
+                  "- Allowed headers: {$headersText}\n" .
+                  "- Handle preflight OPTIONS requests\n" .
+                  "- Add appropriate CORS headers to response\n" .
+                  "- Support credentials if needed\n" .
+                  "- Add PHPDoc comments in Arabic and English\n" .
+                  "- Follow Laravel best practices\n" .
+                  "- Include namespace: App\\Http\\Middleware\n" .
+                  "- Use proper type hints\n\n" .
+                  "Options: " . json_encode($options, JSON_UNESCAPED_UNICODE) . "\n\n" .
+                  "Generate complete, production-ready code.";
+
+        return $this->callAIForContent($prompt);
+    }
+
+    /**
+     * توليد Custom Middleware من وصف نصي.
+     * Generates a Custom middleware from text description.
+     *
+     * @param string $name اسم Middleware.
+     * @param string $description الوصف النصي.
+     * @param array<string, mixed> $options خيارات إضافية.
+     * @return string محتوى ملف Middleware.
+     */
+    protected function generateCustomMiddleware(string $name, string $description, array $options): string
+    {
+        if (empty($description)) {
+            throw new InvalidArgumentException("الوصف مطلوب لـ Custom Middleware. Description is required for Custom Middleware.");
         }
 
-        $template = File::get($templatePath);
-        $content = $this->replaceVariables($template, $variables);
+        $prompt = "Generate a Laravel Custom Middleware named {$name}. " .
+                  "Description: {$description}\n\n" .
+                  "Requirements:\n" .
+                  "- Implement the described functionality\n" .
+                  "- Handle errors gracefully\n" .
+                  "- Return appropriate HTTP responses\n" .
+                  "- Add PHPDoc comments in Arabic and English\n" .
+                  "- Follow Laravel best practices\n" .
+                  "- Include namespace: App\\Http\\Middleware\n" .
+                  "- Use proper type hints and dependency injection\n\n" .
+                  "Additional Options: " . json_encode($options, JSON_UNESCAPED_UNICODE) . "\n\n" .
+                  "Generate complete, production-ready code.";
 
-        $name = $variables['name'] ?? Str::studly($templateName) . 'Middleware';
-
-        return [
-            'name' => $name,
-            'type' => $variables['type'] ?? 'custom',
-            'description' => $variables['description'] ?? "Generated from template: {$templateName}",
-            'content' => $content,
-            'path' => $this->getFilePath($name),
-            'namespace' => 'App\\Http\\Middleware',
-            'created_at' => now()->toDateTimeString(),
-        ];
+        return $this->callAIForContent($prompt);
     }
 
     /**
-     * توليد محتوى Middleware
+     * استدعاء Manus AI للحصول على محتوى الكود.
+     * Calls Manus AI to get the code content.
      *
-     * @param string $name
-     * @param string $type
-     * @param string $description
-     * @param array $options
-     * @return string
+     * @param string $prompt الموجه (Prompt) المرسل للذكاء الاصطناعي.
+     * @return string الكود الذي تم توليده.
+     * @throws MiddlewareGenerationException إذا فشل اتصال الذكاء الاصطناعي.
      */
-    protected function generateContent(string $name, string $type, string $description, array $options = []): string
+    protected function callAIForContent(string $prompt): string
     {
-        // تحديد القالب المناسب
-        $template = $this->getTemplate($type);
+        try {
+            $code = $this->aiClient->generateCode($prompt, 'php');
 
-        // استبدال المتغيرات
-        $variables = array_merge([
-            'name' => $name,
-            'description' => $description,
-            'namespace' => 'App\\Http\\Middleware',
-            'version' => '3.28.0',
-            'date' => now()->toDateString(),
-            'author' => 'Manus AI',
-        ], $options);
-
-        return $this->replaceVariables($template, $variables);
-    }
-
-    /**
-     * الحصول على القالب المناسب
-     *
-     * @param string $type
-     * @return string
-     */
-    protected function getTemplate(string $type): string
-    {
-        return match ($type) {
-            'auth' => $this->getAuthTemplate(),
-            'permission' => $this->getPermissionTemplate(),
-            'rate_limit' => $this->getRateLimitTemplate(),
-            'logging' => $this->getLoggingTemplate(),
-            'cors' => $this->getCorsTemplate(),
-            'validation' => $this->getValidationTemplate(),
-            'cache' => $this->getCacheTemplate(),
-            'transform' => $this->getTransformTemplate(),
-            'security' => $this->getSecurityTemplate(),
-            default => $this->getCustomTemplate(),
-        };
-    }
-
-    /**
-     * قالب Authentication Middleware
-     */
-    protected function getAuthTemplate(): string
-    {
-        return <<<'PHP'
-<?php
-
-namespace {{namespace}};
-
-use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-
-/**
- * {{name}}
- * 
- * {{description}}
- * Auto-generated by Middleware Generator v{{version}}
- * 
- * @version {{version}}
- * @date {{date}}
- * @author {{author}}
- */
-class {{name}}
-{
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
-    {
-        // Log authentication attempt
-        Log::info('Authentication check', [
-            'url' => $request->fullUrl(),
-            'ip' => $request->ip(),
-        ]);
-
-        // Check authentication
-        if (!$this->isAuthenticated($request)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Authentication required',
-                'error' => 'Please provide valid credentials'
-            ], 401);
-        }
-
-        return $next($request);
-    }
-
-    /**
-     * Check if request is authenticated
-     *
-     * @param Request $request
-     * @return bool
-     */
-    protected function isAuthenticated(Request $request): bool
-    {
-        // TODO: Implement your authentication logic
-        // Example: Check for token in header
-        $token = $request->header('Authorization');
-        
-        return !empty($token);
-    }
-}
-PHP;
-    }
-
-    /**
-     * قالب Permission Middleware
-     */
-    protected function getPermissionTemplate(): string
-    {
-        return <<<'PHP'
-<?php
-
-namespace {{namespace}};
-
-use Closure;
-use Illuminate\Http\Request;
-
-/**
- * {{name}}
- * 
- * {{description}}
- * Auto-generated by Middleware Generator v{{version}}
- * 
- * @version {{version}}
- * @date {{date}}
- * @author {{author}}
- */
-class {{name}}
-{
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string  $permission
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next, string $permission = null)
-    {
-        // Check if user has permission
-        if ($permission && !$this->hasPermission($request, $permission)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Permission denied',
-                'error' => "You don't have permission: {$permission}",
-                'required_permission' => $permission
-            ], 403);
-        }
-
-        return $next($request);
-    }
-
-    /**
-     * Check if user has permission
-     *
-     * @param Request $request
-     * @param string $permission
-     * @return bool
-     */
-    protected function hasPermission(Request $request, string $permission): bool
-    {
-        // TODO: Implement your permission check logic
-        // Example: Check user permissions from database
-        // $user = $request->user();
-        // return $user && $user->hasPermissionTo($permission);
-        
-        return true;
-    }
-}
-PHP;
-    }
-
-    /**
-     * قالب Rate Limit Middleware
-     */
-    protected function getRateLimitTemplate(): string
-    {
-        return <<<'PHP'
-<?php
-
-namespace {{namespace}};
-
-use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-
-/**
- * {{name}}
- * 
- * {{description}}
- * Auto-generated by Middleware Generator v{{version}}
- * 
- * @version {{version}}
- * @date {{date}}
- * @author {{author}}
- */
-class {{name}}
-{
-    /**
-     * Maximum number of attempts
-     */
-    protected int $maxAttempts = 60;
-
-    /**
-     * Decay time in minutes
-     */
-    protected int $decayMinutes = 1;
-
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
-    {
-        $key = $this->resolveRequestSignature($request);
-        
-        $attempts = Cache::get($key, 0);
-
-        if ($attempts >= $this->maxAttempts) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Too many requests',
-                'error' => 'Rate limit exceeded. Please try again later.',
-                'retry_after' => $this->decayMinutes * 60
-            ], 429);
-        }
-
-        Cache::put($key, $attempts + 1, now()->addMinutes($this->decayMinutes));
-
-        $response = $next($request);
-
-        return $response->withHeaders([
-            'X-RateLimit-Limit' => $this->maxAttempts,
-            'X-RateLimit-Remaining' => max(0, $this->maxAttempts - $attempts - 1),
-        ]);
-    }
-
-    /**
-     * Resolve request signature
-     *
-     * @param Request $request
-     * @return string
-     */
-    protected function resolveRequestSignature(Request $request): string
-    {
-        return 'rate_limit:' . $request->ip();
-    }
-}
-PHP;
-    }
-
-    /**
-     * قالب Logging Middleware
-     */
-    protected function getLoggingTemplate(): string
-    {
-        return <<<'PHP'
-<?php
-
-namespace {{namespace}};
-
-use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-
-/**
- * {{name}}
- * 
- * {{description}}
- * Auto-generated by Middleware Generator v{{version}}
- * 
- * @version {{version}}
- * @date {{date}}
- * @author {{author}}
- */
-class {{name}}
-{
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
-    {
-        $startTime = microtime(true);
-
-        // Log request
-        Log::info('Request received', [
-            'method' => $request->method(),
-            'url' => $request->fullUrl(),
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
-        $response = $next($request);
-
-        $duration = round((microtime(true) - $startTime) * 1000, 2);
-
-        // Log response
-        Log::info('Response sent', [
-            'status' => $response->status(),
-            'duration_ms' => $duration,
-        ]);
-
-        return $response;
-    }
-}
-PHP;
-    }
-
-    /**
-     * قالب CORS Middleware
-     */
-    protected function getCorsTemplate(): string
-    {
-        return <<<'PHP'
-<?php
-
-namespace {{namespace}};
-
-use Closure;
-use Illuminate\Http\Request;
-
-/**
- * {{name}}
- * 
- * {{description}}
- * Auto-generated by Middleware Generator v{{version}}
- * 
- * @version {{version}}
- * @date {{date}}
- * @author {{author}}
- */
-class {{name}}
-{
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
-    {
-        // Handle preflight request
-        if ($request->isMethod('OPTIONS')) {
-            return response('', 200)
-                ->header('Access-Control-Allow-Origin', '*')
-                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
-                ->header('Access-Control-Max-Age', '86400');
-        }
-
-        $response = $next($request);
-
-        return $response
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-    }
-}
-PHP;
-    }
-
-    /**
-     * قالب Validation Middleware
-     */
-    protected function getValidationTemplate(): string
-    {
-        return <<<'PHP'
-<?php
-
-namespace {{namespace}};
-
-use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-
-/**
- * {{name}}
- * 
- * {{description}}
- * Auto-generated by Middleware Generator v{{version}}
- * 
- * @version {{version}}
- * @date {{date}}
- * @author {{author}}
- */
-class {{name}}
-{
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
-    {
-        $rules = $this->getRules($request);
-
-        if (!empty($rules)) {
-            $validator = Validator::make($request->all(), $rules);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors()
-                ], 422);
+            if (empty($code)) {
+                throw new MiddlewareGenerationException("تلقى استجابة فارغة من Manus AI. Received empty response from Manus AI.");
             }
+
+            return $code;
+        } catch (Throwable $e) {
+            throw new MiddlewareGenerationException("فشل الاتصال بـ Manus AI: " . $e->getMessage(), 0, $e);
         }
-
-        return $next($request);
     }
 
     /**
-     * Get validation rules
+     * كتابة المحتوى إلى ملف.
+     * Writes the content to a file.
      *
-     * @param Request $request
-     * @return array
+     * @param string $filePath المسار الكامل للملف.
+     * @param string $content المحتوى المراد كتابته.
+     * @return void
+     * @throws MiddlewareGenerationException إذا فشلت عملية الكتابة.
      */
-    protected function getRules(Request $request): array
+    protected function writeFile(string $filePath, string $content): void
     {
-        // TODO: Define your validation rules
-        return [];
-    }
-}
-PHP;
-    }
-
-    /**
-     * قالب Cache Middleware
-     */
-    protected function getCacheTemplate(): string
-    {
-        return <<<'PHP'
-<?php
-
-namespace {{namespace}};
-
-use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-
-/**
- * {{name}}
- * 
- * {{description}}
- * Auto-generated by Middleware Generator v{{version}}
- * 
- * @version {{version}}
- * @date {{date}}
- * @author {{author}}
- */
-class {{name}}
-{
-    /**
-     * Cache duration in minutes
-     */
-    protected int $cacheDuration = 60;
-
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
-    {
-        // Only cache GET requests
-        if (!$request->isMethod('GET')) {
-            return $next($request);
+        try {
+            $directory = dirname($filePath);
+            if (!File::isDirectory($directory)) {
+                File::makeDirectory($directory, 0755, true);
+            }
+            File::put($filePath, $content);
+        } catch (Throwable $e) {
+            throw new MiddlewareGenerationException("فشل كتابة الملف إلى المسار '{$filePath}': " . $e->getMessage(), 0, $e);
         }
-
-        $key = $this->getCacheKey($request);
-
-        // Check if response is cached
-        if (Cache::has($key)) {
-            return Cache::get($key);
-        }
-
-        $response = $next($request);
-
-        // Cache the response
-        if ($response->isSuccessful()) {
-            Cache::put($key, $response, now()->addMinutes($this->cacheDuration));
-        }
-
-        return $response;
     }
 
     /**
-     * Get cache key for request
+     * حفظ نسخة احتياطية من الملف.
+     * Save a backup copy of the file.
      *
-     * @param Request $request
-     * @return string
-     */
-    protected function getCacheKey(Request $request): string
-    {
-        return 'response_cache:' . md5($request->fullUrl());
-    }
-}
-PHP;
-    }
-
-    /**
-     * قالب Transform Middleware
-     */
-    protected function getTransformTemplate(): string
-    {
-        return <<<'PHP'
-<?php
-
-namespace {{namespace}};
-
-use Closure;
-use Illuminate\Http\Request;
-
-/**
- * {{name}}
- * 
- * {{description}}
- * Auto-generated by Middleware Generator v{{version}}
- * 
- * @version {{version}}
- * @date {{date}}
- * @author {{author}}
- */
-class {{name}}
-{
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
-    {
-        // Transform request
-        $this->transformRequest($request);
-
-        $response = $next($request);
-
-        // Transform response
-        return $this->transformResponse($response);
-    }
-
-    /**
-     * Transform request data
-     *
-     * @param Request $request
+     * @param string $name اسم Middleware.
+     * @param string $content المحتوى.
      * @return void
      */
-    protected function transformRequest(Request $request): void
+    protected function saveBackup(string $name, string $content): void
     {
-        // TODO: Implement request transformation logic
-    }
-
-    /**
-     * Transform response data
-     *
-     * @param mixed $response
-     * @return mixed
-     */
-    protected function transformResponse($response)
-    {
-        // TODO: Implement response transformation logic
-        return $response;
-    }
-}
-PHP;
-    }
-
-    /**
-     * قالب Security Middleware
-     */
-    protected function getSecurityTemplate(): string
-    {
-        return <<<'PHP'
-<?php
-
-namespace {{namespace}};
-
-use Closure;
-use Illuminate\Http\Request;
-
-/**
- * {{name}}
- * 
- * {{description}}
- * Auto-generated by Middleware Generator v{{version}}
- * 
- * @version {{version}}
- * @date {{date}}
- * @author {{author}}
- */
-class {{name}}
-{
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
-    {
-        $response = $next($request);
-
-        // Add security headers
-        return $response
-            ->header('X-Content-Type-Options', 'nosniff')
-            ->header('X-Frame-Options', 'SAMEORIGIN')
-            ->header('X-XSS-Protection', '1; mode=block')
-            ->header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
-            ->header('Referrer-Policy', 'strict-origin-when-cross-origin')
-            ->header('Content-Security-Policy', "default-src 'self'");
-    }
-}
-PHP;
-    }
-
-    /**
-     * قالب Custom Middleware
-     */
-    protected function getCustomTemplate(): string
-    {
-        return <<<'PHP'
-<?php
-
-namespace {{namespace}};
-
-use Closure;
-use Illuminate\Http\Request;
-
-/**
- * {{name}}
- * 
- * {{description}}
- * Auto-generated by Middleware Generator v{{version}}
- * 
- * @version {{version}}
- * @date {{date}}
- * @author {{author}}
- */
-class {{name}}
-{
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next)
-    {
-        // TODO: Implement your middleware logic here
-        
-        // Before request processing
-        // ...
-
-        $response = $next($request);
-
-        // After request processing
-        // ...
-
-        return $response;
-    }
-}
-PHP;
-    }
-
-    /**
-     * استبدال المتغيرات في القالب
-     *
-     * @param string $template
-     * @param array $variables
-     * @return string
-     */
-    protected function replaceVariables(string $template, array $variables): string
-    {
-        foreach ($variables as $key => $value) {
-            $template = str_replace("{{" . $key . "}}", $value, $template);
-        }
-
-        return $template;
-    }
-
-    /**
-     * تحليل الوصف النصي
-     *
-     * @param string $description
-     * @return array
-     */
-    protected function analyzeDescription(string $description): array
-    {
-        $description = strtolower($description);
-        $type = 'custom';
-        $name = null;
-
-        // تحديد النوع من الوصف
-        if (str_contains($description, 'auth') || str_contains($description, 'مصادقة')) {
-            $type = 'auth';
-        } elseif (str_contains($description, 'permission') || str_contains($description, 'صلاحية')) {
-            $type = 'permission';
-        } elseif (str_contains($description, 'rate') || str_contains($description, 'limit') || str_contains($description, 'معدل')) {
-            $type = 'rate_limit';
-        } elseif (str_contains($description, 'log') || str_contains($description, 'تسجيل')) {
-            $type = 'logging';
-        } elseif (str_contains($description, 'cors')) {
-            $type = 'cors';
-        } elseif (str_contains($description, 'valid') || str_contains($description, 'تحقق')) {
-            $type = 'validation';
-        } elseif (str_contains($description, 'cache') || str_contains($description, 'تخزين')) {
-            $type = 'cache';
-        } elseif (str_contains($description, 'transform') || str_contains($description, 'تحويل')) {
-            $type = 'transform';
-        } elseif (str_contains($description, 'security') || str_contains($description, 'أمان')) {
-            $type = 'security';
-        }
-
-        return [
-            'type' => $type,
-            'name' => $name,
-        ];
-    }
-
-    /**
-     * توليد اسم Middleware
-     *
-     * @param string $description
-     * @return string
-     */
-    protected function generateName(string $description): string
-    {
-        // استخراج الكلمات المهمة
-        $words = preg_split('/\s+/', $description);
-        $words = array_filter($words, fn($word) => strlen($word) > 3);
-        $words = array_slice($words, 0, 3);
-
-        $name = implode('', array_map('ucfirst', $words));
-
-        return $name . 'Middleware';
-    }
-
-    /**
-     * الحصول على مسار الملف
-     *
-     * @param string $name
-     * @return string
-     */
-    protected function getFilePath(string $name): string
-    {
-        return base_path("{$this->middlewarePath}/{$name}.php");
-    }
-
-    /**
-     * حفظ Middleware إلى الملف
-     *
-     * @param array $middleware
-     * @return bool
-     */
-    public function save(array $middleware): bool
-    {
-        $path = $middleware['path'];
-        $content = $middleware['content'];
-
-        // إنشاء المجلد إذا لم يكن موجوداً
-        $directory = dirname($path);
-        if (!File::isDirectory($directory)) {
-            File::makeDirectory($directory, 0755, true);
-        }
-
-        return File::put($path, $content) !== false;
-    }
-
-    /**
-     * التحقق من صحة Middleware
-     *
-     * @param array $middleware
-     * @return array
-     */
-    public function validate(array $middleware): array
-    {
-        $errors = [];
-        $warnings = [];
-
-        // التحقق من الاسم
-        if (empty($middleware['name'])) {
-            $errors[] = 'Middleware name is required';
-        }
-
-        // التحقق من المحتوى
-        if (empty($middleware['content'])) {
-            $errors[] = 'Middleware content is empty';
-        }
-
-        // التحقق من صحة PHP Syntax
-        if (!empty($middleware['content'])) {
-            $tempFile = tempnam(sys_get_temp_dir(), 'middleware_');
-            file_put_contents($tempFile, $middleware['content']);
-            
-            exec("php -l {$tempFile} 2>&1", $output, $returnCode);
-            
-            if ($returnCode !== 0) {
-                $errors[] = 'PHP syntax error: ' . implode("\n", $output);
+        try {
+            $backupDir = base_path($this->backupPath);
+            if (!File::isDirectory($backupDir)) {
+                File::makeDirectory($backupDir, 0755, true);
             }
-            
-            unlink($tempFile);
-        }
 
-        // التحقق من وجود handle method
-        if (!str_contains($middleware['content'], 'public function handle')) {
-            $errors[] = 'Middleware must have a handle() method';
+            $timestamp = date('Y-m-d_H-i-s');
+            $backupFile = $backupDir . "{$name}_{$timestamp}.php";
+            File::put($backupFile, $content);
+        } catch (Throwable $e) {
+            // لا نرمي استثناء هنا، فقط نسجل الخطأ
+            // Don't throw exception here, just log the error
+            \Log::warning("فشل حفظ النسخة الاحتياطية: " . $e->getMessage());
         }
-
-        return [
-            'valid' => empty($errors),
-            'errors' => $errors,
-            'warnings' => $warnings,
-        ];
     }
 
     /**
-     * الحصول على قائمة الأنواع المدعومة
+     * حفظ محتوى Middleware إلى ملف.
+     * Save middleware content to file.
      *
-     * @return array
+     * @param string $name اسم Middleware.
+     * @param string $content المحتوى.
+     * @return string المسار الكامل للملف.
+     * @throws MiddlewareGenerationException
      */
-    public function getSupportedTypes(): array
+    public function saveMiddleware(string $name, string $content): string
     {
-        return self::TYPES;
+        $name = $this->formatMiddlewareName($name);
+        $filePath = $this->getMiddlewareFilePath($name);
+        
+        $this->writeFile($filePath, $content);
+        $this->saveBackup($name, $content);
+        
+        return $filePath;
+    }
+
+    /**
+     * الحصول على قائمة Middleware المولدة.
+     * Get list of generated middlewares.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getGeneratedMiddlewares(): array
+    {
+        $middlewarePath = base_path($this->middlewarePath);
+        $files = File::files($middlewarePath);
+        $middlewares = [];
+
+        foreach ($files as $file) {
+            $name = $file->getFilenameWithoutExtension();
+            $middlewares[] = [
+                'name' => $name,
+                'path' => $file->getPathname(),
+                'size' => $file->getSize(),
+                'modified' => date('Y-m-d H:i:s', $file->getMTime()),
+            ];
+        }
+
+        return $middlewares;
+    }
+
+    /**
+     * حذف Middleware.
+     * Delete a middleware.
+     *
+     * @param string $name اسم Middleware.
+     * @return bool
+     * @throws MiddlewareGenerationException
+     */
+    public function deleteMiddleware(string $name): bool
+    {
+        $name = $this->formatMiddlewareName($name);
+        $filePath = $this->getMiddlewareFilePath($name);
+
+        if (!File::exists($filePath)) {
+            throw new MiddlewareGenerationException("Middleware '{$name}' غير موجود. Middleware '{$name}' not found.");
+        }
+
+        try {
+            return File::delete($filePath);
+        } catch (Throwable $e) {
+            throw new MiddlewareGenerationException("فشل حذف Middleware: " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * الحصول على مسار الملف للتحميل.
+     * Get the file path for download.
+     *
+     * @param string $name اسم Middleware.
+     * @return string
+     * @throws MiddlewareGenerationException
+     */
+    public function getDownloadableFilePath(string $name): string
+    {
+        $name = $this->formatMiddlewareName($name);
+        $filePath = $this->getMiddlewareFilePath($name);
+
+        if (!File::exists($filePath)) {
+            throw new MiddlewareGenerationException("Middleware '{$name}' غير موجود. Middleware '{$name}' not found.");
+        }
+
+        return $filePath;
+    }
+
+    /**
+     * تنسيق اسم Middleware لضمان اللاحقة 'Middleware'.
+     * Formats the middleware name to ensure the 'Middleware' suffix.
+     *
+     * @param string $name الاسم الأصلي.
+     * @return string الاسم المنسق.
+     */
+    protected function formatMiddlewareName(string $name): string
+    {
+        $name = str_replace(['/', '\\'], '', $name);
+        return str_ends_with($name, 'Middleware') ? $name : $name . 'Middleware';
+    }
+
+    /**
+     * الحصول على المسار الكامل لملف Middleware.
+     * Gets the full file path for the middleware.
+     *
+     * @param string $name اسم Middleware المنسق.
+     * @return string المسار الكامل.
+     */
+    protected function getMiddlewareFilePath(string $name): string
+    {
+        return base_path($this->middlewarePath . $name . '.php');
     }
 }

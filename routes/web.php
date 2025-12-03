@@ -242,3 +242,6 @@ require __DIR__."/migration_generator.php";
 
 // Factory Generator Routes (v3.25.0)
 require __DIR__."/factory_generator.php";
+
+// Middleware Generator Routes
+require __DIR__."/middleware_generator.php";
