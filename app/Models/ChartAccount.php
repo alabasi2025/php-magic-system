@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\OptimizedQueries;
 
 /**
  * ChartAccount Model
@@ -35,7 +36,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class ChartAccount extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, OptimizedQueries;
+
+    /**
+     * Default relations to eager load
+     * 
+     * @var array
+     */
+    protected $defaultRelations = ['chartGroup', 'parent'];
 
     /**
      * The table associated with the model.
@@ -127,6 +135,40 @@ class ChartAccount extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope للحسابات حسب المجموعة
+     */
+    public function scopeByChartGroup($query, $chartGroupId)
+    {
+        return $query->where('chart_group_id', $chartGroupId);
+    }
+
+    /**
+     * Scope للحسابات حسب النوع
+     */
+    public function scopeByType($query, $accountType)
+    {
+        return $query->where('account_type', $accountType);
+    }
+
+    /**
+     * Scope للحسابات النشطة حسب المجموعة
+     */
+    public function scopeActiveByChartGroup($query, $chartGroupId)
+    {
+        return $query->where('chart_group_id', $chartGroupId)
+                     ->where('is_active', true);
+    }
+
+    /**
+     * Scope للحسابات النشطة حسب النوع
+     */
+    public function scopeActiveByType($query, $accountType)
+    {
+        return $query->where('account_type', $accountType)
+                     ->where('is_active', true);
     }
 
     /**
