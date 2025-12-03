@@ -194,3 +194,21 @@ Route::get('/developer/git/status', [DeveloperController::class, 'getGitStatus']
 // Main Developer Dashboard
 Route::get('/developer', [DeveloperController::class, 'getDashboard'])->name('developer.index');
 Route::get('/developer/vue-dashboard', [DeveloperController::class, 'getVueDashboard'])->name('developer.vue-dashboard');
+
+// AI Assistant Plus v3.18.0
+Route::prefix('developer/ai-assistant-plus')->name('developer.ai-assistant-plus.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\AiAssistantPlusController::class, 'index'])->name('index');
+    Route::post('/chat', [\App\Http\Controllers\AiAssistantPlusController::class, 'chat'])->name('chat');
+    Route::post('/analyze-code', [\App\Http\Controllers\AiAssistantPlusController::class, 'analyzeCode'])->name('analyze-code');
+    Route::post('/generate-code', [\App\Http\Controllers\AiAssistantPlusController::class, 'generateCode'])->name('generate-code');
+    Route::post('/fix-bug', [\App\Http\Controllers\AiAssistantPlusController::class, 'fixBug'])->name('fix-bug');
+    Route::post('/refactor-code', [\App\Http\Controllers\AiAssistantPlusController::class, 'refactorCode'])->name('refactor-code');
+    Route::post('/generate-tests', [\App\Http\Controllers\AiAssistantPlusController::class, 'generateTests'])->name('generate-tests');
+    Route::post('/generate-documentation', [\App\Http\Controllers\AiAssistantPlusController::class, 'generateDocumentation'])->name('generate-documentation');
+    Route::post('/security-scan', [\App\Http\Controllers\AiAssistantPlusController::class, 'securityScan'])->name('security-scan');
+    Route::post('/optimize-performance', [\App\Http\Controllers\AiAssistantPlusController::class, 'optimizePerformance'])->name('optimize-performance');
+    Route::post('/translate-code', [\App\Http\Controllers\AiAssistantPlusController::class, 'translateCode'])->name('translate-code');
+    Route::post('/get-suggestions', [\App\Http\Controllers\AiAssistantPlusController::class, 'getSuggestions'])->name('get-suggestions');
+    Route::post('/clear-conversation', [\App\Http\Controllers\AiAssistantPlusController::class, 'clearConversation'])->name('clear-conversation');
+    Route::get('/usage-stats', [\App\Http\Controllers\AiAssistantPlusController::class, 'getUsageStats'])->name('usage-stats');
+});
