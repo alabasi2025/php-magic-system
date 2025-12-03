@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>محلل الأداء</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -276,41 +277,45 @@
                 loadingSpinner.classList.remove('hidden');
                 analyzeBtn.querySelector('span').textContent = 'جاري التحليل...';
 
-                // محاكاة طلب AJAX
-                setTimeout(() => {
-                    // هنا يتم إرسال طلب AJAX إلى الـ backend
-                    // fetch('/api/analyze', { method: 'POST', body: JSON.stringify({ code, type }) })
-                    // .then(response => response.json())
-                    // .then(data => {
-                    //     updateUI(data);
-                    // })
-                    // .catch(error => {
-                    //     alert('حدث خطأ أثناء التحليل: ' + error);
-                    // })
-                    // .finally(() => {
-                    //     // تعطيل حالة التحميل
-                    //     analyzeBtn.disabled = false;
-                    //     loadingSpinner.classList.add('hidden');
-                    //     analyzeBtn.querySelector('span').textContent = 'تحليل الكود';
-                    // });
-
-                    // استخدام البيانات الوهمية للمحاكاة
-                    const simulatedResults = {
-                        score: Math.floor(Math.random() * 100),
-                        bottlenecks: mockResults.bottlenecks.slice(0, Math.floor(Math.random() * 3) + 1),
-                        suggestions: mockResults.suggestions.slice(0, Math.floor(Math.random() * 3) + 1),
-                        detailedReport: mockResults.detailedReport.replace('1500', Math.floor(Math.random() * 2000) + 500).replace('48', Math.floor(Math.random() * 100) + 20),
-                        timeData: mockResults.timeData.map(d => d + Math.floor(Math.random() * 200) - 100),
-                        memoryData: mockResults.memoryData.map(d => d + Math.floor(Math.random() * 10) - 5)
-                    };
-                    updateUI(simulatedResults);
-
+                // إرسال طلب AJAX إلى الـ backend
+                fetch('/developer/ai/performance-analyzer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        analysis_type: type
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // تحويل النتائج من الـ API إلى الصيغة المطلوبة
+                        const results = {
+                            score: data.data.performance_score || 75,
+                            bottlenecks: data.data.bottlenecks || ['لم يتم اكتشاف نقاط اختناق'],
+                            suggestions: data.data.suggestions || ['لا توجد اقتراحات حالياً'],
+                            detailedReport: data.data.detailed_report || 'تقرير مفصل غير متاح',
+                            timeData: data.data.time_data || [100, 200, 150, 300, 250],
+                            memoryData: data.data.memory_data || [10, 15, 12, 18, 16]
+                        };
+                        updateUI(results);
+                    } else {
+                        alert('حدث خطأ: ' + (data.error || 'خطأ غير محدد'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('حدث خطأ أثناء التحليل. الرجاء المحاولة مرة أخرى.');
+                })
+                .finally(() => {
                     // تعطيل حالة التحميل
                     analyzeBtn.disabled = false;
                     loadingSpinner.classList.add('hidden');
                     analyzeBtn.querySelector('span').textContent = 'تحليل الكود';
-
-                }, 2000); // محاكاة وقت التحليل
+                });
             });
 
             // محاكاة زر التصدير
