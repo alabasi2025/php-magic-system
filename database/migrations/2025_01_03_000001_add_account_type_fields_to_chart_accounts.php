@@ -12,10 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('chart_accounts', function (Blueprint $table) {
-            // هل الحساب رئيسي (للترتيب الشجري) أم فرعي (نهائي)
-            $table->boolean('is_parent')->default(false)->after('parent_id')->comment('true = حساب رئيسي للترتيب، false = حساب فرعي نهائي');
+            // فحص وإضافة الأعمدة فقط إذا لم تكن موجودة
+            if (!Schema::hasColumn('chart_accounts', 'is_parent')) {
+                $table->boolean('is_parent')->default(false)->after('parent_id')->comment('true = حساب رئيسي للترتيب، false = حساب فرعي نهائي');
+            }
             
-            // نوع الحساب (صندوق، بنك، محفظة، صراف، حساب وسيط، عام)
+            // تعديل نوع العمود account_type إذا كان موجوداً
+            if (Schema::hasColumn('chart_accounts', 'account_type')) {
+                // حذف العمود القديم وإعادة إنشائه بالقيم الجديدة
+                $table->dropColumn('account_type');
+            }
+            
             $table->enum('account_type', [
                 'general',           // عام (افتراضي)
                 'cash_box',          // صندوق
@@ -33,25 +40,29 @@ return new class extends Migration
                 'equity'             // حقوق ملكية
             ])->default('general')->after('is_parent')->comment('نوع الحساب');
             
-            // إذا كان حساب وسيط، لأي فئة؟
-            $table->enum('intermediate_for', [
-                'cash_boxes',        // للصناديق
-                'banks',             // للبنوك
-                'wallets',           // للمحافظ
-                'atms',              // للصرافات
-                'customers',         // للعملاء
-                'suppliers',         // للموردين
-                'employees'          // للموظفين
-            ])->nullable()->after('account_type')->comment('إذا كان حساب وسيط، لأي فئة؟');
+            if (!Schema::hasColumn('chart_accounts', 'intermediate_for')) {
+                $table->enum('intermediate_for', [
+                    'cash_boxes',        // للصناديق
+                    'banks',             // للبنوك
+                    'wallets',           // للمحافظ
+                    'atms',              // للصرافات
+                    'customers',         // للعملاء
+                    'suppliers',         // للموردين
+                    'employees'          // للموظفين
+                ])->nullable()->after('account_type')->comment('إذا كان حساب وسيط، لأي فئة؟');
+            }
             
-            // هل تم ربط هذا الحساب الوسيط؟
-            $table->boolean('is_linked')->default(false)->after('intermediate_for')->comment('هل تم ربط هذا الحساب الوسيط بكيان؟');
+            if (!Schema::hasColumn('chart_accounts', 'is_linked')) {
+                $table->boolean('is_linked')->default(false)->after('intermediate_for')->comment('هل تم ربط هذا الحساب الوسيط بكيان؟');
+            }
             
-            // معرف الكيان المرتبط (صندوق، بنك، إلخ)
-            $table->unsignedBigInteger('linked_entity_id')->nullable()->after('is_linked')->comment('معرف الكيان المرتبط');
+            if (!Schema::hasColumn('chart_accounts', 'linked_entity_id')) {
+                $table->unsignedBigInteger('linked_entity_id')->nullable()->after('is_linked')->comment('معرف الكيان المرتبط');
+            }
             
-            // نوع الكيان المرتبط
-            $table->string('linked_entity_type')->nullable()->after('linked_entity_id')->comment('نوع الكيان المرتبط (CashBox, Bank, etc.)');
+            if (!Schema::hasColumn('chart_accounts', 'linked_entity_type')) {
+                $table->string('linked_entity_type')->nullable()->after('linked_entity_id')->comment('نوع الكيان المرتبط (CashBox, Bank, etc.)');
+            }
         });
     }
 
