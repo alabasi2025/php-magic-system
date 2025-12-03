@@ -133,6 +133,11 @@
                         <span class="sidebar-text">المحاسبة</span>
                     </a>
                     
+                    <a href="{{ route('chart-of-accounts.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-indigo-50 text-gray-700 hover:text-indigo-600">
+                        <i class="fas fa-book w-6"></i>
+                        <span class="sidebar-text">الأدلة المحاسبية المبسطة</span>
+                    </a>
+                    
                     <a href="{{ route('customers.index') }}" class="flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-purple-50 text-gray-700 hover:text-purple-600">
                         <i class="fas fa-users w-6"></i>
                         <span class="sidebar-text">العملاء</span>
