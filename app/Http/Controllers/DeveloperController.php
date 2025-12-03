@@ -1961,11 +1961,18 @@ class DeveloperController extends Controller
     public function getAiApiGeneratorPage()
     {
         return view('developer.ai.api-generator');
-    }
-
-    public function generateApiWithAi(Request $request)
+    }    public function generateTestsWithAi(Request $request)
     {
-        return response()->json(['message' => 'قيد التطوير...']);
+        $request->validate([
+            'code' => 'required|string',
+            'test_type' => 'required|in:unit,feature,integration',
+            'framework' => 'required|in:phpunit,pest'
+        ]);
+        
+        $service = new \App\Services\AI\TestGeneratorService();
+        $result = $service->generateTests($request->code, $request->test_type, $request->framework);
+        
+        return response()->json($result);
     }
 
     // 10. محسن قاعدة البيانات
