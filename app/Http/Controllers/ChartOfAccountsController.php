@@ -167,4 +167,72 @@ class ChartOfAccountsController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Update an existing account
+     */
+    public function updateAccount(Request $request, $id)
+    {
+        $request->validate([
+            'code' => 'required|string|max:50',
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:group,detail',
+        ]);
+
+        try {
+            $account = ChartAccount::findOrFail($id);
+            
+            $account->update([
+                'code' => $request->code,
+                'name' => $request->name,
+                'type' => $request->type,
+                'description' => $request->description,
+                'is_active' => $request->has('is_active'),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث الحساب بنجاح',
+                'account' => $account
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء تحديث الحساب: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete an account
+     */
+    public function deleteAccount($id)
+    {
+        try {
+            $account = ChartAccount::findOrFail($id);
+            
+            // Check if account has children
+            if ($account->children()->count() > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لا يمكن حذف حساب يحتوي على حسابات فرعية'
+                ], 400);
+            }
+
+            // Check if account has transactions (if transactions table exists)
+            // This is a placeholder - implement based on your transactions structure
+            
+            $account->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف الحساب بنجاح'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء حذف الحساب: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

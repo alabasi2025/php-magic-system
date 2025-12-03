@@ -1,1 +1,1 @@
-<?php return ['version' => 'v2.11.0'];
+<?php return ['version' => 'v2.12.0'];
