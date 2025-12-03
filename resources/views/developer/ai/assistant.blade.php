@@ -90,6 +90,7 @@
 
 <script>
 let conversationContext = [];
+let currentTaskId = null;
 
 // إرسال الرسالة
 document.getElementById('chatForm').addEventListener('submit', async function(e) {
@@ -119,7 +120,8 @@ document.getElementById('chatForm').addEventListener('submit', async function(e)
             },
             body: JSON.stringify({
                 message: message,
-                context: conversationContext
+                context: conversationContext,
+                task_id: currentTaskId
             })
         });
         
@@ -127,6 +129,10 @@ document.getElementById('chatForm').addEventListener('submit', async function(e)
         
         if (data.success) {
             addAIMessage(data.message);
+            // حفظ task_id للمحادثات المتعددة
+            if (data.task_id) {
+                currentTaskId = data.task_id;
+            }
             // تحديث السياق
             conversationContext.push(
                 { role: 'user', content: message },

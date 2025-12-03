@@ -1989,10 +1989,12 @@ class DeveloperController extends Controller
         ]);
 
         try {
-            $chatService = new \App\Services\AI\ChatService();
-            $result = $chatService->sendMessage(
+            // استخدام ManusService بدلاً من ChatService
+            $manusService = new \App\Services\AI\ManusService();
+            $result = $manusService->sendMessage(
                 $request->input('message'),
-                $request->input('context', [])
+                $request->input('context', []),
+                $request->input('task_id', null)
             );
 
             return response()->json($result);
