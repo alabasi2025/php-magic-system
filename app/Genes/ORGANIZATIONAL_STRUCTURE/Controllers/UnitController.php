@@ -51,7 +51,7 @@ class UnitController extends Controller
     public function create()
     {
         // @note: افتراض وجود نماذج Holding و User لاختيارها
-        $holdings = \App\Models\Organization\Holding::all(); // افتراض وجود نموذج Holding
+        $holdings = \App\Models\Holding::all(); // افتراض وجود نموذج Holding
         $units = Unit::all(); // للوحدة الأم
         $managers = \App\Models\User::all(); // افتراض وجود نموذج User للمديرين
 
@@ -121,7 +121,7 @@ class UnitController extends Controller
     public function edit(string $id)
     {
         $unit = Unit::withTrashed()->findOrFail($id);
-        $holdings = \App\Models\Organization\Holding::all();
+        $holdings = \App\Models\Holding::all();
         $units = Unit::where('id', '!=', $id)->get(); // للوحدة الأم، استبعاد الوحدة نفسها
         $managers = \App\Models\User::all();
 
