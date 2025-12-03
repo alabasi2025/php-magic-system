@@ -1,0 +1,9 @@
+{
+  "name": "CustomApiMiddleware",
+  "type": "auth",
+  "description": "Custom API authentication middleware with advanced features",
+  "options": {
+    "author": "SEMOP Team",
+    "version": "1.0.0"
+  }
+}
