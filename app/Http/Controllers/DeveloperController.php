@@ -1900,7 +1900,14 @@ class DeveloperController extends Controller
 
     public function detectBugsWithAi(Request $request)
     {
-        return response()->json(['message' => 'قيد التطوير...']);
+        $request->validate([
+            'code' => 'required|string'
+        ]);
+        
+        $service = new \App\Services\AI\BugDetectorService();
+        $result = $service->detectBugs($request->code);
+        
+        return response()->json($result);
     }
 
     // 5. توليد التوثيق
@@ -2334,27 +2341,6 @@ class DeveloperController extends Controller
         
         $service = new \App\Services\AI\CodeOptimizerService();
         $result = $service->checkQuality($request->code);
-        
-        return response()->json($result);
-    }
-    
-    // ========================================
-    // Bug Detector - كاشف الأخطاء الذكي
-    // ========================================
-    
-    public function getAiBugDetectorPage()
-    {
-        return view('developer.ai.bug-detector');
-    }
-    
-    public function detectBugsWithAi(Request $request)
-    {
-        $request->validate([
-            'code' => 'required|string'
-        ]);
-        
-        $service = new \App\Services\AI\BugDetectorService();
-        $result = $service->detectBugs($request->code);
         
         return response()->json($result);
     }
