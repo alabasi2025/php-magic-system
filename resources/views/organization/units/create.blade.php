@@ -1,193 +1,287 @@
 @extends('layouts.app')
 
-{{-- تعيين اتجاه الصفحة من اليمين لليسار لدعم اللغة العربية (RTL) --}}
-@section('styles')
-    {{-- يمكن إضافة CSS مخصص هنا إذا لم يكن القالب الأساسي يدعم RTL بشكل كامل --}}
-    <style>
-        body {
-            direction: rtl;
-            text-align: right;
-        }
-        .form-check-label {
-            padding-right: 1.5rem; /* لضبط محاذاة النص بجانب مربع الاختيار */
-        }
-    </style>
-@endsection
+@section('title', 'إنشاء وحدة تنظيمية جديدة')
 
 @section('content')
-<div class="container my-5">
-    {{-- عنوان الصفحة --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">
-            <i class="fas fa-sitemap fa-fw me-2"></i>
-            إنشاء وحدة تنظيمية جديدة
+<div class="container-fluid" dir="rtl">
+    
+    {{-- العنوان والتنقل --}}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-plus-circle text-success"></i> إنشاء وحدة تنظيمية جديدة
         </h1>
-        <a href="{{ route('organization.units.index') }}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-right fa-fw me-1"></i>
-            العودة إلى قائمة الوحدات
+        <a href="{{ route('organization.units.index') }}" class="btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-right fa-sm ml-1"></i> العودة إلى قائمة الوحدات
         </a>
     </div>
 
-    {{-- عرض رسائل الفلاش (Flash Messages) --}}
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle fa-fw me-2"></i>
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
+    {{-- رسائل الفلاش --}}
     @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-times-circle fa-fw me-2"></i>
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-times-circle ml-2"></i> 
+            <strong>خطأ!</strong> {{ session('error') }}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
         </div>
     @endif
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">
-                <i class="fas fa-plus-circle fa-fw me-2"></i>
-                نموذج إنشاء وحدة
-            </h5>
-        </div>
-        <div class="card-body">
-            {{-- نموذج الإرسال --}}
-            <form action="{{ route('organization.units.store') }}" method="POST">
-                @csrf
+    {{-- البطاقة الرئيسية --}}
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-gradient-success">
+                    <h6 class="m-0 font-weight-bold text-white">
+                        <i class="fas fa-edit ml-1"></i> نموذج إنشاء وحدة تنظيمية
+                    </h6>
+                </div>
+                
+                <div class="card-body">
+                    <form action="{{ route('organization.units.store') }}" method="POST" id="createUnitForm">
+                        @csrf
 
-                {{-- حقل Holding ID (الكيان القابض) --}}
-                <div class="mb-3">
-                    <label for="holding_id" class="form-label">
-                        <i class="fas fa-building fa-fw me-1"></i>
-                        الكيان القابض <span class="text-danger">*</span>
-                    </label>
-                    <select class="form-select @error('holding_id') is-invalid @enderror" id="holding_id" name="holding_id" required>
-                        <option value="">اختر الكيان القابض</option>
-                        {{-- يجب تكرار الخيارات من قاعدة البيانات --}}
-                        @foreach ($holdings as $holding)
-                            <option value="{{ $holding->id }}" {{ old('holding_id') == $holding->id ? 'selected' : '' }}>
-                                {{ $holding->name }} ({{ $holding->code }})
-                            </option>
-                        @endforeach
-                    </select>
-                    {{-- عرض أخطاء التحقق (Validation Errors) --}}
-                    @error('holding_id')
-                        <div class="invalid-feedback">
-                            {{ $message }}
+                        {{-- معلومات أساسية --}}
+                        <div class="border-bottom pb-3 mb-4">
+                            <h6 class="text-primary font-weight-bold">
+                                <i class="fas fa-info-circle ml-1"></i> المعلومات الأساسية
+                            </h6>
                         </div>
-                    @enderror
-                </div>
 
-                {{-- حقل Code (رمز الوحدة) --}}
-                <div class="mb-3">
-                    <label for="code" class="form-label">
-                        <i class="fas fa-barcode fa-fw me-1"></i>
-                        رمز الوحدة <span class="text-danger">*</span>
-                    </label>
-                    <input type="text" class="form-control @error('code') is-invalid @enderror" id="code" name="code" value="{{ old('code') }}" required maxlength="10">
-                    {{-- عرض أخطاء التحقق (Validation Errors) --}}
-                    @error('code')
-                        <div class="invalid-feedback">
-                            {{ $message }}
+                        <div class="row">
+                            {{-- الكيان القابض --}}
+                            <div class="col-md-6 mb-4">
+                                <label for="holding_id" class="form-label font-weight-bold">
+                                    <i class="fas fa-building text-primary ml-1"></i>
+                                    الكيان القابض <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-control form-control-lg @error('holding_id') is-invalid @enderror" 
+                                        id="holding_id" 
+                                        name="holding_id" 
+                                        required>
+                                    <option value="">اختر الكيان القابض</option>
+                                    @foreach ($holdings as $holding)
+                                        <option value="{{ $holding->id }}" {{ old('holding_id') == $holding->id ? 'selected' : '' }}>
+                                            {{ $holding->name }} ({{ $holding->code }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('holding_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle ml-1"></i> اختر الشركة القابضة التي تتبع لها هذه الوحدة
+                                </small>
+                            </div>
+
+                            {{-- رمز الوحدة --}}
+                            <div class="col-md-6 mb-4">
+                                <label for="code" class="form-label font-weight-bold">
+                                    <i class="fas fa-barcode text-info ml-1"></i>
+                                    رمز الوحدة <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control form-control-lg @error('code') is-invalid @enderror" 
+                                       id="code" 
+                                       name="code" 
+                                       value="{{ old('code') }}" 
+                                       required 
+                                       maxlength="20"
+                                       placeholder="مثال: UNIT-001">
+                                @error('code')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle ml-1"></i> رمز فريد للوحدة (حروف وأرقام)
+                                </small>
+                            </div>
                         </div>
-                    @enderror
-                </div>
 
-                {{-- حقل Name (اسم الوحدة) --}}
-                <div class="mb-3">
-                    <label for="name" class="form-label">
-                        <i class="fas fa-tag fa-fw me-1"></i>
-                        اسم الوحدة (بالعربية) <span class="text-danger">*</span>
-                    </label>
-                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
-                    {{-- عرض أخطاء التحقق (Validation Errors) --}}
-                    @error('name')
-                        <div class="invalid-feedback">
-                            {{ $message }}
+                        <div class="row">
+                            {{-- اسم الوحدة --}}
+                            <div class="col-md-12 mb-4">
+                                <label for="name" class="form-label font-weight-bold">
+                                    <i class="fas fa-tag text-success ml-1"></i>
+                                    اسم الوحدة (بالعربية) <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control form-control-lg @error('name') is-invalid @enderror" 
+                                       id="name" 
+                                       name="name" 
+                                       value="{{ old('name') }}" 
+                                       required
+                                       placeholder="مثال: وحدة المبيعات">
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
-                    @enderror
-                </div>
 
-                {{-- حقل Type (نوع الوحدة) --}}
-                <div class="mb-3">
-                    <label for="type" class="form-label">
-                        <i class="fas fa-list-alt fa-fw me-1"></i>
-                        نوع الوحدة <span class="text-danger">*</span>
-                    </label>
-                    <select class="form-select @error('type') is-invalid @enderror" id="type" name="type" required>
-                        <option value="">اختر نوع الوحدة</option>
-                        {{-- افتراض أنواع للوحدات --}}
-                        @php
-                            $unitTypes = ['Main Unit' => 'وحدة رئيسية', 'Branch' => 'فرع', 'Department Group' => 'مجموعة إدارات'];
-                        @endphp
-                        @foreach ($unitTypes as $key => $value)
-                            <option value="{{ $key }}" {{ old('type') == $key ? 'selected' : '' }}>
-                                {{ $value }}
-                            </option>
-                        @endforeach
-                    </select>
-                    {{-- عرض أخطاء التحقق (Validation Errors) --}}
-                    @error('type')
-                        <div class="invalid-feedback">
-                            {{ $message }}
+                        {{-- تفاصيل إضافية --}}
+                        <div class="border-bottom pb-3 mb-4 mt-4">
+                            <h6 class="text-primary font-weight-bold">
+                                <i class="fas fa-cogs ml-1"></i> التفاصيل الإضافية
+                            </h6>
                         </div>
-                    @enderror
-                </div>
 
-                {{-- حقل Manager ID (مدير الوحدة) --}}
-                <div class="mb-3">
-                    <label for="manager_id" class="form-label">
-                        <i class="fas fa-user-tie fa-fw me-1"></i>
-                        مدير الوحدة
-                    </label>
-                    <select class="form-select @error('manager_id') is-invalid @enderror" id="manager_id" name="manager_id">
-                        <option value="">لا يوجد مدير محدد</option>
-                        {{-- يجب تكرار الخيارات من قائمة المستخدمين/المديرين --}}
-                        @foreach ($managers as $manager)
-                            <option value="{{ $manager->id }}" {{ old('manager_id') == $manager->id ? 'selected' : '' }}>
-                                {{ $manager->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    {{-- عرض أخطاء التحقق (Validation Errors) --}}
-                    @error('manager_id')
-                        <div class="invalid-feedback">
-                            {{ $message }}
+                        <div class="row">
+                            {{-- نوع الوحدة --}}
+                            <div class="col-md-6 mb-4">
+                                <label for="type" class="form-label font-weight-bold">
+                                    <i class="fas fa-layer-group text-warning ml-1"></i>
+                                    نوع الوحدة <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-control form-control-lg @error('type') is-invalid @enderror" 
+                                        id="type" 
+                                        name="type" 
+                                        required>
+                                    <option value="">اختر نوع الوحدة</option>
+                                    <option value="company" {{ old('type') == 'company' ? 'selected' : '' }}>
+                                        <i class="fas fa-building"></i> شركة
+                                    </option>
+                                    <option value="branch" {{ old('type') == 'branch' ? 'selected' : '' }}>
+                                        <i class="fas fa-code-branch"></i> فرع
+                                    </option>
+                                    <option value="department" {{ old('type') == 'department' ? 'selected' : '' }}>
+                                        <i class="fas fa-sitemap"></i> قسم
+                                    </option>
+                                </select>
+                                @error('type')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- مدير الوحدة --}}
+                            <div class="col-md-6 mb-4">
+                                <label for="manager_id" class="form-label font-weight-bold">
+                                    <i class="fas fa-user-tie text-secondary ml-1"></i>
+                                    مدير الوحدة
+                                </label>
+                                <select class="form-control form-control-lg @error('manager_id') is-invalid @enderror" 
+                                        id="manager_id" 
+                                        name="manager_id">
+                                    <option value="">لا يوجد مدير محدد</option>
+                                    @foreach ($managers as $manager)
+                                        <option value="{{ $manager->id }}" {{ old('manager_id') == $manager->id ? 'selected' : '' }}>
+                                            {{ $manager->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('manager_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle ml-1"></i> اختياري - يمكن تحديده لاحقاً
+                                </small>
+                            </div>
                         </div>
-                    @enderror
-                </div>
 
-                {{-- حقل Is Active (حالة التفعيل) --}}
-                <div class="mb-3 form-check form-switch">
-                    <input class="form-check-input @error('is_active') is-invalid @enderror" type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="is_active">
-                        <i class="fas fa-toggle-on fa-fw me-1"></i>
-                        الوحدة مفعلة
-                    </label>
-                    {{-- عرض أخطاء التحقق (Validation Errors) --}}
-                    @error('is_active')
-                        <div class="invalid-feedback">
-                            {{ $message }}
+                        {{-- حالة التفعيل --}}
+                        <div class="row">
+                            <div class="col-md-12 mb-4">
+                                <div class="custom-control custom-switch custom-control-lg">
+                                    <input type="checkbox" 
+                                           class="custom-control-input" 
+                                           id="is_active" 
+                                           name="is_active" 
+                                           value="1" 
+                                           {{ old('is_active', true) ? 'checked' : '' }}>
+                                    <label class="custom-control-label font-weight-bold" for="is_active">
+                                        <i class="fas fa-toggle-on text-success ml-1"></i>
+                                        الوحدة مفعلة ونشطة
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted mr-5">
+                                    إذا كانت الوحدة غير نشطة، لن تظهر في التقارير والعمليات اليومية
+                                </small>
+                            </div>
                         </div>
-                    @enderror
-                </div>
 
-                {{-- زر الإرسال --}}
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                    <button type="submit" class="btn btn-success btn-lg">
-                        <i class="fas fa-save fa-fw me-2"></i>
-                        حفظ الوحدة الجديدة
-                    </button>
+                        {{-- أزرار الإجراءات --}}
+                        <div class="border-top pt-4 mt-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <button type="submit" class="btn btn-success btn-lg btn-block shadow">
+                                        <i class="fas fa-save ml-2"></i> حفظ الوحدة الجديدة
+                                    </button>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <a href="{{ route('organization.units.index') }}" class="btn btn-secondary btn-lg btn-block">
+                                        <i class="fas fa-times ml-2"></i> إلغاء
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
-            </form>
+            </div>
+
+            {{-- بطاقة المساعدة --}}
+            <div class="card shadow-sm border-right-info mb-4">
+                <div class="card-body">
+                    <h6 class="text-info font-weight-bold mb-3">
+                        <i class="fas fa-lightbulb ml-1"></i> نصائح مفيدة
+                    </h6>
+                    <ul class="mb-0 text-muted">
+                        <li>تأكد من اختيار رمز فريد للوحدة لتجنب التكرار</li>
+                        <li>يمكنك تعديل جميع البيانات لاحقاً من صفحة التعديل</li>
+                        <li>الوحدات غير النشطة لن تظهر في التقارير الافتراضية</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
+
 </div>
 @endsection
 
-{{-- قسم السكريبتات (Scripts) --}}
-@section('scripts')
-    {{-- يمكن إضافة سكريبتات JavaScript هنا، مثل مكتبة Select2 لتحسين حقول الاختيار --}}
-@endsection
+@push('styles')
+<style>
+    .custom-control-lg .custom-control-label {
+        font-size: 1.1rem;
+        padding-top: 0.25rem;
+    }
+    
+    .custom-control-lg .custom-control-input {
+        width: 3rem;
+        height: 1.5rem;
+    }
+    
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+    }
+    
+    .border-right-info {
+        border-right: 0.25rem solid #36b9cc !important;
+    }
+    
+    .form-control-lg {
+        font-size: 1rem;
+    }
+    
+    label.font-weight-bold {
+        color: #5a5c69;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+    // تفعيل التحقق من الصحة
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
+@endpush

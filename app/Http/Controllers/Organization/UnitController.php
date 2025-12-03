@@ -28,19 +28,42 @@ class UnitController extends Controller
      */
     public function index(Request $request)
     {
-        // @note: افتراض وجود علاقات departments و projects في نموذج Unit
+        // بناء الاستعلام مع الفلاتر
         $units = Unit::query()
-            ->with(['holding', 'parent']) // العلاقات المطلوبة
-            ->withCount(['departments', 'projects']) // حساب عدد الأقسام والمشاريع
+            ->with(['holding', 'parent', 'manager']) // العلاقات المطلوبة
+            // فلتر البحث
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('code', 'like', "%{$search}%");
+                });
+            })
+            // فلتر الشركة القابضة
+            ->when($request->filled('holding_id'), function ($query) use ($request) {
+                $query->where('holding_id', $request->holding_id);
+            })
+            // فلتر النوع
+            ->when($request->filled('type'), function ($query) use ($request) {
+                $query->where('type', $request->type);
+            })
+            // فلتر الحالة
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $isActive = $request->status === 'active' ? 1 : 0;
+                $query->where('is_active', $isActive);
+            })
+            // تضمين المحذوفة حذفا ناعما إذا طلب ذلك
             ->when($request->has('trashed'), function ($query) {
-                // تضمين المحذوفة حذفا ناعما إذا طلب ذلك
                 $query->withTrashed();
             })
             ->orderBy('code')
-            ->paginate(10);
+            ->paginate(10)
+            ->appends($request->except('page'));
 
-        // @note: افتراض وجود عرض (view) لعرض القائمة
-        return view('organization.units.index', compact('units'));
+        // جلب جميع الشركات القابضة للفلتر
+        $holdings = \App\Models\Holding::all();
+
+        return view('organization.units.index', compact('units', 'holdings'));
     }
 
     /**
