@@ -51,7 +51,7 @@ class CashBoxController extends Controller
             $units = Unit::where('is_active', true)->get();
             
             // Get available intermediate accounts for cash boxes (not linked yet)
-            $intermediateAccounts = ChartAccount::where('is_main_account', false)
+            $intermediateAccounts = ChartAccount::whereNotNull('parent_id')
                 ->where('account_type', 'intermediate')
                 ->where('intermediate_for', 'cash_boxes')
                 ->where(function($query) {
@@ -157,7 +157,7 @@ class CashBoxController extends Controller
             $units = Unit::where('is_active', true)->get();
             
             // Get available intermediate accounts (including the current one)
-            $intermediateAccounts = ChartAccount::where('is_main_account', false)
+            $intermediateAccounts = ChartAccount::whereNotNull('parent_id')
                 ->where('account_type', 'intermediate')
                 ->where('intermediate_for', 'cash_boxes')
                 ->where(function($query) use ($cashBox) {
