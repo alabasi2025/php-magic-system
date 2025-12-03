@@ -58,6 +58,10 @@ class ChartAccount extends Model
         'name',
         'name_en',
         'account_type',
+        'intermediate_for',
+        'is_linked',
+        'linked_entity_id',
+        'linked_entity_type',
         'description',
         'balance',
         'debit_balance',
@@ -75,6 +79,7 @@ class ChartAccount extends Model
     protected $casts = [
         'level' => 'integer',
         'is_parent' => 'boolean',
+        'is_linked' => 'boolean',
         'balance' => 'decimal:2',
         'debit_balance' => 'decimal:2',
         'credit_balance' => 'decimal:2',
@@ -154,13 +159,83 @@ class ChartAccount extends Model
     public function getAccountTypeLabelAttribute(): string
     {
         return match($this->account_type) {
-            'asset' => 'أصول',
-            'liability' => 'خصوم',
+            'general' => 'عام',
+            'cash_box' => 'صندوق',
+            'bank' => 'بنك',
+            'wallet' => 'محفظة',
+            'atm' => 'صراف',
+            'intermediate' => 'حساب وسيط',
+            'customer' => 'عميل',
+            'supplier' => 'مورد',
+            'employee' => 'موظف',
+            'expense' => 'مصروف',
+            'revenue' => 'إيراد',
+            'asset' => 'أصل',
+            'liability' => 'التزام',
             'equity' => 'حقوق ملكية',
-            'revenue' => 'إيرادات',
-            'expense' => 'مصروفات',
             default => $this->account_type,
         };
+    }
+
+    /**
+     * Get the intermediate for label in Arabic.
+     */
+    public function getIntermediateForLabelAttribute(): ?string
+    {
+        if (!$this->intermediate_for) {
+            return null;
+        }
+
+        return match($this->intermediate_for) {
+            'cash_boxes' => 'للصناديق',
+            'banks' => 'للبنوك',
+            'wallets' => 'للمحافظ',
+            'atms' => 'للصرافات',
+            'customers' => 'للعملاء',
+            'suppliers' => 'للموردين',
+            'employees' => 'للموظفين',
+            default => $this->intermediate_for,
+        };
+    }
+
+    /**
+     * Scope للحسابات الوسيطة المتاحة (غير المرتبطة)
+     */
+    public function scopeAvailableIntermediates($query, $forType = null)
+    {
+        $query = $query->where('account_type', 'intermediate')
+                       ->where('is_linked', false)
+                       ->where('is_active', true);
+        
+        if ($forType) {
+            $query->where('intermediate_for', $forType);
+        }
+        
+        return $query;
+    }
+
+    /**
+     * ربط الحساب الوسيط بكيان
+     */
+    public function linkToEntity($entityId, $entityType): void
+    {
+        $this->update([
+            'is_linked' => true,
+            'linked_entity_id' => $entityId,
+            'linked_entity_type' => $entityType,
+        ]);
+    }
+
+    /**
+     * فك ربط الحساب الوسيط
+     */
+    public function unlinkFromEntity(): void
+    {
+        $this->update([
+            'is_linked' => false,
+            'linked_entity_id' => null,
+            'linked_entity_type' => null,
+        ]);
     }
 
     /**
