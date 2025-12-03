@@ -15,6 +15,7 @@ use App\Http\Controllers\LoyaltyController;
 use App\Http\Controllers\InsuranceController;
 use App\Http\Controllers\GeneController;
 use App\Http\Controllers\ChartOfAccountsController;
+use App\Http\Controllers\CashBoxController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +42,18 @@ Route::prefix('chart-of-accounts')->name('chart-of-accounts.')->group(function (
     Route::post('/add-account', [ChartOfAccountsController::class, 'addAccount'])->name('add-account');
     Route::put('/update-account/{id}', [ChartOfAccountsController::class, 'updateAccount'])->name('update-account');
     Route::delete('/delete-account/{id}', [ChartOfAccountsController::class, 'deleteAccount'])->name('delete-account');
+});
+
+// Cash Boxes Routes
+Route::prefix('cash-boxes')->name('cash-boxes.')->group(function () {
+    Route::get('/', [CashBoxController::class, 'index'])->name('index');
+    Route::get('/create', [CashBoxController::class, 'create'])->name('create');
+    Route::post('/', [CashBoxController::class, 'store'])->name('store');
+    Route::get('/{id}', [CashBoxController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [CashBoxController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [CashBoxController::class, 'update'])->name('update');
+    Route::delete('/{id}', [CashBoxController::class, 'destroy'])->name('destroy');
+    Route::post('/get-intermediate-accounts', [CashBoxController::class, 'getIntermediateAccounts'])->name('get-intermediate-accounts');
 });
 
 Route::prefix('customers')->name('customers.')->group(function () {

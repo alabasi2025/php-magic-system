@@ -33,9 +33,14 @@ class CashBox extends Model
      */
     protected $fillable = [
         'name',
+        'code',
         'description',
-        'status',
+        'balance',
         'is_active',
+        'unit_id',
+        'intermediate_account_id',
+        'created_by',
+        'updated_by',
     ];
 
     /**
@@ -64,6 +69,38 @@ class CashBox extends Model
      */
     public function getSearchableAttributes(): array
     {
-        return ['name', 'description'];
+        return ['name', 'description', 'code'];
+    }
+
+    /**
+     * Get the unit that owns the cash box.
+     */
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
+
+    /**
+     * Get the intermediate account associated with the cash box.
+     */
+    public function intermediateAccount()
+    {
+        return $this->belongsTo(ChartAccount::class, 'intermediate_account_id');
+    }
+
+    /**
+     * Get the user who created the cash box.
+     */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Get the user who last updated the cash box.
+     */
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }
