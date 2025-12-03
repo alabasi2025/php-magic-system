@@ -122,7 +122,9 @@ class ChartOfAccountsController extends Controller
             'parent_id' => 'nullable|exists:chart_accounts,id',
             'code' => 'required|string|max:50',
             'name' => 'required|string|max:255',
-            'account_type' => 'required|in:asset,liability,equity,revenue,expense',
+            'is_parent' => 'required|boolean',
+            'account_type' => 'nullable|in:general,cash_box,bank,wallet,atm,intermediate',
+            'intermediate_for' => 'nullable|in:cash_boxes,banks,wallets,atms',
         ]);
 
         try {
@@ -146,7 +148,10 @@ class ChartOfAccountsController extends Controller
                 'code' => $request->code,
                 'name' => $request->name,
                 'name_en' => $request->name_en,
+                'is_parent' => $request->is_parent,
                 'account_type' => $request->account_type,
+                'intermediate_for' => $request->intermediate_for,
+                'is_linked' => false,
                 'description' => $request->description,
                 'is_active' => $request->has('is_active'),
                 'created_by' => auth()->id(),

@@ -145,12 +145,45 @@
                     <i class="fas fa-layer-group text-indigo-600 ml-1"></i>
                     نوع الحساب <span class="text-red-500">*</span>
                 </label>
-                <select name="type" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                <select name="is_parent" id="is_parent" required onchange="toggleAccountTypeFields()" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                     <option value="">-- اختر النوع --</option>
-                    <option value="group">مجموعة (Group)</option>
-                    <option value="detail">تفصيلي (Detail)</option>
+                    <option value="1">حساب رئيسي (للترتيب الشجري فقط)</option>
+                    <option value="0">حساب فرعي (الحساب النهائي)</option>
                 </select>
-                <p class="text-gray-500 text-sm mt-1">المجموعة: حساب رئيسي يحتوي على حسابات فرعية | التفصيلي: حساب نهائي للعمليات</p>
+                <p class="text-gray-500 text-sm mt-1">الحساب الرئيسي: للترتيب الشجري فقط | الحساب الفرعي: يستخدم في القيود المحاسبية</p>
+            </div>
+
+            <!-- نوع الحساب الفرعي (يظهر فقط للحسابات الفرعية) -->
+            <div id="accountTypeField" class="hidden">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-tag text-indigo-600 ml-1"></i>
+                    نوع الحساب الفرعي <span class="text-red-500">*</span>
+                </label>
+                <select name="account_type" id="account_type" onchange="toggleIntermediateField()" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <option value="">-- اختر النوع --</option>
+                    <option value="general">حساب عام</option>
+                    <option value="cash_box">صندوق</option>
+                    <option value="bank">بنك</option>
+                    <option value="wallet">محفظة إلكترونية</option>
+                    <option value="atm">صراف آلي</option>
+                    <option value="intermediate">حساب وسيط</option>
+                </select>
+            </div>
+
+            <!-- حساب وسيط لأي فئة (يظهر فقط عند اختيار حساب وسيط) -->
+            <div id="intermediateForField" class="hidden">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-link text-indigo-600 ml-1"></i>
+                    حساب وسيط لأي فئة؟ <span class="text-red-500">*</span>
+                </label>
+                <select name="intermediate_for" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <option value="">-- اختر الفئة --</option>
+                    <option value="cash_boxes">الصناديق</option>
+                    <option value="banks">البنوك</option>
+                    <option value="wallets">المحافظ الإلكترونية</option>
+                    <option value="atms">الصرافات الآلية</option>
+                </select>
+                <p class="text-gray-500 text-sm mt-1">سيظهر هذا الحساب كخيار عند إنشاء عنصر من الفئة المحددة</p>
             </div>
 
             <!-- الوصف -->
@@ -201,6 +234,37 @@ function closeAddAccountModal() {
     document.getElementById('addAccountModal').classList.add('hidden');
     document.getElementById('addAccountModal').classList.remove('flex');
     document.getElementById('addAccountForm').reset();
+}
+
+// Toggle account type fields based on is_parent selection
+function toggleAccountTypeFields() {
+    const isParent = document.getElementById('is_parent').value;
+    const accountTypeField = document.getElementById('accountTypeField');
+    const intermediateForField = document.getElementById('intermediateForField');
+    
+    if (isParent === '0') {
+        // حساب فرعي - إظهار حقل نوع الحساب
+        accountTypeField.classList.remove('hidden');
+    } else {
+        // حساب رئيسي - إخفاء جميع الحقول الإضافية
+        accountTypeField.classList.add('hidden');
+        intermediateForField.classList.add('hidden');
+        document.getElementById('account_type').value = '';
+    }
+}
+
+// Toggle intermediate for field based on account_type selection
+function toggleIntermediateField() {
+    const accountType = document.getElementById('account_type').value;
+    const intermediateForField = document.getElementById('intermediateForField');
+    
+    if (accountType === 'intermediate') {
+        // حساب وسيط - إظهار حقل الفئة
+        intermediateForField.classList.remove('hidden');
+    } else {
+        // نوع آخر - إخفاء حقل الفئة
+        intermediateForField.classList.add('hidden');
+    }
 }
 
 // Submit form
