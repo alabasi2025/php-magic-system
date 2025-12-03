@@ -83,7 +83,7 @@ class CashBoxController extends Controller
             'code' => 'required|string|max:50|unique:cash_boxes,code',
             'balance' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
         try {
@@ -195,7 +195,7 @@ class CashBoxController extends Controller
             'code' => 'required|string|max:50|unique:cash_boxes,code,' . $id,
             'balance' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
         try {
