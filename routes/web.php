@@ -17,6 +17,7 @@ use App\Http\Controllers\GeneController;
 use App\Http\Controllers\ChartOfAccountsController;
 use App\Http\Controllers\MasterChartController;
 use App\Http\Controllers\CashBoxController;
+use App\Http\Controllers\IntermediateAccountController;
 
 /*
 |--------------------------------------------------------------------------
@@ -167,6 +168,21 @@ Route::prefix('partnership')->name('partnership.')->group(function () {
     Route::get('/profits', [App\Http\Controllers\PartnershipController::class, 'profits'])->name('profits.index');
     Route::get('/reports', [App\Http\Controllers\PartnershipController::class, 'reports'])->name('reports.index');
     Route::get('/settings', [App\Http\Controllers\PartnershipController::class, 'settings'])->name('settings');
+});
+
+// Intermediate Accounts Routes
+Route::prefix('intermediate-accounts')->name('intermediate-accounts.')->group(function () {
+    Route::get('/', [IntermediateAccountController::class, 'index'])->name('index');
+    Route::get('/create', [IntermediateAccountController::class, 'create'])->name('create');
+    Route::post('/', [IntermediateAccountController::class, 'store'])->name('store');
+    Route::get('/{id}', [IntermediateAccountController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [IntermediateAccountController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [IntermediateAccountController::class, 'update'])->name('update');
+    Route::delete('/{id}', [IntermediateAccountController::class, 'destroy'])->name('destroy');
+    
+    // AJAX Routes
+    Route::get('/api/by-chart-group/{chartGroupId}', [IntermediateAccountController::class, 'getByChartGroup'])->name('api.by-chart-group');
+    Route::get('/api/by-unit/{unitId}', [IntermediateAccountController::class, 'getByUnit'])->name('api.by-unit');
 });
 
 // Organization Structure Routes are now loaded from ORGANIZATIONAL_STRUCTURE Gene
