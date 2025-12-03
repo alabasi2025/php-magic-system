@@ -1983,7 +1983,25 @@ class DeveloperController extends Controller
 
     public function chatWithAiAssistant(Request $request)
     {
-        return response()->json(['message' => 'قيد التطوير...']);
+        $request->validate([
+            'message' => 'required|string',
+            'context' => 'sometimes|array',
+        ]);
+
+        try {
+            $chatService = new \App\Services\AI\ChatService();
+            $result = $chatService->sendMessage(
+                $request->input('message'),
+                $request->input('context', [])
+            );
+
+            return response()->json($result);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'حدث خطأ: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     // 13. إعدادات AI
