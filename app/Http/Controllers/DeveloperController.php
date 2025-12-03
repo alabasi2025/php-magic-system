@@ -2009,12 +2009,105 @@ class DeveloperController extends Controller
     // 13. إعدادات AI
     public function getAiSettingsPage()
     {
-        return view('developer.ai.settings');
+        $settings = \App\Models\AiSetting::where('group', 'ai')->get();
+        return view('developer.ai.settings', compact('settings'));
     }
 
     public function updateAiSettings(Request $request)
     {
-        return response()->json(['message' => 'تم حفظ الإعدادات بنجاح']);
+        $request->validate([
+            'manus_api_key' => 'nullable|string',
+            'ai_agent_profile' => 'required|in:manus-1.5,manus-1.5-lite',
+            'ai_task_mode' => 'required|in:chat,adaptive,agent',
+        ]);
+
+        try {
+            // حفظ Manus API Key
+            if ($request->filled('manus_api_key')) {
+                \App\Models\AiSetting::set(
+                    'manus_api_key',
+                    $request->manus_api_key,
+                    'string',
+                    'ai',
+                    'Manus AI API Key',
+                    true // encrypted
+                );
+            }
+
+            // حفظ Agent Profile
+            \App\Models\AiSetting::set(
+                'ai_agent_profile',
+                $request->ai_agent_profile,
+                'string',
+                'ai',
+                'نموذج Manus AI المستخدم',
+                false
+            );
+
+            // حفظ Task Mode
+            \App\Models\AiSetting::set(
+                'ai_task_mode',
+                $request->ai_task_mode,
+                'string',
+                'ai',
+                'وضع المهمة',
+                false
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حفظ الإعدادات بنجاح ✅'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // فحص اتصال Manus AI
+    public function testManusConnection(Request $request)
+    {
+        try {
+            $apiKey = $request->input('api_key') ?: \App\Models\AiSetting::get('manus_api_key');
+            
+            if (empty($apiKey)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'API Key غير موجود'
+                ], 400);
+            }
+
+            // اختبار الاتصال بإرسال رسالة بسيطة
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'API_KEY' => $apiKey,
+                'Content-Type' => 'application/json',
+            ])->timeout(30)->post('https://api.manus.ai/v1/tasks', [
+                'prompt' => 'مرحباً',
+                'agentProfile' => 'manus-1.5-lite',
+                'taskMode' => 'chat',
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'الاتصال ناجح! ✅',
+                    'task_id' => $data['task_id'] ?? null,
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'فشل الاتصال: ' . $response->body(),
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في الاتصال: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 }

@@ -18,7 +18,8 @@ class ManusService
 
     public function __construct()
     {
-        $this->apiKey = env('MANUS_API_KEY', '');
+        // قراءة API Key من قاعدة البيانات أولاً، ثم من .env
+        $this->apiKey = \App\Models\AiSetting::get('manus_api_key') ?: env('MANUS_API_KEY', '');
     }
 
     /**
@@ -42,8 +43,8 @@ class ManusService
             // بناء البيانات المرسلة
             $data = [
                 'prompt' => $prompt,
-                'agentProfile' => 'manus-1.5',
-                'taskMode' => 'chat',
+                'agentProfile' => \App\Models\AiSetting::get('ai_agent_profile', 'manus-1.5'),
+                'taskMode' => \App\Models\AiSetting::get('ai_task_mode', 'chat'),
                 'locale' => 'ar-SA',
             ];
 

@@ -134,6 +134,7 @@ Route::post('/developer/ai/assistant', [DeveloperController::class, 'chatWithAiA
 // 13. إعدادات AI
 Route::get('/developer/ai/settings', [DeveloperController::class, 'getAiSettingsPage'])->name('ai.settings');
 Route::post('/developer/ai/settings', [DeveloperController::class, 'updateAiSettings'])->name('ai.settings.post');
+Route::post('/developer/ai/test-connection', [DeveloperController::class, 'testManusConnection'])->name('ai.test-connection');
 
 
 // ========================================
