@@ -568,39 +568,21 @@
                         
                         <!-- القائمة الفرعية لنظام المطور -->
                         <div id="developerMenu" class="hidden mt-2 mr-6 space-y-1">
-                            <!-- أدوات المراقبة والتصحيح -->
-                            <div class="mb-3">
-                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">المراقبة والتصحيح</span>
-                                <div class="mt-1 space-y-1">
-                                    <a href="/telescope" target="_blank" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors">
-                                        <i class="fas fa-telescope w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">Telescope</span>
-                                    </a>
-                                    <a href="{{ route('developer.debugbar') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors">
-                                        <i class="fas fa-bug w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">Debugbar</span>
-                                    </a>
-                                    <a href="/horizon" target="_blank" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-colors">
-                                        <i class="fas fa-layer-group w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">Horizon</span>
-                                    </a>
-                                </div>
-                            </div>
                             
-                            <!-- أدوات الذكاء الاصطناعي -->
+                            <!-- 1. أدوات الذكاء الاصطناعي -->
                             <div class="mb-3">
-                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">الذكاء الاصطناعي</span>
+                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">🤖 الذكاء الاصطناعي</span>
                                 <div class="mt-1 space-y-1">
-                                    <a href="{{ route('ai-tools.dashboard') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-colors">
+                                    <a href="{{ route('ai-tools.dashboard') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 text-gray-600 hover:text-purple-600 transition-all duration-200">
                                         <i class="fas fa-brain w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">أدوات الذكاء الاصطناعي</span>
+                                        <span class="sidebar-text text-sm font-medium">لوحة تحكم AI</span>
                                     </a>
                                 </div>
                             </div>
                             
-                            <!-- أدوات قاعدة البيانات -->
+                            <!-- 2. أدوات قاعدة البيانات -->
                             <div class="mb-3">
-                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">قاعدة البيانات</span>
+                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">💾 قاعدة البيانات</span>
                                 <div class="mt-1 space-y-1">
                                     <a href="{{ route('developer.migrations') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 transition-colors">
                                         <i class="fas fa-database w-5 text-sm"></i>
@@ -625,13 +607,17 @@
                                 </div>
                             </div>
                             
-                            <!-- أدوات الكود -->
+                            <!-- 3. أدوات الكود والتطوير -->
                             <div class="mb-3">
-                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">أدوات الكود</span>
+                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">⚙️ أدوات الكود</span>
                                 <div class="mt-1 space-y-1">
                                     <a href="{{ route('developer.cache') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-colors">
                                         <i class="fas fa-broom w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">مسح Cache</span>
+                                    </a>
+                                    <a href="{{ route('developer.routes-list') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-violet-50 text-gray-600 hover:text-violet-600 transition-colors">
+                                        <i class="fas fa-route w-5 text-sm"></i>
+                                        <span class="sidebar-text text-sm">قائمة Routes</span>
                                     </a>
                                     <a href="{{ route('developer.pint') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-cyan-50 text-gray-600 hover:text-cyan-600 transition-colors">
                                         <i class="fas fa-magic w-5 text-sm"></i>
@@ -641,24 +627,39 @@
                                         <i class="fas fa-vial w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">تشغيل الاختبارات</span>
                                     </a>
-                                    <a href="{{ route('developer.routes-list') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-violet-50 text-gray-600 hover:text-violet-600 transition-colors">
-                                        <i class="fas fa-route w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">قائمة Routes</span>
-                                    </a>
                                 </div>
                             </div>
                             
-                            <!-- معلومات النظام -->
+                            <!-- 4. أدوات المراقبة والتصحيح -->
                             <div class="mb-3">
-                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">معلومات النظام</span>
+                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">🔍 المراقبة والتصحيح</span>
                                 <div class="mt-1 space-y-1">
-                                    <a href="{{ route('developer.server-info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-colors">
-                                        <i class="fas fa-server w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">معلومات الخادم</span>
+                                    <a href="/telescope" target="_blank" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors">
+                                        <i class="fas fa-telescope w-5 text-sm"></i>
+                                        <span class="sidebar-text text-sm">Telescope</span>
+                                    </a>
+                                    <a href="{{ route('developer.debugbar') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors">
+                                        <i class="fas fa-bug w-5 text-sm"></i>
+                                        <span class="sidebar-text text-sm">Debugbar</span>
+                                    </a>
+                                    <a href="/horizon" target="_blank" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-colors">
+                                        <i class="fas fa-layer-group w-5 text-sm"></i>
+                                        <span class="sidebar-text text-sm">Horizon</span>
                                     </a>
                                     <a href="{{ route('developer.logs-viewer') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors">
                                         <i class="fas fa-file-alt w-5 text-sm"></i>
                                         <span class="sidebar-text text-sm">السجلات (Logs)</span>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- 5. معلومات النظام -->
+                            <div class="mb-3">
+                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">📊 معلومات النظام</span>
+                                <div class="mt-1 space-y-1">
+                                    <a href="{{ route('developer.server-info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-colors">
+                                        <i class="fas fa-server w-5 text-sm"></i>
+                                        <span class="sidebar-text text-sm">معلومات الخادم</span>
                                     </a>
                                 </div>
                             </div>
