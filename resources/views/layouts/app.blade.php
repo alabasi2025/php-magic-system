@@ -560,7 +560,7 @@
                         <!-- نظام المطور الرئيسي -->
                         <button onclick="toggleDeveloperMenu()" class="w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 text-gray-700 hover:text-white transition-all duration-300">
                             <div class="flex items-center space-x-3 space-x-reverse">
-                                <i class="fas fa-code w-6"></i>
+                                <i class="fas fa-code w-6" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
                                 <span class="sidebar-text">نظام المطور</span>
                             </div>
                             <i id="developerMenuIcon" class="fas fa-chevron-down sidebar-text transition-transform duration-300"></i>
@@ -569,97 +569,181 @@
                         <!-- القائمة الفرعية لنظام المطور -->
                         <div id="developerMenu" class="hidden mt-2 mr-6 space-y-1">
                             
-                            <!-- 1. أدوات الذكاء الاصطناعي -->
-                            <div class="mb-3">
-                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">🤖 الذكاء الاصطناعي</span>
-                                <div class="mt-1 space-y-1">
-                                    <a href="{{ route('ai-tools.dashboard') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 text-gray-600 hover:text-purple-600 transition-all duration-200">
-                                        <i class="fas fa-brain w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm font-medium">لوحة تحكم AI</span>
+                            <!-- لوحة التحكم -->
+                            <a href="{{ route('developer.dashboard') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 text-gray-600 hover:text-purple-600 transition-all duration-200">
+                                <i class="fas fa-tachometer-alt w-5 text-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                                <span class="sidebar-text text-sm font-medium">لوحة التحكم</span>
+                            </a>
+                            
+                            <!-- 1. الذكاء الاصطناعي -->
+                            <div class="mb-2">
+                                <button onclick="toggleSubMenu('ai-menu')" class="w-full flex items-center justify-between space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 text-gray-700 transition-all duration-200">
+                                    <div class="flex items-center space-x-2 space-x-reverse">
+                                        <i class="fas fa-robot w-5 text-sm" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                                        <span class="sidebar-text text-sm font-medium">الذكاء الاصطناعي</span>
+                                    </div>
+                                    <i id="ai-menu-icon" class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
+                                </button>
+                                <div id="ai-menu" class="hidden mr-4 mt-1 space-y-1">
+                                    <a href="{{ route('ai.code-generator') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>مولد الأكواد</span>
+                                    </a>
+                                    <a href="{{ route('ai.code-refactor') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>تحسين الكود</span>
+                                    </a>
+                                    <a href="{{ route('ai.code-review') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>مراجعة الكود</span>
+                                    </a>
+                                    <a href="{{ route('ai.bug-detector') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>كشف الأخطاء</span>
+                                    </a>
+                                    <a href="{{ route('ai.documentation-generator') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>توليد التوثيق</span>
+                                    </a>
+                                    <a href="{{ route('ai.test-generator') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-teal-50 text-gray-600 hover:text-teal-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>مولد الاختبارات</span>
+                                    </a>
+                                    <a href="{{ route('ai.performance-analyzer') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-orange-50 text-gray-600 hover:text-orange-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>تحليل الأداء</span>
+                                    </a>
+                                    <a href="{{ route('ai.security-scanner') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>فحص الأمان</span>
+                                    </a>
+                                    <a href="{{ route('ai.api-generator') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>مولد API</span>
+                                    </a>
+                                    <a href="{{ route('ai.database-optimizer') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-cyan-50 text-gray-600 hover:text-cyan-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>محسن قاعدة البيانات</span>
+                                    </a>
+                                    <a href="{{ route('ai.code-translator') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>مترجم الأكواد</span>
+                                    </a>
+                                    <a href="{{ route('ai.assistant') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>المساعد الذكي</span>
+                                    </a>
+                                    <a href="{{ route('ai.settings') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gray-50 text-gray-600 hover:text-gray-800 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>إعدادات AI</span>
                                     </a>
                                 </div>
                             </div>
                             
-                            <!-- 2. أدوات قاعدة البيانات -->
-                            <div class="mb-3">
-                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">💾 قاعدة البيانات</span>
-                                <div class="mt-1 space-y-1">
-                                    <a href="{{ route('developer.migrations') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-600 transition-colors">
-                                        <i class="fas fa-database w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">Migrations</span>
+                            <!-- 2. قاعدة البيانات -->
+                            <div class="mb-2">
+                                <button onclick="toggleSubMenu('database-menu')" class="w-full flex items-center justify-between space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 text-gray-700 transition-all duration-200">
+                                    <div class="flex items-center space-x-2 space-x-reverse">
+                                        <i class="fas fa-database w-5 text-sm" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                                        <span class="sidebar-text text-sm font-medium">قاعدة البيانات</span>
+                                    </div>
+                                    <i id="database-menu-icon" class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
+                                </button>
+                                <div id="database-menu" class="hidden mr-4 mt-1 space-y-1">
+                                    <a href="{{ route('developer.migrations') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>Migrations</span>
                                     </a>
-                                    <a href="{{ route('developer.seeders') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-yellow-50 text-gray-600 hover:text-yellow-600 transition-colors">
-                                        <i class="fas fa-seedling w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">Seeders</span>
+                                    <a href="{{ route('developer.seeders') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>Seeders</span>
                                     </a>
-                                    <a href="{{ route('developer.database-info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-teal-50 text-gray-600 hover:text-teal-600 transition-colors">
-                                        <i class="fas fa-info-circle w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">معلومات القاعدة</span>
+                                    <a href="{{ route('developer.database-info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-cyan-50 text-gray-600 hover:text-cyan-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>معلومات القاعدة</span>
                                     </a>
-                                    <a href="{{ route('developer.database-optimize') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-orange-50 text-gray-600 hover:text-orange-600 transition-colors">
-                                        <i class="fas fa-bolt w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">تحسين القاعدة</span>
+                                    <a href="{{ route('developer.database-optimize') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>تحسين القاعدة</span>
                                     </a>
-                                    <a href="{{ route('developer.database-backup') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors">
-                                        <i class="fas fa-download w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">نسخ احتياطي</span>
-                                    </a>
-                                </div>
-                            </div>
-                            
-                            <!-- 3. أدوات الكود والتطوير -->
-                            <div class="mb-3">
-                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">⚙️ أدوات الكود</span>
-                                <div class="mt-1 space-y-1">
-                                    <a href="{{ route('developer.cache') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-pink-50 text-gray-600 hover:text-pink-600 transition-colors">
-                                        <i class="fas fa-broom w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">مسح Cache</span>
-                                    </a>
-                                    <a href="{{ route('developer.routes-list') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-violet-50 text-gray-600 hover:text-violet-600 transition-colors">
-                                        <i class="fas fa-route w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">قائمة Routes</span>
-                                    </a>
-                                    <a href="{{ route('developer.pint') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-cyan-50 text-gray-600 hover:text-cyan-600 transition-colors">
-                                        <i class="fas fa-magic w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">تنسيق الكود (Pint)</span>
-                                    </a>
-                                    <a href="{{ route('developer.tests') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-lime-50 text-gray-600 hover:text-lime-600 transition-colors">
-                                        <i class="fas fa-vial w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">تشغيل الاختبارات</span>
+                                    <a href="{{ route('developer.database-backup') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-teal-50 text-gray-600 hover:text-teal-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>نسخ احتياطي</span>
                                     </a>
                                 </div>
                             </div>
                             
-                            <!-- 4. أدوات المراقبة والتصحيح -->
-                            <div class="mb-3">
-                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">🔍 المراقبة والتصحيح</span>
-                                <div class="mt-1 space-y-1">
-                                    <a href="/telescope" target="_blank" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors">
-                                        <i class="fas fa-telescope w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">Telescope</span>
+                            <!-- 3. أدوات الكود -->
+                            <div class="mb-2">
+                                <button onclick="toggleSubMenu('code-menu')" class="w-full flex items-center justify-between space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-orange-50 hover:to-yellow-50 text-gray-700 transition-all duration-200">
+                                    <div class="flex items-center space-x-2 space-x-reverse">
+                                        <i class="fas fa-tools w-5 text-sm" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                                        <span class="sidebar-text text-sm font-medium">أدوات الكود</span>
+                                    </div>
+                                    <i id="code-menu-icon" class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
+                                </button>
+                                <div id="code-menu" class="hidden mr-4 mt-1 space-y-1">
+                                    <a href="{{ route('developer.cache') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-orange-50 text-gray-600 hover:text-orange-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>مسح Cache</span>
                                     </a>
-                                    <a href="{{ route('developer.debugbar') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors">
-                                        <i class="fas fa-bug w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">Debugbar</span>
+                                    <a href="{{ route('developer.routes-list') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>قائمة Routes</span>
                                     </a>
-                                    <a href="/horizon" target="_blank" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-colors">
-                                        <i class="fas fa-layer-group w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">Horizon</span>
+                                    <a href="{{ route('developer.pint') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-cyan-50 text-gray-600 hover:text-cyan-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>تنسيق الكود (Pint)</span>
                                     </a>
-                                    <a href="{{ route('developer.logs-viewer') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors">
-                                        <i class="fas fa-file-alt w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">السجلات (Logs)</span>
+                                    <a href="{{ route('developer.tests') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-green-50 text-gray-600 hover:text-green-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>تشغيل الاختبارات</span>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- 4. المراقبة والتصحيح -->
+                            <div class="mb-2">
+                                <button onclick="toggleSubMenu('monitoring-menu')" class="w-full flex items-center justify-between space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-teal-50 hover:to-green-50 text-gray-700 transition-all duration-200">
+                                    <div class="flex items-center space-x-2 space-x-reverse">
+                                        <i class="fas fa-search w-5 text-sm" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                                        <span class="sidebar-text text-sm font-medium">المراقبة والتصحيح</span>
+                                    </div>
+                                    <i id="monitoring-menu-icon" class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
+                                </button>
+                                <div id="monitoring-menu" class="hidden mr-4 mt-1 space-y-1">
+                                    <a href="/telescope" target="_blank" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>Telescope</span>
+                                    </a>
+                                    <a href="{{ route('developer.debugbar') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-purple-50 text-gray-600 hover:text-purple-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>Debugbar</span>
+                                    </a>
+                                    <a href="/horizon" target="_blank" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>Horizon</span>
                                     </a>
                                 </div>
                             </div>
                             
                             <!-- 5. معلومات النظام -->
-                            <div class="mb-3">
-                                <span class="sidebar-text text-xs font-semibold text-gray-400 px-3">📊 معلومات النظام</span>
-                                <div class="mt-1 space-y-1">
-                                    <a href="{{ route('developer.server-info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-colors">
-                                        <i class="fas fa-server w-5 text-sm"></i>
-                                        <span class="sidebar-text text-sm">معلومات الخادم</span>
+                            <div class="mb-2">
+                                <button onclick="toggleSubMenu('system-menu')" class="w-full flex items-center justify-between space-x-2 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 text-gray-700 transition-all duration-200">
+                                    <div class="flex items-center space-x-2 space-x-reverse">
+                                        <i class="fas fa-info-circle w-5 text-sm" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                                        <span class="sidebar-text text-sm font-medium">معلومات النظام</span>
+                                    </div>
+                                    <i id="system-menu-icon" class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
+                                </button>
+                                <div id="system-menu" class="hidden mr-4 mt-1 space-y-1">
+                                    <a href="{{ route('developer.server-info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-orange-50 text-gray-600 hover:text-orange-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>معلومات الخادم</span>
+                                    </a>
+                                    <a href="{{ route('developer.logs-viewer') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>السجلات (Logs)</span>
                                     </a>
                                 </div>
                             </div>
@@ -705,6 +789,18 @@
         function toggleDeveloperMenu() {
             const menu = document.getElementById('developerMenu');
             const icon = document.getElementById('developerMenuIcon');
+            
+            if (menu && icon) {
+                menu.classList.toggle('hidden');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            }
+        }
+        
+        // Sub Menu Toggle (للتبويبات الفرعية)
+        function toggleSubMenu(menuId) {
+            const menu = document.getElementById(menuId);
+            const icon = document.getElementById(menuId + '-icon');
             
             if (menu && icon) {
                 menu.classList.toggle('hidden');
