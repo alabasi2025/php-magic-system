@@ -1,0 +1,121 @@
+<?php
+
+namespace {{namespace}};
+
+use App\Http\Controllers\Controller;
+use {{modelNamespace}}\{{modelName}};
+use App\Http\Requests\Store{{modelName}}Request;
+use App\Http\Requests\Update{{modelName}}Request;
+use App\Http\Resources\{{modelName}}Resource;
+use App\Http\Resources\{{modelName}}Collection;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+
+/**
+ * {{modelName}} API Controller
+ * واجهة API لـ {{modelNameArabic}}
+ * 
+ * This controller handles RESTful API operations for {{modelName}} resource.
+ * يتعامل هذا المتحكم مع عمليات RESTful API لمورد {{modelNameArabic}}.
+ * 
+ * @package {{namespace}}
+ * @author Manus AI - Controller Generator v3.27.0
+ * @generated {{timestamp}}
+ */
+class {{controllerName}} extends Controller
+{
+    /**
+     * Display a listing of {{modelNamePlural}}.
+     * عرض قائمة {{modelNamePluralArabic}}
+     *
+     * @param Request $request
+     * @return {{modelName}}Collection|ResourceCollection
+     */
+    public function index(Request $request): {{modelName}}Collection|ResourceCollection
+    {
+        $query = {{modelName}}::query();
+
+        {{searchLogic}}
+
+        {{filterLogic}}
+
+        ${{modelNameCamel}}s = $query{{eagerLoading}}
+            ->latest()
+            ->paginate($request->input('per_page', {{perPage}}));
+
+        return new {{modelName}}Collection(${{modelNameCamel}}s);
+    }
+
+    /**
+     * Store a newly created {{modelNameLower}}.
+     * إنشاء {{modelNameLowerArabic}} جديد
+     *
+     * @param Store{{modelName}}Request $request
+     * @return JsonResponse
+     */
+    public function store(Store{{modelName}}Request $request): JsonResponse
+    {
+        {{beforeCreate}}
+        
+        ${{modelNameCamel}} = {{modelName}}::create($request->validated());
+
+        {{afterCreate}}
+
+        return (new {{modelName}}Resource(${{modelNameCamel}}))
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    /**
+     * Display the specified {{modelNameLower}}.
+     * عرض {{modelNameLowerArabic}} محدد
+     *
+     * @param {{modelName}} ${{modelNameCamel}}
+     * @return {{modelName}}Resource
+     */
+    public function show({{modelName}} ${{modelNameCamel}}): {{modelName}}Resource
+    {
+        return new {{modelName}}Resource(${{modelNameCamel}}->load({{showRelations}}));
+    }
+
+    /**
+     * Update the specified {{modelNameLower}}.
+     * تحديث {{modelNameLowerArabic}} موجود
+     *
+     * @param Update{{modelName}}Request $request
+     * @param {{modelName}} ${{modelNameCamel}}
+     * @return {{modelName}}Resource
+     */
+    public function update(Update{{modelName}}Request $request, {{modelName}} ${{modelNameCamel}}): {{modelName}}Resource
+    {
+        {{beforeUpdate}}
+        
+        ${{modelNameCamel}}->update($request->validated());
+
+        {{afterUpdate}}
+
+        return new {{modelName}}Resource(${{modelNameCamel}});
+    }
+
+    /**
+     * Remove the specified {{modelNameLower}}.
+     * حذف {{modelNameLowerArabic}}
+     *
+     * @param {{modelName}} ${{modelNameCamel}}
+     * @return JsonResponse
+     */
+    public function destroy({{modelName}} ${{modelNameCamel}}): JsonResponse
+    {
+        {{beforeDelete}}
+        
+        ${{modelNameCamel}}->delete();
+
+        {{afterDelete}}
+
+        return response()->json([
+            'message' => '{{successMessageDelete}}',
+            'success' => true
+        ], 200);
+    }
+}

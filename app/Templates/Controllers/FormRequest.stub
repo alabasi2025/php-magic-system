@@ -1,0 +1,92 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+/**
+ * {{requestName}} Request
+ * طلب {{requestNameArabic}}
+ * 
+ * This request handles validation for {{modelName}} {{action}}.
+ * يتعامل هذا الطلب مع التحقق من صحة {{action}} {{modelNameArabic}}.
+ * 
+ * @package App\Http\Requests
+ * @author Manus AI - Controller Generator v3.27.0
+ * @generated {{timestamp}}
+ */
+class {{requestName}} extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     * تحديد ما إذا كان المستخدم مصرحاً له بإجراء هذا الطلب
+     *
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return {{authorizeLogic}};
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     * الحصول على قواعد التحقق التي تنطبق على الطلب
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            {{validationRules}}
+        ];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     * الحصول على سمات مخصصة لأخطاء المدقق
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            {{attributesArabic}}
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     * الحصول على رسائل مخصصة لأخطاء المدقق
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            {{customMessages}}
+        ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     * تحضير البيانات للتحقق
+     *
+     * @return void
+     */
+    protected function prepareForValidation(): void
+    {
+        {{prepareLogic}}
+    }
+
+    /**
+     * Handle a passed validation attempt.
+     * معالجة محاولة التحقق الناجحة
+     *
+     * @return void
+     */
+    protected function passedValidation(): void
+    {
+        {{passedLogic}}
+    }
+}

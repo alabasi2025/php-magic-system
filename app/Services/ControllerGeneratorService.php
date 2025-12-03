@@ -1,0 +1,242 @@
+<?php
+
+namespace App\Services;
+
+use App\Exceptions\ControllerGenerationException;
+use App\Services\AI\ManusAIClient;
+use Illuminate\Support\Facades\File;
+use InvalidArgumentException;
+use Throwable;
+
+/**
+ * ControllerGeneratorService
+ *
+ * الخدمة الرئيسية لتوليد وحدات التحكم (Controllers) في Laravel.
+ * تدعم أنماط متعددة (Resource, API, Invokable) وتكامل الذكاء الاصطناعي.
+ *
+ * The main service for generating Laravel Controllers.
+ * Supports multiple patterns (Resource, API, Invokable) and AI integration.
+ *
+ * @package App\Services
+ * @version v3.27.0
+ * @author Manus AI
+ */
+class ControllerGeneratorService
+{
+    // ثوابت لأنواع وحدات التحكم المدعومة
+    // Constants for supported controller types
+    public const TYPE_RESOURCE = 'resource';
+    public const TYPE_API = 'api';
+    public const TYPE_INVOKABLE = 'invokable';
+
+    /**
+     * @var ManusAIClient عميل Manus AI للتكامل مع الذكاء الاصطناعي.
+     *                    Manus AI client for AI integration.
+     */
+    protected ManusAIClient $aiClient;
+
+    /**
+     * المسار الأساسي لوحدات التحكم.
+     * The base path for controllers.
+     *
+     * @var string
+     */
+    protected string $controllerPath = 'app/Http/Controllers/';
+
+    /**
+     * ControllerGeneratorService constructor.
+     *
+     * @param ManusAIClient $aiClient عميل Manus AI.
+     */
+    public function __construct(ManusAIClient $aiClient)
+    {
+        $this->aiClient = $aiClient;
+    }
+
+    /**
+     * توليد وحدة تحكم (Controller) جديدة بناءً على النوع المحدد.
+     * Generates a new Controller based on the specified type.
+     *
+     * @param string $name اسم وحدة التحكم (مثال: PostController).
+     *                     The name of the controller (e.g., PostController).
+     * @param string $type نوع وحدة التحكم (resource, api, invokable).
+     *                     The type of the controller (resource, api, invokable).
+     * @param array<string, mixed> $options خيارات إضافية للتوليد (مثل: 'model', 'requests').
+     *                                      Additional generation options (e.g., 'model', 'requests').
+     * @return string المسار الكامل للملف الذي تم إنشاؤه.
+     *                The full path to the created file.
+     * @throws ControllerGenerationException إذا فشل التوليد أو كان النوع غير مدعوم.
+     *                                       If generation fails or the type is unsupported.
+     */
+    public function generateController(string $name, string $type, array $options = []): string
+    {
+        $name = $this->formatControllerName($name);
+        $type = strtolower($type);
+
+        try {
+            $content = match ($type) {
+                self::TYPE_RESOURCE => $this->generateResourceController($name, $options),
+                self::TYPE_API => $this->generateApiController($name, $options),
+                self::TYPE_INVOKABLE => $this->generateInvokableController($name, $options),
+                default => throw new InvalidArgumentException("نوع وحدة التحكم غير مدعوم: {$type}. Unsupported controller type: {$type}."),
+            };
+
+            $filePath = $this->getControllerFilePath($name);
+            $this->writeFile($filePath, $content);
+
+            return $filePath;
+        } catch (InvalidArgumentException $e) {
+            throw new ControllerGenerationException("خطأ في المدخلات: " . $e->getMessage(), 0, $e);
+        } catch (Throwable $e) {
+            // معالجة أي خطأ غير متوقع أثناء التوليد
+            // Handle any unexpected error during generation
+            throw new ControllerGenerationException("فشل توليد وحدة التحكم '{$name}': " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * توليد محتوى وحدة تحكم من نوع Resource.
+     * Generates the content for a Resource controller.
+     *
+     * @param string $name اسم وحدة التحكم.
+     * @param array<string, mixed> $options الخيارات.
+     * @return string محتوى ملف وحدة التحكم.
+     */
+    protected function generateResourceController(string $name, array $options): string
+    {
+        // بناء موجه (Prompt) للذكاء الاصطناعي لإنشاء محتوى Controller
+        // Construct an AI prompt for generating Controller content
+        $prompt = "Generate a Laravel Resource Controller named {$name}. " .
+                  "Include standard resource methods (index, create, store, show, edit, update, destroy). " .
+                  "The controller should use dependency injection for the model and requests if specified in options. " .
+                  "Options: " . json_encode($options, JSON_UNESCAPED_UNICODE);
+
+        // استدعاء الذكاء الاصطناعي للحصول على محتوى الكود
+        // Call AI to get the code content
+        $codeContent = $this->callAIForContent($prompt);
+
+        return $codeContent;
+    }
+
+    /**
+     * توليد محتوى وحدة تحكم من نوع API.
+     * Generates the content for an API controller.
+     *
+     * @param string $name اسم وحدة التحكم.
+     * @param array<string, mixed> $options الخيارات.
+     * @return string محتوى ملف وحدة التحكم.
+     */
+    protected function generateApiController(string $name, array $options): string
+    {
+        $prompt = "Generate a Laravel API Resource Controller named {$name}. " .
+                  "Include standard API methods (index, store, show, update, destroy). " .
+                  "Ensure it extends a base API Controller if available, or uses appropriate responses. " .
+                  "Options: " . json_encode($options, JSON_UNESCAPED_UNICODE);
+
+        $codeContent = $this->callAIForContent($prompt);
+
+        return $codeContent;
+    }
+
+    /**
+     * توليد محتوى وحدة تحكم من نوع Invokable.
+     * Generates the content for an Invokable controller.
+     *
+     * @param string $name اسم وحدة التحكم.
+     * @param array<string, mixed> $options الخيارات.
+     * @return string محتوى ملف وحدة التحكم.
+     */
+    protected function generateInvokableController(string $name, array $options): string
+    {
+        $prompt = "Generate a Laravel Invokable Controller named {$name}. " .
+                  "It should only contain the __invoke method. " .
+                  "Options: " . json_encode($options, JSON_UNESCAPED_UNICODE);
+
+        $codeContent = $this->callAIForContent($prompt);
+
+        return $codeContent;
+    }
+
+    /**
+     * استدعاء Manus AI للحصول على محتوى الكود.
+     * Calls Manus AI to get the code content.
+     *
+     * @param string $prompt الموجه (Prompt) المرسل للذكاء الاصطناعي.
+     * @return string الكود الذي تم توليده.
+     * @throws ControllerGenerationException إذا فشل اتصال الذكاء الاصطناعي.
+     *                                       If the AI connection fails.
+     */
+    protected function callAIForContent(string $prompt): string
+    {
+        try {
+            // افتراض أن ManusAIClient لديه طريقة generateCode
+            // Assuming ManusAIClient has a generateCode method
+            $code = $this->aiClient->generateCode($prompt, 'php');
+
+            if (empty($code)) {
+                throw new ControllerGenerationException("تلقى استجابة فارغة من Manus AI. Received empty response from Manus AI.");
+            }
+
+            return $code;
+        } catch (Throwable $e) {
+            // معالجة أخطاء الاتصال أو الاستجابة من Manus AI
+            // Handle connection or response errors from Manus AI
+            throw new ControllerGenerationException("فشل الاتصال بـ Manus AI: " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * كتابة المحتوى إلى ملف.
+     * Writes the content to a file.
+     *
+     * @param string $filePath المسار الكامل للملف.
+     * @param string $content المحتوى المراد كتابته.
+     * @return void
+     * @throws ControllerGenerationException إذا فشلت عملية الكتابة.
+     *                                       If the writing operation fails.
+     */
+    protected function writeFile(string $filePath, string $content): void
+    {
+        try {
+            $directory = dirname($filePath);
+            if (!File::isDirectory($directory)) {
+                File::makeDirectory($directory, 0755, true);
+            }
+            File::put($filePath, $content);
+        } catch (Throwable $e) {
+            throw new ControllerGenerationException("فشل كتابة الملف إلى المسار '{$filePath}': " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * تنسيق اسم وحدة التحكم لضمان اللاحقة 'Controller'.
+     * Formats the controller name to ensure the 'Controller' suffix.
+     *
+     * @param string $name الاسم الأصلي.
+     * @return string الاسم المنسق.
+     */
+    protected function formatControllerName(string $name): string
+    {
+        $name = str_replace(['/', '\\'], '', $name);
+        return str_ends_with($name, 'Controller') ? $name : $name . 'Controller';
+    }
+
+    /**
+     * الحصول على المسار الكامل لملف وحدة التحكم.
+     * Gets the full file path for the controller.
+     *
+     * @param string $name اسم وحدة التحكم المنسق.
+     * @return string المسار الكامل.
+     */
+    protected function getControllerFilePath(string $name): string
+    {
+        return base_path($this->controllerPath . $name . '.php');
+    }
+}
+
+// ملاحظة: لكي يعمل هذا الكود بشكل كامل، يجب توفير الكلاس App\Services\AI\ManusAIClient
+// Note: For this code to work completely, the App\Services\AI\ManusAIClient class must be provided.
+// ويجب توفير الكلاس App\Exceptions\ControllerGenerationException
+// And the App\Exceptions\ControllerGenerationException class must be provided.
+// تم افتراض وجودهما لغرض بناء الخدمة الرئيسية.
+// They are assumed to exist for the purpose of building the main service.

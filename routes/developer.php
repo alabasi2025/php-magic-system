@@ -212,3 +212,14 @@ Route::prefix('developer/ai-assistant-plus')->name('developer.ai-assistant-plus.
     Route::post('/clear-conversation', [\App\Http\Controllers\AiAssistantPlusController::class, 'clearConversation'])->name('clear-conversation');
     Route::get('/usage-stats', [\App\Http\Controllers\AiAssistantPlusController::class, 'getUsageStats'])->name('usage-stats');
 });
+
+// ========================================
+// Controller Generator v3.27.0 - Task 19/100
+// ========================================
+Route::prefix('developer/controller-generator')->name('developer.controller-generator.')->group(function () {
+    Route::get('/', [App\Http\Controllers\ControllerGeneratorController::class, 'index'])->name('index');
+    Route::post('/generate', [App\Http\Controllers\ControllerGeneratorController::class, 'generate'])->name('generate');
+    Route::post('/preview', [App\Http\Controllers\ControllerGeneratorController::class, 'preview'])->name('preview');
+    Route::post('/download', [App\Http\Controllers\ControllerGeneratorController::class, 'download'])->name('download');
+    Route::get('/history', [App\Http\Controllers\ControllerGeneratorController::class, 'history'])->name('history');
+});

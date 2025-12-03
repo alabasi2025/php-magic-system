@@ -1,0 +1,148 @@
+<?php
+
+namespace {{namespace}};
+
+use {{modelNamespace}}\{{modelName}};
+use App\Http\Requests\Store{{modelName}}Request;
+use App\Http\Requests\Update{{modelName}}Request;
+use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+
+/**
+ * {{modelName}} Controller
+ * {{modelNameArabic}} إدارة
+ * 
+ * This controller handles CRUD operations for {{modelName}} resource.
+ * يتعامل هذا المتحكم مع عمليات CRUD لمورد {{modelNameArabic}}.
+ * 
+ * @package {{namespace}}
+ * @author Manus AI - Controller Generator v3.27.0
+ * @generated {{timestamp}}
+ */
+class {{controllerName}} extends Controller
+{
+    /**
+     * Display a listing of {{modelNamePlural}}.
+     * عرض قائمة {{modelNamePluralArabic}}
+     *
+     * @param Request $request
+     * @return View
+     */
+    public function index(Request $request): View
+    {
+        $query = {{modelName}}::query();
+
+        {{searchLogic}}
+
+        {{filterLogic}}
+
+        ${{modelNameCamel}}s = $query{{eagerLoading}}
+            ->latest()
+            ->paginate({{perPage}});
+
+        return view('{{viewPath}}.index', compact('{{modelNameCamel}}s'));
+    }
+
+    /**
+     * Show the form for creating a new {{modelNameLower}}.
+     * عرض نموذج إنشاء {{modelNameLowerArabic}} جديد
+     *
+     * @return View
+     */
+    public function create(): View
+    {
+        {{createViewData}}
+        
+        return view('{{viewPath}}.create'{{createCompact}});
+    }
+
+    /**
+     * Store a newly created {{modelNameLower}} in storage.
+     * حفظ {{modelNameLowerArabic}} جديد
+     *
+     * @param Store{{modelName}}Request $request
+     * @return RedirectResponse
+     */
+    public function store(Store{{modelName}}Request $request): RedirectResponse
+    {
+        {{beforeCreate}}
+        
+        ${{modelNameCamel}} = {{modelName}}::create($request->validated());
+
+        {{afterCreate}}
+
+        return redirect()
+            ->route('{{routePrefix}}.show', ${{modelNameCamel}})
+            ->with('success', '{{successMessageCreate}}');
+    }
+
+    /**
+     * Display the specified {{modelNameLower}}.
+     * عرض تفاصيل {{modelNameLowerArabic}} محدد
+     *
+     * @param {{modelName}} ${{modelNameCamel}}
+     * @return View
+     */
+    public function show({{modelName}} ${{modelNameCamel}}): View
+    {
+        ${{modelNameCamel}}->load({{showRelations}});
+        
+        return view('{{viewPath}}.show', compact('{{modelNameCamel}}'));
+    }
+
+    /**
+     * Show the form for editing the specified {{modelNameLower}}.
+     * عرض نموذج تعديل {{modelNameLowerArabic}}
+     *
+     * @param {{modelName}} ${{modelNameCamel}}
+     * @return View
+     */
+    public function edit({{modelName}} ${{modelNameCamel}}): View
+    {
+        {{editViewData}}
+        
+        return view('{{viewPath}}.edit', compact('{{modelNameCamel}}'{{editCompact}}));
+    }
+
+    /**
+     * Update the specified {{modelNameLower}} in storage.
+     * تحديث {{modelNameLowerArabic}} موجود
+     *
+     * @param Update{{modelName}}Request $request
+     * @param {{modelName}} ${{modelNameCamel}}
+     * @return RedirectResponse
+     */
+    public function update(Update{{modelName}}Request $request, {{modelName}} ${{modelNameCamel}}): RedirectResponse
+    {
+        {{beforeUpdate}}
+        
+        ${{modelNameCamel}}->update($request->validated());
+
+        {{afterUpdate}}
+
+        return redirect()
+            ->route('{{routePrefix}}.show', ${{modelNameCamel}})
+            ->with('success', '{{successMessageUpdate}}');
+    }
+
+    /**
+     * Remove the specified {{modelNameLower}} from storage.
+     * حذف {{modelNameLowerArabic}}
+     *
+     * @param {{modelName}} ${{modelNameCamel}}
+     * @return RedirectResponse
+     */
+    public function destroy({{modelName}} ${{modelNameCamel}}): RedirectResponse
+    {
+        {{beforeDelete}}
+        
+        ${{modelNameCamel}}->delete();
+
+        {{afterDelete}}
+
+        return redirect()
+            ->route('{{routePrefix}}.index')
+            ->with('success', '{{successMessageDelete}}');
+    }
+}

@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+/**
+ * {{modelName}} Resource
+ * مورد {{modelNameArabic}} للـ API
+ * 
+ * This resource transforms {{modelName}} model for API responses.
+ * يحول هذا المورد نموذج {{modelNameArabic}} لاستجابات API.
+ * 
+ * @package App\Http\Resources
+ * @author Manus AI - Controller Generator v3.27.0
+ * @generated {{timestamp}}
+ */
+class {{modelName}}Resource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     * تحويل المورد إلى مصفوفة
+     *
+     * @param Request $request
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            {{resourceFields}}
+            {{resourceRelations}}
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
+            {{softDeleteField}}
+        ];
+    }
+
+    /**
+     * Get additional data that should be returned with the resource array.
+     * الحصول على بيانات إضافية يجب إرجاعها مع مصفوفة المورد
+     *
+     * @param Request $request
+     * @return array<string, mixed>
+     */
+    public function with(Request $request): array
+    {
+        return [
+            'meta' => [
+                'version' => 'v3.27.0',
+                'generated_by' => 'Controller Generator',
+            ],
+        ];
+    }
+}
