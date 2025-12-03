@@ -2326,7 +2326,7 @@ class DeveloperController extends Controller
         return response()->json($result);
     }
     
-    public function checkCodeQuality(Request $request)
+     public function checkCodeQuality(Request $request)
     {
         $request->validate([
             'code' => 'required|string'
@@ -2337,5 +2337,25 @@ class DeveloperController extends Controller
         
         return response()->json($result);
     }
-
+    
+    // ========================================
+    // Bug Detector - كاشف الأخطاء الذكي
+    // ========================================
+    
+    public function getAiBugDetectorPage()
+    {
+        return view('developer.ai.bug-detector');
+    }
+    
+    public function detectBugsWithAi(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string'
+        ]);
+        
+        $service = new \App\Services\AI\BugDetectorService();
+        $result = $service->detectBugs($request->code);
+        
+        return response()->json($result);
+    }
 }
