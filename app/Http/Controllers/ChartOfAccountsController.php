@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ChartGroup;
 use App\Models\ChartAccount;
 use App\Models\Unit;
+use App\Services\MasterChartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -17,6 +18,12 @@ use Illuminate\Support\Facades\DB;
  */
 class ChartOfAccountsController extends Controller
 {
+    protected $masterChartService;
+
+    public function __construct(MasterChartService $masterChartService)
+    {
+        $this->masterChartService = $masterChartService;
+    }
     /**
      * Display the main page with all chart groups
      *
@@ -87,8 +94,8 @@ class ChartOfAccountsController extends Controller
         ]);
 
         try {
-            $chartGroup = ChartGroup::create([
-                'unit_id' => $request->unit_id,
+            // استخدام MasterChartService لإنشاء الدليل مع التفرع التلقائي
+            $chartGroup = $this->masterChartService->createSubChart($request->unit_id, [
                 'code' => $request->code,
                 'name' => $request->name,
                 'name_en' => $request->name_en,
@@ -98,11 +105,10 @@ class ChartOfAccountsController extends Controller
                 'color' => $request->color,
                 'is_active' => $request->has('is_active'),
                 'sort_order' => $request->sort_order ?? 0,
-                'created_by' => auth()->id(),
             ]);
 
             return redirect()->route('chart-of-accounts.show', $chartGroup->id)
-                ->with('success', 'تم إنشاء الدليل المحاسبي بنجاح');
+                ->with('success', 'تم إنشاء الدليل المحاسبي بنجاح مع فرع تلقائي في دليل الحسابات الوسيطة');
         } catch (\Exception $e) {
             return back()->withInput()
                 ->with('error', 'حدث خطأ أثناء إنشاء الدليل المحاسبي: ' . $e->getMessage());

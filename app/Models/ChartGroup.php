@@ -48,10 +48,13 @@ class ChartGroup extends Model
      */
     protected $fillable = [
         'unit_id',
+        'parent_group_id',
+        'source_group_id',
         'code',
         'name',
         'name_en',
         'type',
+        'is_master',
         'description',
         'icon',
         'color',
@@ -68,6 +71,7 @@ class ChartGroup extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'is_master' => 'boolean',
         'sort_order' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -80,6 +84,38 @@ class ChartGroup extends Model
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    /**
+     * Get the parent chart group (for sub-groups).
+     */
+    public function parentGroup(): BelongsTo
+    {
+        return $this->belongsTo(ChartGroup::class, 'parent_group_id');
+    }
+
+    /**
+     * Get the child chart groups (sub-groups).
+     */
+    public function childGroups(): HasMany
+    {
+        return $this->hasMany(ChartGroup::class, 'parent_group_id');
+    }
+
+    /**
+     * Get the source chart group (for intermediate account branches).
+     */
+    public function sourceGroup(): BelongsTo
+    {
+        return $this->belongsTo(ChartGroup::class, 'source_group_id');
+    }
+
+    /**
+     * Get the intermediate branches linked to this group.
+     */
+    public function intermediateBranches(): HasMany
+    {
+        return $this->hasMany(ChartGroup::class, 'source_group_id');
     }
 
     /**
@@ -128,6 +164,8 @@ class ChartGroup extends Model
     public function getTypeLabelAttribute(): string
     {
         return match($this->type) {
+            'master_chart' => 'الدليل الرئيسي',
+            'intermediate_master' => 'دليل الحسابات الوسيطة',
             'payroll' => 'أعمال الموظفين',
             'final_accounts' => 'الحسابات النهائية',
             'assets' => 'الأصول',
@@ -147,6 +185,8 @@ class ChartGroup extends Model
     public function getDefaultIconAttribute(): string
     {
         return match($this->type) {
+            'master_chart' => 'fas fa-sitemap',
+            'intermediate_master' => 'fas fa-exchange-alt',
             'payroll' => 'fas fa-users',
             'final_accounts' => 'fas fa-file-invoice-dollar',
             'assets' => 'fas fa-building',
@@ -166,6 +206,8 @@ class ChartGroup extends Model
     public function getDefaultColorAttribute(): string
     {
         return match($this->type) {
+            'master_chart' => 'teal',
+            'intermediate_master' => 'cyan',
             'payroll' => 'blue',
             'final_accounts' => 'green',
             'assets' => 'purple',
