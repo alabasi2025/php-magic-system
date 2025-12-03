@@ -1941,9 +1941,35 @@ class DeveloperController extends Controller
         return view('developer.ai.performance-analyzer');
     }
 
+    /**
+     * تحليل أداء الكود باستخدام الذكاء الاصطناعي
+     */
     public function analyzePerformanceWithAi(Request $request)
     {
-        return response()->json(['message' => 'قيد التطوير...']);
+        $request->validate([
+            'code' => 'required|string',
+            'analysis_type' => 'required|in:full,speed,bottlenecks,memory,queries',
+        ]);
+        
+        try {
+            $service = new \App\Services\AI\PerformanceAnalyzerService();
+            $result = $service->analyzePerformance(
+                $request->code,
+                $request->analysis_type
+            );
+            
+            return response()->json([
+                'success' => true,
+                'data' => $result
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Performance Analysis Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     // 8. فحص الأمان
