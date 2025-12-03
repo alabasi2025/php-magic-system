@@ -630,3 +630,17 @@ Route::prefix('documentation')->group(function () {
     Route::get('/', fn() => response()->json(['message' => 'Documentation System API']));
     Route::get('/api-docs', fn() => response()->json(['docs' => []]));
 });
+
+// ============================================
+// Task 11: Refactoring Tool API (v3.19.0)
+// ============================================
+Route::prefix('developer/ai/refactoring-tool')->group(function () {
+    Route::post('/analyze', [App\Http\Controllers\RefactoringToolController::class, 'analyze']);
+    Route::post('/suggest', [App\Http\Controllers\RefactoringToolController::class, 'suggest']);
+    Route::post('/apply', [App\Http\Controllers\RefactoringToolController::class, 'apply']);
+    Route::post('/preview', [App\Http\Controllers\RefactoringToolController::class, 'preview']);
+    Route::post('/detect-smells', [App\Http\Controllers\RefactoringToolController::class, 'detectSmells']);
+    Route::post('/extract-method', [App\Http\Controllers\RefactoringToolController::class, 'extractMethod']);
+    Route::post('/remove-dead-code', [App\Http\Controllers\RefactoringToolController::class, 'removeDeadCode']);
+    Route::post('/simplify-conditionals', [App\Http\Controllers\RefactoringToolController::class, 'simplifyConditionals']);
+});

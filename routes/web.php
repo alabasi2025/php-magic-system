@@ -226,4 +226,7 @@ Route::prefix('ai-tools')->name('ai-tools.')->group(function () {
     
     // Performance Analyzer API
     Route::post('/performance-analyzer/analyze', [App\Http\Controllers\DeveloperController::class, 'analyzePerformanceWithAi'])->name('performance-analyzer.analyze');
+    
+    // Refactoring Tool (Task 11 - v3.19.0)
+    Route::get('/refactoring-tool', [App\Http\Controllers\RefactoringToolController::class, 'index'])->name('refactoring-tool');
 });
