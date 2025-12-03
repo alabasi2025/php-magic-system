@@ -14,6 +14,7 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\LoyaltyController;
 use App\Http\Controllers\InsuranceController;
 use App\Http\Controllers\GeneController;
+use App\Http\Controllers\ChartOfAccountsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,15 @@ Route::get('/api/stats', [DashboardController::class, 'getStats'])->name('dashbo
 // Module Routes
 Route::prefix('accounting')->name('accounting.')->group(function () {
     Route::get('/', [AccountingController::class, 'index'])->name('index');
+});
+
+// Chart of Accounts Routes
+Route::prefix('chart-of-accounts')->name('chart-of-accounts.')->group(function () {
+    Route::get('/', [ChartOfAccountsController::class, 'index'])->name('index');
+    Route::get('/create', [ChartOfAccountsController::class, 'create'])->name('create');
+    Route::post('/', [ChartOfAccountsController::class, 'store'])->name('store');
+    Route::get('/{id}', [ChartOfAccountsController::class, 'show'])->name('show');
+    Route::post('/add-account', [ChartOfAccountsController::class, 'addAccount'])->name('add-account');
 });
 
 Route::prefix('customers')->name('customers.')->group(function () {
