@@ -1918,7 +1918,15 @@ class DeveloperController extends Controller
 
     public function generateDocumentationWithAi(Request $request)
     {
-        return response()->json(['message' => 'قيد التطوير...']);
+        $request->validate([
+            'code' => 'required|string',
+            'type' => 'required|in:code,readme,api,user_guide'
+        ]);
+        
+        $service = new \App\Services\AI\DocumentationGeneratorService();
+        $result = $service->generateDocumentation($request->code, $request->type);
+        
+        return response()->json($result);
     }
 
     // 6. مولد الاختبارات
