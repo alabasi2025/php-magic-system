@@ -209,7 +209,12 @@ Route::prefix('ai-tools')->name('ai-tools.')->group(function () {
     Route::get('/design-to-code', [App\Http\Controllers\AIToolsController::class, 'designToCode'])->name('design-to-code');
     Route::get('/nlp-code-generator', [App\Http\Controllers\AIToolsController::class, 'nlpCodeGenerator'])->name('nlp-code-generator');
     Route::get('/performance-analyzer', [App\Http\Controllers\AIToolsController::class, 'performanceAnalyzer'])->name('performance-analyzer');
-    Route::get('/security-scanner', [App\Http\Controllers\AIToolsController::class, 'securityScanner'])->name('security-scanner');
+    Route::get('/security-scanner', [App\Http\Controllers\SecurityScannerController::class, 'index'])->name('security-scanner');
+    Route::post('/security-scanner/scan', [App\Http\Controllers\SecurityScannerController::class, 'scan'])->name('security-scanner.scan');
+    Route::post('/security-scanner/scan-file', [App\Http\Controllers\SecurityScannerController::class, 'scanFile'])->name('security-scanner.scan-file');
+    Route::post('/security-scanner/scan-directory', [App\Http\Controllers\SecurityScannerController::class, 'scanDirectory'])->name('security-scanner.scan-directory');
+    Route::get('/security-scanner/recommendations', [App\Http\Controllers\SecurityScannerController::class, 'recommendations'])->name('security-scanner.recommendations');
+    Route::post('/security-scanner/export', [App\Http\Controllers\SecurityScannerController::class, 'exportReport'])->name('security-scanner.export');
     Route::get('/code-refactoring', [App\Http\Controllers\AIToolsController::class, 'codeRefactoring'])->name('code-refactoring');
     Route::get('/code-review-assistant', [App\Http\Controllers\AIToolsController::class, 'codeReviewAssistant'])->name('code-review-assistant');
     Route::get('/interactive-doc-generator', [App\Http\Controllers\AIToolsController::class, 'interactiveDocGenerator'])->name('interactive-doc-generator');
