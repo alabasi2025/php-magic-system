@@ -140,6 +140,12 @@ Route::post('/developer/ai/test-connection', [DeveloperController::class, 'testM
 Route::get('/developer/ai/task-viewer', [DeveloperController::class, 'getTaskViewerPage'])->name('ai.task-viewer');
 Route::get('/developer/ai/task/{taskId}', [DeveloperController::class, 'getTaskDetails'])->name('ai.task-details');
 
+// 15. محسن الكود (Code Optimizer)
+Route::get('/developer/ai/code-optimizer', [DeveloperController::class, 'getCodeOptimizer'])->name('ai.code-optimizer');
+Route::post('/developer/ai/code-optimizer/analyze', [DeveloperController::class, 'analyzeCode'])->name('ai.code-optimizer.analyze');
+Route::post('/developer/ai/code-optimizer/optimize', [DeveloperController::class, 'optimizeCode'])->name('ai.code-optimizer.optimize');
+Route::post('/developer/ai/code-optimizer/quality', [DeveloperController::class, 'checkCodeQuality'])->name('ai.code-optimizer.quality');
+
 
 // ========================================
 // الخانات الفرعية الإضافية - v2.8.8

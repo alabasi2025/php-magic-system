@@ -2292,5 +2292,50 @@ class DeveloperController extends Controller
             ], 500);
         }
     }
+    
+    // ============================================
+    // Code Optimizer Methods
+    // ============================================
+    
+    public function getCodeOptimizer()
+    {
+        return view('developer.ai.code-optimizer');
+    }
+    
+    public function analyzeCode(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string'
+        ]);
+        
+        $service = new \App\Services\AI\CodeOptimizerService();
+        $result = $service->analyzeCode($request->code);
+        
+        return response()->json($result);
+    }
+    
+    public function optimizeCode(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string'
+        ]);
+        
+        $service = new \App\Services\AI\CodeOptimizerService();
+        $result = $service->optimizeCode($request->code);
+        
+        return response()->json($result);
+    }
+    
+    public function checkCodeQuality(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string'
+        ]);
+        
+        $service = new \App\Services\AI\CodeOptimizerService();
+        $result = $service->checkQuality($request->code);
+        
+        return response()->json($result);
+    }
 
 }
