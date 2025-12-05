@@ -71,9 +71,9 @@
 <script>
     // **ملاحظة:** في بيئة الإنتاج، يجب أن يتم تمرير مفتاح API عبر متغير بيئة أو معالج خلفي (Backend Handler)
     // لتجنب كشفه في الواجهة الأمامية. هذا الكود هو للمحاكاة وإظهار منطق التكامل.
-    const MANUS_API_KEY = 'sk-4-tSe7JkjRuRPoZ70EWgVWA_Kr9v2ldVSfo8z5VsVJGhbNjAodRsNM618fEaYGGWvvKHofv-HSTwglnGZcizlVrTDJQt';
-    const MANUS_API_URL = 'https://api.manus.ai/v1/chat/completions'; // افتراض نقطة نهاية متوافقة مع OpenAI
-    const MODEL_NAME = 'gpt-4.1-mini';
+    // const MANUS_API_KEY = 'sk-4-tSe7JkjRuRPoZ70EWgVWA_Kr9v2ldVSfo8z5VsVJGhbNjAodRsNM618fEaYGGWvvKHofv-HSTwglnGZcizlVrTDJQt';
+    const API_ENDPOINT = '/developer/ai/documentation-generator';
+    // const MODEL_NAME = 'gpt-4.1-mini';
 
     async function generateDocumentation() {
         const code = document.getElementById('sourceCode').value;
@@ -91,20 +91,19 @@
         outputDiv.innerHTML = '<div class="flex items-center justify-center"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="text-indigo-600">جاري توليد التوثيق... قد يستغرق الأمر بضع ثوانٍ.</span></div>';
         downloadArea.classList.add('hidden');
 
-        let prompt = `أنت خبير في توثيق الكود. قم بتوليد ${getDocTypeDescription(docType)} للكود التالي. يجب أن يكون الإخراج بتنسيق ${outputFormat} وجميع النصوص باللغة العربية الفصحى. الكود المصدر: \n\n\`\`\`\n${code}\n\`\`\``;
+// تم نقل منطق الـ prompt إلى الباك إند
 
         try {
-            const response = await fetch(MANUS_API_URL, {
+            const response = await fetch(API_ENDPOINT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${MANUS_API_KEY}`
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
                 body: JSON.stringify({
-                    model: MODEL_NAME,
-                    messages: [{ role: "user", content: prompt }],
-                    temperature: 0.7,
-                    max_tokens: 4096
+                    code: code,
+                    doc_type: docType,
+                    output_format: outputFormat
                 })
             });
 
@@ -113,7 +112,10 @@
             }
 
             const data = await response.json();
-            const documentation = data.choices[0].message.content;
+            if (data.status === 'error') {
+                throw new Error(data.message);
+            }
+            const documentation = data.documentation;
 
             // عرض النتيجة
             outputDiv.innerHTML = formatOutput(documentation, outputFormat);
@@ -121,7 +123,7 @@
 
         } catch (error) {
             console.error('خطأ في التوليد:', error);
-            outputDiv.innerHTML = `<p class="text-red-600 font-semibold">حدث خطأ أثناء توليد التوثيق: ${error.message}. يرجى التحقق من مفتاح API أو الاتصال بالخادم.</p>`;
+            outputDiv.innerHTML = `<p class="text-red-600 font-semibold">حدث خطأ أثناء توليد التوثيق: ${error.message}. يرجى التحقق من سجلات الخادم.</p>`;
             downloadArea.classList.add('hidden');
         }
     }
