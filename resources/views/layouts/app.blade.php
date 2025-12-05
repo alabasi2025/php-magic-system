@@ -230,7 +230,7 @@
         <aside id="sidebar" class="sidebar sidebar-expanded bg-white shadow-lg fixed right-0 h-full overflow-y-auto">
             <div class="p-4">
                 <nav class="space-y-2">
-                    <a href="{{ route('dashboard') }}" class="sidebar-item flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent text-gray-700 hover:text-purple-600 transition-all duration-300">
+                    <a href="{{ url('/') }}" class="sidebar-item flex items-center space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent text-gray-700 hover:text-purple-600 transition-all duration-300">
                         <i class="fas fa-home text-2xl icon-gradient-purple icon-shadow"></i>
                         <span class="sidebar-text font-semibold">الرئيسية</span>
                     </a>
