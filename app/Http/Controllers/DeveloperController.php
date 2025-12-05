@@ -461,35 +461,38 @@ class DeveloperController extends Controller
         $php_version = phpversion();
         $laravel_version = app()->version();
         $server_software = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown';
-        $os = php_uname();
+        $server_ip = $_SERVER['SERVER_ADDR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
+        $server_name = $_SERVER['SERVER_NAME'] ?? 'Unknown';
+        $server_port = $_SERVER['SERVER_PORT'] ?? 'Unknown';
+        $document_root = $_SERVER['DOCUMENT_ROOT'] ?? base_path();
         $max_execution_time = ini_get('max_execution_time');
         $memory_limit = ini_get('memory_limit');
         $upload_max_filesize = ini_get('upload_max_filesize');
         $post_max_size = ini_get('post_max_size');
         
-        // PHP Extensions
-        $extensions = get_loaded_extensions();
-        sort($extensions);
+        // Disk space
+        $disk_total_space = disk_total_space(base_path());
+        $disk_free_space = disk_free_space(base_path());
         
-        // Server info
-        $server_info = [
-            'server_name' => $_SERVER['SERVER_NAME'] ?? 'Unknown',
-            'server_addr' => $_SERVER['SERVER_ADDR'] ?? 'Unknown',
-            'server_port' => $_SERVER['SERVER_PORT'] ?? 'Unknown',
-            'document_root' => $_SERVER['DOCUMENT_ROOT'] ?? 'Unknown',
-        ];
+        // PHP Extensions
+        $php_extensions = get_loaded_extensions();
+        sort($php_extensions);
         
         return view('developer.server-info', compact(
             'php_version',
             'laravel_version',
             'server_software',
-            'os',
+            'server_ip',
+            'server_name',
+            'server_port',
+            'document_root',
             'max_execution_time',
             'memory_limit',
             'upload_max_filesize',
             'post_max_size',
-            'extensions',
-            'server_info'
+            'disk_total_space',
+            'disk_free_space',
+            'php_extensions'
         ));
     }
 
