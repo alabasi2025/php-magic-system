@@ -1,4 +1,4 @@
-@php
+{{--
 /**
  * Laravel Blade View: Security Scanner Interface
  * File: /home/ubuntu/php-magic-system/resources/views/developer/ai/security-scanner.blade.php
@@ -8,7 +8,7 @@
  *
  * المتطلبات المدمجة:
  * 1. فحص SQL Injection, XSS, CSRF, والأذونات
- * 2. تصميم احترافية (باستخدام Tailwind CSS)
+ * 2. تصميم احترافي (باستخدام Tailwind CSS)
  * 3. محرر كود مع Syntax Highlighting
  * 4. عرض النتائج بألوان حسب الخطورة
  * 5. اقتراحات إصلاح فورية
@@ -16,7 +16,7 @@
  * 
  * @version 3.14.0
  */
-@endphp
+--}}
 
 @extends('layouts.app')
 
