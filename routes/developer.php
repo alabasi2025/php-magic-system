@@ -162,7 +162,8 @@ Route::get('/developer/horizon', [DeveloperController::class, 'getHorizon'])->na
 Route::get('/developer/migrations', [DeveloperController::class, 'getMigrationsPage'])->name('developer.migrations');
 Route::post('/developer/migrations/run', [DeveloperController::class, 'runMigrations'])->name('developer.migrations.run');
 Route::get('/developer/seeders', [DeveloperController::class, 'getSeedersPage'])->name('developer.seeders');
-Route::post('/developer/seeders/run', [DeveloperController::class, 'runSeeders'])->name('developer.seeders.run');
+Route::post('/developer/seeders/run-specific', [DeveloperController::class, 'runSpecificSeeder'])->name('developer.seeders.run-specific');
+Route::post('/developer/seeders/run-all', [DeveloperController::class, 'runAllSeeders'])->name('developer.seeders.run-all');
 Route::get('/developer/database-info', [DeveloperController::class, 'getDatabaseInfoPage'])->name('developer.database-info');
 Route::get('/developer/database-optimize', [DeveloperController::class, 'getDatabaseOptimizePage'])->name('developer.database-optimize');
 Route::post('/developer/database-optimize/run', [DeveloperController::class, 'runDatabaseOptimize'])->name('developer.database-optimize.run');

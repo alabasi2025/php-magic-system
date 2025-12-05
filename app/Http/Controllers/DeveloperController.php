@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\File;
 
 /**
  * DeveloperController
@@ -551,7 +552,31 @@ class DeveloperController extends Controller
      */
     public function getSeedersPage()
     {
-        return view('developer.seeders');
+        $seedersPath = database_path('seeders');
+        $seeders = [];
+
+        try {
+            // Get all files in the seeders directory
+            $files = File::files($seedersPath);
+
+            foreach ($files as $file) {
+                $filename = $file->getFilename();
+                // Exclude DatabaseSeeder and any other non-seeder files
+                if ($filename !== 'DatabaseSeeder.php' && $file->getExtension() === 'php') {
+                    $seeders[] = [
+                        'name' => $file->getBasename('.php'),
+                        'size' => $file->getSize(),
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            // Log the error but continue with empty list
+            \Log::error("Error reading seeders directory: " . $e->getMessage());
+        }
+
+        $total = count($seeders);
+
+        return view('developer.seeders', compact('seeders', 'total'));
     }
 
     /**
@@ -1106,13 +1131,64 @@ class DeveloperController extends Controller
         }
     }
     
-    public function runSeeders()
+    /**
+     * تشغيل Seeder محدد
+     * Run a specific Seeder
+     */
+    public function runSpecificSeeder(Request $request)
+    {
+        $seederName = $request->input('seeder');
+        if (!$seederName) {
+            return response()->json(['success' => false, 'message' => 'Seeder name is required.'], 400);
+        }
+
+        try {
+            $start = microtime(true);
+            \Artisan::call('db:seed', ['--class' => $seederName, '--force' => true]);
+            $end = microtime(true);
+            $duration = round($end - $start, 2);
+            $output = \Artisan::output();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Seeder '{$seederName}' ran successfully.",
+                'output' => trim($output),
+                'duration' => $duration
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => "Error running Seeder '{$seederName}'.",
+                'trace' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * تشغيل جميع Seeders (Artisan db:seed)
+     * Run all Seeders
+     */
+    public function runAllSeeders()
     {
         try {
+            $start = microtime(true);
             \Artisan::call('db:seed', ['--force' => true]);
-            return response()->json(['success' => true, 'message' => 'Seeders ran successfully']);
+            $end = microtime(true);
+            $duration = round($end - $start, 2);
+            $output = \Artisan::output();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'All Seeders ran successfully.',
+                'output' => trim($output),
+                'duration' => $duration
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error running all Seeders.',
+                'trace' => $e->getMessage()
+            ], 500);
         }
     }
     

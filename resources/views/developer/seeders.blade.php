@@ -185,7 +185,7 @@ async function runSeeder(seederName) {
     showLoading(`جاري تشغيل ${seederName}...`);
     
     try {
-        const response = await fetch('{{ route("developer.seeders.run") }}', {
+        const response = await fetch('{{ route("developer.seeders.run-specific") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
