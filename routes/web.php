@@ -251,3 +251,6 @@ require __DIR__."/request_generator.php";
 
 // Resource Generator Routes (v3.30.0)
 require __DIR__."/resource_generator.php";
+
+// Policy Generator Routes (v3.31.0) - Task 23/100
+require __DIR__."/policy_generator.php";
