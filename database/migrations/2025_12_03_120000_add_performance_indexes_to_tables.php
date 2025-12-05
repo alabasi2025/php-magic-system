@@ -45,10 +45,10 @@ return new class extends Migration
         if (Schema::hasTable('cash_box_transactions')) {
             Schema::table('cash_box_transactions', function (Blueprint $table) {
                 $table->index('cash_box_id', 'idx_cash_box_transactions_cash_box_id');
-                $table->index('transaction_type', 'idx_cash_box_transactions_type');
+                $table->index('type', 'idx_cash_box_transactions_type');
                 $table->index('transaction_date', 'idx_cash_box_transactions_date');
                 $table->index(['cash_box_id', 'transaction_date'], 'idx_cash_box_transactions_box_date');
-                $table->index(['transaction_type', 'transaction_date'], 'idx_cash_box_transactions_type_date');
+                $table->index(['type', 'transaction_date'], 'idx_cash_box_transactions_type_date');
             });
         }
 
@@ -66,7 +66,7 @@ return new class extends Migration
         if (Schema::hasTable('intermediate_transactions')) {
             Schema::table('intermediate_transactions', function (Blueprint $table) {
                 $table->index('intermediate_account_id', 'idx_intermediate_transactions_account_id');
-                $table->index('transaction_type', 'idx_intermediate_transactions_type');
+                $table->index('type', 'idx_intermediate_transactions_type');
                 $table->index('transaction_date', 'idx_intermediate_transactions_date');
                 $table->index(['intermediate_account_id', 'transaction_date'], 'idx_intermediate_transactions_account_date');
             });
@@ -85,7 +85,7 @@ return new class extends Migration
         if (Schema::hasTable('partner_transactions')) {
             Schema::table('partner_transactions', function (Blueprint $table) {
                 $table->index('partner_id', 'idx_partner_transactions_partner_id');
-                $table->index('transaction_type', 'idx_partner_transactions_type');
+                $table->index('type', 'idx_partner_transactions_type');
                 $table->index('transaction_date', 'idx_partner_transactions_date');
                 $table->index(['partner_id', 'transaction_date'], 'idx_partner_transactions_partner_date');
             });
