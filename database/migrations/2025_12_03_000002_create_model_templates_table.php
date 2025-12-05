@@ -79,6 +79,7 @@ return new class extends Migration
             $table->index('usage_count');
             $table->index('rating');
         });
+        }
     }
 
     /**

@@ -31,6 +31,7 @@ return new class extends Migration
             // Indexes for performance
             $table->index('created_at');
         });
+        }
     }
 
     /**

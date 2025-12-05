@@ -71,6 +71,7 @@ return new class extends Migration
             $table->index('is_active');
             $table->index('created_at');
         });
+        }
     }
 
     /**

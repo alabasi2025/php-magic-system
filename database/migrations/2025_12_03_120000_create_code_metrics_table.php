@@ -92,6 +92,7 @@ return new class extends Migration
             $table->index('grade');
             $table->index('analyzed_at');
         });
+        }
     }
 
     /**

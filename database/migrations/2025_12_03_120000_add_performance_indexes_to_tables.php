@@ -167,6 +167,7 @@ return new class extends Migration
             $table->index('email', 'idx_users_email');
             $table->index('created_at', 'idx_users_created_at');
         });
+        }
     }
 
     /**

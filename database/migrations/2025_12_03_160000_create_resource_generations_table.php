@@ -55,6 +55,7 @@ return new class extends Migration
             $table->index('status');
             $table->index('created_at');
         });
+        }
     }
 
     /**
