@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Support\Facades\File;
-
+use Illuminate\Support\Facades\Route;
 
 /**
  * DeveloperController
@@ -467,7 +467,29 @@ class DeveloperController extends Controller
      */
     public function getRoutesListPage()
     {
-        return view('developer.routes-list');
+        $routes = collect(Route::getRoutes())->map(function ($route) {
+            // استبعاد المسارات التي لا تحتوي على URI (مثل المسارات المغلقة)
+            if (is_null($route->uri())) {
+                return null;
+            }
+
+            // استبعاد المسارات التي تبدأ بـ _ignition
+            if (str_starts_with($route->uri(), '_ignition')) {
+                return null;
+            }
+
+            return [
+                'method' => implode('|', $route->methods()),
+                'uri' => $route->uri(),
+                'name' => $route->getName(),
+                'action' => $route->getActionName(),
+                'middleware' => implode(', ', $route->gatherMiddleware()),
+            ];
+        })->filter()->sortBy('uri')->values()->all();
+
+        $total = count($routes);
+
+        return view('developer.routes-list', compact('routes', 'total'));
     }
 
     /**
