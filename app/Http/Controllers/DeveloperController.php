@@ -676,13 +676,60 @@ class DeveloperController extends Controller
         ]);
     }
     
-    public function reviewCodeWithAi(Request $request)
+    public function reviewCodeWithAi(Request $request): JsonResponse
     {
-        return response()->json([
-            'success' => true,
-            'message' => 'Code reviewed successfully',
-            'review' => 'Review results'
-        ]);
+        try {
+            // 1. التحقق من صحة المدخلات
+            $validator = Validator::make($request->all(), [
+                'code' => 'required|string|min:10',
+                'language' => 'required|string|in:php,javascript,python,java,csharp,typescript,other',
+            ], [
+                'code.required' => 'حقل الكود مطلوب للمراجعة.',
+                'code.min' => 'يجب أن يحتوي الكود على 10 أحرف على الأقل.',
+                'language.required' => 'لغة البرمجة مطلوبة.',
+                'language.in' => 'لغة البرمجة المدخلة غير مدعومة حاليًا.',
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $validated = $validator->validated();
+            $code = $validated['code'];
+            $language = $validated['language'];
+
+            // 2. محاكاة عملية المراجعة (لغرض الاختبار)
+            $mockReview = "تمت مراجعة الكود بنجاح.\n\nلغة البرمجة: {$language}\n\nالكود الذي تم إرساله:\n\n```{$language}\n{$code}\n```\n\n**ملاحظة:** هذه نتيجة محاكاة لغرض الاختبار.";
+
+            // 3. إرجاع النتائج بصيغة JSON
+            return response()->json([
+                'status' => 'success',
+                'message' => 'تمت مراجعة الكود بنجاح (محاكاة).',
+                'review' => $mockReview,
+            ], 200, [], JSON_UNESCAPED_UNICODE);
+
+        } catch (ValidationException $e) {
+            // معالجة أخطاء التحقق من صحة المدخلات
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطأ في التحقق من صحة المدخلات.',
+                'errors' => $e->errors(),
+            ], 422, [], JSON_UNESCAPED_UNICODE);
+
+        } catch (Exception $e) {
+            // 4. معالجة الأخطاء العامة
+            Log::error('Error during code review: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+
+            // إرجاع استجابة خطأ احترافية
+            return response()->json([
+                'status' => 'error',
+                'message' => 'حدث خطأ غير متوقع أثناء مراجعة الكود. يرجى المحاولة لاحقًا.',
+                'details' => $e->getMessage(),
+            ], 500, [], JSON_UNESCAPED_UNICODE);
+        }
     }
     
     public function detectBugsWithAi(Request $request)
