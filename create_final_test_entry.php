@@ -18,6 +18,7 @@ try {
         'description' => 'قيد اختبار نهائي - تم إنشاؤه للاختبار الشامل',
         'status' => 'draft',
         'unit_id' => 1,
+        'user_id' => 1,
         'created_by' => 1,
         'total_debit' => 15000.00,
         'total_credit' => 15000.00,
