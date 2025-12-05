@@ -56,10 +56,10 @@
                     <tr>
                         <td class="py-3 px-6 text-right">الإجمالي</td>
                         <td class="py-3 px-6 text-right text-green-700">
-                            {{ number_format($journalEntry->lines->sum('debit'), 2) }}
+                            {{ number_format($journalEntry->details->sum('debit'), 2) }}
                         </td>
                         <td class="py-3 px-6 text-right text-red-700">
-                            {{ number_format($journalEntry->lines->sum('credit'), 2) }}
+                            {{ number_format($journalEntry->details->sum('credit'), 2) }}
                         </td>
                     </tr>
                 </tfoot>
