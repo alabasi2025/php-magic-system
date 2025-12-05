@@ -1386,6 +1386,35 @@ class DeveloperController extends Controller
         return $this->clearCache();
     }
 
+    /**
+     * مسح نوع واحد من Cache
+     * Clear a single type of cache
+     */
+    public function clearSingleCache(Request $request)
+    {
+        $type = $request->input('type');
+        $command = match($type) {
+            'cache' => 'cache:clear',
+            'config' => 'config:clear',
+            'route' => 'route:clear',
+            'view' => 'view:clear',
+            default => null,
+        };
+
+        if ($command) {
+            \Artisan::call($command);
+            return response()->json([
+                'success' => true,
+                'message' => "Cache type '{$type}' cleared successfully"
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => "Invalid cache type: {$type}"
+        ], 400);
+    }
+
     // ========================================
     // Logs Methods - مفقودة
     // ========================================
