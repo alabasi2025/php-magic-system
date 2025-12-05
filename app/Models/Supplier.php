@@ -4,66 +4,81 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Supplier Model
- * 
- * @package App\Models
  * @property int $id
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string $name
+ * @property string|null $contact_person
+ * @property string $phone
+ * @property string|null $email
+ * @property string|null $address
+ * @property float $initial_balance
+ * @property float $balance
+ * @property bool $is_active
+ * @property int $user_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Transaction[] $transactions
+ * @property-read \App\Models\User $creator
  */
 class Supplier extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'suppliers';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // الحقول المسموح بتعبئتها جماعياً
     protected $fillable = [
         'name',
-        'description',
-        'status',
+        'contact_person',
+        'phone',
+        'email',
+        'address',
+        'initial_balance',
+        'balance', // يمكن تحديثه من خلال الخدمة فقط
         'is_active',
+        'user_id',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
+    // تحويل الحقول إلى أنواع بيانات محددة
     protected $casts = [
+        'initial_balance' => 'decimal:2',
+        'balance' => 'decimal:2',
         'is_active' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * علاقة المورد بالتعاملات المالية (المشتريات، المدفوعات).
      *
-     * @var array<int, string>
+     * @return HasMany
      */
-    protected $hidden = [];
+    public function transactions(): HasMany
+    {
+        // نفترض وجود نموذج Transaction يربط بالكيانات المالية
+        return $this->hasMany(Transaction::class, 'supplier_id');
+    }
 
     /**
-     * Get the attributes that should be searchable.
+     * علاقة المورد بالمستخدم الذي أنشأه.
      *
-     * @return array<int, string>
+     * @return BelongsTo
      */
-    public function getSearchableAttributes(): array
+    public function creator(): BelongsTo
     {
-        return ['name', 'description'];
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * حساب الرصيد الحالي للمورد.
+     * يتم استدعاؤها من الخدمة عند الحاجة.
+     *
+     * @return float
+     */
+    public function calculateCurrentBalance(): float
+    {
+        // الرصيد الافتتاحي + مجموع التعاملات (يجب أن يكون منطق التعاملات في الخدمة)
+        // نفترض أن قيمة التعاملات موجبة تعني دين على الشركة (مستحق للمورد) وسالبة تعني دفع للمورد.
+        $transactionsSum = $this->transactions()->sum('amount');
+        return $this->initial_balance + $transactionsSum;
     }
 }

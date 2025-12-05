@@ -4,66 +4,88 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * StockMovement Model
- * 
- * @package App\Models
  * @property int $id
+ * @property int $warehouse_id
+ * @property int $item_id
+ * @property string $movement_type
+ * @property string $reference_type
+ * @property int $reference_id
+ * @property float $quantity
+ * @property float|null $unit_price
+ * @property float $balance_before
+ * @property float $balance_after
+ * @property \Illuminate\Support\Carbon $date
+ * @property int|null $created_by
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read \App\Models\Warehouse $warehouse
+ * @property-read \App\Models\Item $item
+ * @property-read \App\Models\User|null $creator
  */
 class StockMovement extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
+    // اسم الجدول
     protected $table = 'stock_movements';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // الحقول التي يمكن تعبئتها جماعياً
     protected $fillable = [
-        'name',
-        'description',
-        'status',
-        'is_active',
+        'warehouse_id',
+        'item_id',
+        'movement_type',
+        'reference_type',
+        'reference_id',
+        'quantity',
+        'unit_price',
+        'balance_before',
+        'balance_after',
+        'date',
+        'created_by',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
+    // تحويل الحقول إلى أنواع بيانات محددة
     protected $casts = [
-        'is_active' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
+        'date' => 'datetime',
+        'quantity' => 'float',
+        'unit_price' => 'float',
+        'balance_before' => 'float',
+        'balance_after' => 'float',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
+     * علاقة الحركة بالمخزن.
      */
-    protected $hidden = [];
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
 
     /**
-     * Get the attributes that should be searchable.
-     *
-     * @return array<int, string>
+     * علاقة الحركة بالصنف.
      */
-    public function getSearchableAttributes(): array
+    public function item(): BelongsTo
     {
-        return ['name', 'description'];
+        return $this->belongsTo(Item::class);
+    }
+
+    /**
+     * علاقة الحركة بالمستخدم الذي أنشأها.
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * علاقة الحركة بالكيان المرجعي (Polymorphic Relation).
+     */
+    public function reference()
+    {
+        return $this->morphTo();
     }
 }

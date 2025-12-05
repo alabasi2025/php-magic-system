@@ -4,66 +4,47 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Warehouse Model
- * 
- * @package App\Models
  * @property int $id
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string $name
+ * @property string|null $location
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\StockMovement[] $stockMovements
  */
 class Warehouse extends Model
 {
     use HasFactory;
 
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'warehouses';
-
-    /**
-     * The attributes that are mass assignable.
-     *
+     * الحقول التي يمكن تعبئتها بشكل جماعي.
      * @var array<int, string>
      */
     protected $fillable = [
         'name',
-        'description',
-        'status',
+        'location',
         'is_active',
     ];
 
     /**
-     * The attributes that should be cast.
-     *
+     * تحويل الحقول إلى أنواع بيانات محددة.
      * @var array<string, string>
      */
     protected $casts = [
         'is_active' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
+     * علاقة حركات المخزون (Stock Movements) المرتبطة بهذا المخزن.
+     * @return HasMany
      */
-    protected $hidden = [];
-
-    /**
-     * Get the attributes that should be searchable.
-     *
-     * @return array<int, string>
-     */
-    public function getSearchableAttributes(): array
+    public function stockMovements(): HasMany
     {
-        return ['name', 'description'];
+        // يمكن أن يكون المخزن هو المصدر أو الوجهة للحركة
+        return $this->hasMany(StockMovement::class, 'from_warehouse_id');
     }
 }

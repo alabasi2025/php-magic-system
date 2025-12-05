@@ -3,185 +3,143 @@
 namespace App\Http\Controllers;
 
 use App\Models\StockMovement;
-use App\Models\StockBalance;
-use App\Http\Requests\StockMovementRequest;
+use App\Services\StockMovementService;
+use App\Http\Requests\StockMovementStoreRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
+use Exception;
 
 class StockMovementController extends Controller
 {
-    /**
-     * Display a listing of the resource (Stock Movements).
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function index(Request $request): JsonResponse
-    {
-        // Basic pagination and eager loading for related data
-        // Assuming 'product', 'sourceLocation', and 'destinationLocation' are defined relationships in StockMovement model
-        $movements = StockMovement::with(['product', 'sourceLocation', 'destinationLocation'])
-            ->latest()
-            ->paginate($request->get('per_page', 15));
+    protected $movementService;
 
-        return response()->json($movements);
+    /**
+     * تهيئة المتحكم.
+     */
+    public function __construct(StockMovementService $movementService)
+    {
+        $this->movementService = $movementService;
+        // تطبيق سياسة الأمان (Authorization) على جميع الدوال
+        $this->authorizeResource(StockMovement::class, 'movement');
     }
 
     /**
-     * Store a newly created resource in storage and update stock balances.
-     *
-     * @param StockMovementRequest $request
-     * @return JsonResponse
+     * عرض سجل حركات المخزون (Index).
      */
-    public function store(StockMovementRequest $request): JsonResponse
+    public function index(Request $request)
     {
-        $data = $request->validated();
-        $movementType = $data['movement_type'];
-        $quantity = (float) $data['quantity'];
-        $productId = $data['product_id'];
-        $sourceLocationId = $data['source_location_id'] ?? null;
-        $destinationLocationId = $data['destination_location_id'] ?? null;
+        // التحقق من الصلاحية لعرض السجل
+        if (Gate::denies('viewAny', StockMovement::class)) {
+            abort(403, 'غير مصرح لك بمشاهدة سجل حركات المخزون.');
+        }
 
-        // Use a database transaction to ensure atomicity for stock updates
         try {
-            DB::beginTransaction();
+            $filters = $request->only(['warehouse_id', 'item_id', 'movement_type', 'start_date', 'end_date']);
+            $movements = $this->movementService->getMovementsHistory($filters);
 
-            // 1. Record the Stock Movement (Transaction History)
-            $movement = StockMovement::create($data);
-
-            // 2. Update Stock Balances based on movement type
-            if ($movementType === 'in' || ($movementType === 'adjustment' && $destinationLocationId)) {
-                // 'in' or positive 'adjustment' affects the destination location
-                $locationId = $destinationLocationId;
-                if ($locationId) {
-                    $this->updateStockBalance($productId, $locationId, $quantity);
-                }
-            }
-
-            if ($movementType === 'out' || ($movementType === 'adjustment' && $sourceLocationId)) {
-                // 'out' or negative 'adjustment' affects the source location
-                $locationId = $sourceLocationId;
-                if ($locationId) {
-                    // Check if sufficient stock exists before decrementing
-                    $currentBalance = StockBalance::where('product_id', $productId)
-                        ->where('location_id', $locationId)
-                        ->value('quantity') ?? 0;
-
-                    if ($currentBalance < $quantity) {
-                        DB::rollBack();
-                        return response()->json([
-                            'message' => 'Insufficient stock at location to complete the movement.',
-                            'current_stock' => $currentBalance,
-                        ], 409); // 409 Conflict
-                    }
-
-                    $this->updateStockBalance($productId, $locationId, -$quantity);
-                }
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Stock movement recorded and balances updated successfully.',
-                'movement' => $movement->load(['product', 'sourceLocation', 'destinationLocation']),
-            ], 201); // 201 Created
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            // Log the error for debugging
-            \Log::error('Stock Movement failed: ' . $e->getMessage(), ['exception' => $e]);
-
-            return response()->json([
-                'message' => 'An error occurred while processing the stock movement.',
-                'error' => $e->getMessage(),
-            ], 500);
+            return view('stock_movements.index', compact('movements', 'filters'));
+        } catch (Exception $e) {
+            // معالجة الأخطاء
+            return back()->with('error', 'حدث خطأ أثناء جلب سجل الحركات: ' . $e->getMessage());
         }
     }
 
     /**
-     * Helper function to update or create a StockBalance record.
-     *
-     * @param int $productId
-     * @param int $locationId
-     * @param float $quantityChange (positive for increase, negative for decrease)
-     * @return StockBalance
+     * عرض نموذج إنشاء حركة جديدة (Create).
      */
-    protected function updateStockBalance(int $productId, int $locationId, float $quantityChange): StockBalance
+    public function create()
     {
-        // Find the balance or initialize a new one
-        $balance = StockBalance::firstOrNew([
-            'product_id' => $productId,
-            'location_id' => $locationId,
-        ]);
+        // التحقق من الصلاحية لإنشاء حركة
+        if (Gate::denies('create', StockMovement::class)) {
+            abort(403, 'غير مصرح لك بإنشاء حركات مخزون.');
+        }
 
-        // Update the quantity
-        $balance->quantity += $quantityChange;
+        // جلب البيانات اللازمة للعرض (مثل المخازن والأصناف)
+        $warehouses = \App\Models\Warehouse::all();
+        $items = \App\Models\Item::all();
 
-        // Ensure quantity does not go below zero (should be caught by the transaction check, but good for safety)
-        $balance->quantity = max(0, $balance->quantity);
-
-        $balance->save();
-
-        return $balance;
+        return view('stock_movements.create', compact('warehouses', 'items'));
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param StockMovement $stockMovement
-     * @return JsonResponse
+     * تخزين حركة مخزون جديدة (Store).
      */
-    public function show(StockMovement $stockMovement): JsonResponse
+    public function store(StockMovementStoreRequest $request)
     {
-        // Eager load relationships for a complete view
-        $stockMovement->load(['product', 'sourceLocation', 'destinationLocation']);
+        // التحقق من الصلاحية يتم تلقائياً عبر StockMovementStoreRequest::authorize()
 
-        return response()->json($stockMovement);
+        try {
+            // يجب تحويل الكمية إلى قيمة سالبة إذا كانت حركة "خروج"
+            $data = $request->validated();
+            if ($data['movement_type'] === 'out' || $data['movement_type'] === 'transfer') {
+                $data['quantity'] = -$data['quantity'];
+            }
+
+            $movement = $this->movementService->createMovement($data);
+
+            return redirect()->route('stock_movements.index')->with('success', 'تم تسجيل الحركة بنجاح. الرصيد الجديد: ' . $movement->balance_after);
+        } catch (Exception $e) {
+            // معالجة الأخطاء الناتجة عن منطق الأعمال (مثل الرصيد غير الكافي)
+            return back()->withInput()->with('error', 'فشل تسجيل الحركة: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * NOTE: Updating a stock movement record after it has been processed is generally discouraged
-     * as it can lead to inconsistencies in stock balances. For a production system, this method
-     * should ideally be restricted or implement complex reversal/correction logic.
-     * For CRUD completeness, a basic update is provided, but it DOES NOT update stock balances.
-     *
-     * @param StockMovementRequest $request
-     * @param StockMovement $stockMovement
-     * @return JsonResponse
+     * عرض تفاصيل حركة مخزون محددة (Show).
      */
-    public function update(StockMovementRequest $request, StockMovement $stockMovement): JsonResponse
+    public function show(StockMovement $movement)
     {
-        // Only update the movement record itself, without affecting stock balances.
-        // A proper system would require a separate 'Stock Correction' or 'Reversal' movement.
-        $stockMovement->update($request->validated());
+        // التحقق من الصلاحية يتم تلقائياً عبر authorizeResource
+        return view('stock_movements.show', compact('movement'));
+    }
 
-        return response()->json([
-            'message' => 'Stock movement record updated successfully (Note: Stock balances were NOT affected).',
-            'movement' => $stockMovement->load(['product', 'sourceLocation', 'destinationLocation']),
-        ]);
+    // لا يتم دعم التعديل (Edit/Update) أو الحذف (Destroy) لحركات المخزون عادةً
+    // لأنها سجلات تاريخية. أي تصحيح يتم عبر حركة "تسوية" جديدة.
+    // لذلك، لن يتم تضمين دوال update و destroy.
+
+    /**
+     * تقرير حركة صنف محدد (ميزة إضافية).
+     */
+    public function itemReport(Request $request)
+    {
+        // التحقق من الصلاحية
+        if (Gate::denies('viewReports', StockMovement::class)) {
+            abort(403, 'غير مصرح لك بمشاهدة تقارير الحركة.');
+        }
+
+        $itemId = $request->input('item_id');
+        $warehouseId = $request->input('warehouse_id');
+
+        if (!$itemId) {
+            return view('stock_movements.item_report', ['movements' => null, 'items' => \App\Models\Item::all()]);
+        }
+
+        $movements = $this->movementService->getItemMovementReport($itemId, $warehouseId);
+        $item = \App\Models\Item::find($itemId);
+
+        return view('stock_movements.item_report', compact('movements', 'item'));
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * NOTE: Deleting a stock movement record is highly discouraged in a production environment
-     * as it destroys transaction history and causes stock balance inconsistencies.
-     * This method is provided for CRUD completeness but should be heavily restricted.
-     * It DOES NOT reverse the stock balance change.
-     *
-     * @param StockMovement $stockMovement
-     * @return JsonResponse
+     * تقرير حركة مخزن محدد (ميزة إضافية).
      */
-    public function destroy(StockMovement $stockMovement): JsonResponse
+    public function warehouseReport(Request $request)
     {
-        // In a real-world scenario, this would likely be a soft delete or a restricted operation.
-        $stockMovement->delete();
+        // التحقق من الصلاحية
+        if (Gate::denies('viewReports', StockMovement::class)) {
+            abort(403, 'غير مصرح لك بمشاهدة تقارير الحركة.');
+        }
 
-        return response()->json([
-            'message' => 'Stock movement record deleted successfully (Note: Stock balances were NOT affected).',
-        ], 204); // 204 No Content
+        $warehouseId = $request->input('warehouse_id');
+        $itemId = $request->input('item_id');
+
+        if (!$warehouseId) {
+            return view('stock_movements.warehouse_report', ['movements' => null, 'warehouses' => \App\Models\Warehouse::all()]);
+        }
+
+        $movements = $this->movementService->getWarehouseMovementReport($warehouseId, $itemId);
+        $warehouse = \App\Models\Warehouse::find($warehouseId);
+
+        return view('stock_movements.warehouse_report', compact('movements', 'warehouse'));
     }
 }

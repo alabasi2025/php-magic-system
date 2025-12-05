@@ -2,260 +2,144 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Warehouse;
-use App\Models\WarehouseLocation; // Assuming a WarehouseLocation model exists for location management
 use App\Http\Requests\WarehouseStoreRequest;
 use App\Http\Requests\WarehouseUpdateRequest;
-use Illuminate\Http\JsonResponse;
+use App\Models\Warehouse;
+use App\Services\WarehouseService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 
-/**
- * Class WarehouseController
- * Manages CRUD operations for Warehouses, along with inventory summary and location management.
- * Follows Laravel 12 best practices and uses proper naming conventions.
- */
 class WarehouseController extends Controller
 {
-    /**
-     * Display a listing of the warehouses.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function index(Request $request): JsonResponse
-    {
-        // Fetch all warehouses with pagination
-        $warehouses = Warehouse::query()
-            ->when($request->has('search'), function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->input('search') . '%')
-                      ->orWhere('code', 'like', '%' . $request->input('search') . '%');
-            })
-            ->latest()
-            ->paginate($request->input('per_page', 15));
+    protected WarehouseService $warehouseService;
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Warehouses retrieved successfully.',
-            'data' => $warehouses,
-        ]);
+    /**
+     * تهيئة المتحكم وحقن خدمة المخازن.
+     */
+    public function __construct(WarehouseService $warehouseService)
+    {
+        $this->warehouseService = $warehouseService;
+        // تطبيق سياسة الأمان على جميع الدوال باستثناء الإحصائيات
+        $this->authorizeResource(Warehouse::class, 'warehouse');
     }
 
     /**
-     * Store a newly created warehouse in storage.
-     *
-     * @param WarehouseStoreRequest $request
-     * @return JsonResponse
+     * عرض قائمة بجميع المخازن.
      */
-    public function store(WarehouseStoreRequest $request): JsonResponse
+    public function index(Request $request): View
     {
-        try {
-            // Validation is handled by WarehouseStoreRequest
-            $warehouse = Warehouse::create($request->validated());
+        // يتم التحقق من الصلاحية تلقائياً عبر authorizeResource (viewAny)
+        $warehouses = $this->warehouseService->getAllWarehouses(10);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Warehouse created successfully.',
-                'data' => $warehouse,
-            ], 201);
-        } catch (\Exception $e) {
-            Log::error('Warehouse creation failed: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to create warehouse.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return view('warehouses.index', compact('warehouses'));
     }
 
     /**
-     * Display the specified warehouse.
-     *
-     * @param Warehouse $warehouse
-     * @return JsonResponse
+     * عرض نموذج إنشاء مخزن جديد.
      */
-    public function show(Warehouse $warehouse): JsonResponse
+    public function create(): View
     {
-        // Load related locations for a complete view
-        $warehouse->load('locations');
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Warehouse retrieved successfully.',
-            'data' => $warehouse,
-        ]);
+        // يتم التحقق من الصلاحية تلقائياً عبر authorizeResource (create)
+        // يجب تمرير قائمة المدراء المحتملين (Users) إلى الواجهة
+        $managers = \App\Models\User::all(); // مثال
+        return view('warehouses.create', compact('managers'));
     }
 
     /**
-     * Update the specified warehouse in storage.
-     *
-     * @param WarehouseUpdateRequest $request
-     * @param Warehouse $warehouse
-     * @return JsonResponse
+     * تخزين مخزن جديد في قاعدة البيانات.
      */
-    public function update(WarehouseUpdateRequest $request, Warehouse $warehouse): JsonResponse
+    public function store(WarehouseStoreRequest $request): RedirectResponse
     {
-        try {
-            // Validation is handled by WarehouseUpdateRequest
-            $warehouse->update($request->validated());
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Warehouse updated successfully.',
-                'data' => $warehouse,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Warehouse update failed: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update warehouse.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    /**
-     * Remove the specified warehouse from storage.
-     *
-     * @param Warehouse $warehouse
-     * @return JsonResponse
-     */
-    public function destroy(Warehouse $warehouse): JsonResponse
-    {
-        try {
-            // Implement logic to check for existing inventory or transactions before deletion
-            // For production-ready code, consider soft deletes or throwing an exception if dependencies exist.
-            if ($warehouse->inventory()->exists()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Cannot delete warehouse with existing inventory records.',
-                ], 409); // Conflict
-            }
-
-            $warehouse->delete();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Warehouse deleted successfully.',
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error('Warehouse deletion failed: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete warehouse.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    /**
-     * Get a summary of the inventory for the specified warehouse.
-     *
-     * @param Warehouse $warehouse
-     * @return JsonResponse
-     */
-    public function inventorySummary(Warehouse $warehouse): JsonResponse
-    {
-        // This is a placeholder for a complex inventory summary logic.
-        // It assumes a relationship 'inventory' exists on the Warehouse model.
-        // In a real system, this would involve complex joins and aggregations.
-
-        // Example: Group by item and sum the quantity
-        $summary = $warehouse->inventory()
-            ->select('item_id', DB::raw('SUM(quantity) as total_quantity'))
-            ->groupBy('item_id')
-            ->with('item') // Assuming an 'item' relationship on the inventory model
-            ->get();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Inventory summary retrieved successfully.',
-            'warehouse' => $warehouse->name,
-            'data' => $summary,
-        ]);
-    }
-
-    /**
-     * Add a new location (e.g., shelf, aisle) to the specified warehouse.
-     *
-     * @param Request $request
-     * @param Warehouse $warehouse
-     * @return JsonResponse
-     */
-    public function addLocation(Request $request, Warehouse $warehouse): JsonResponse
-    {
-        // Simple validation for the new location data
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:warehouse_locations,code',
-            'description' => 'nullable|string',
-        ]);
+        // يتم التحقق من الصلاحية تلقائياً عبر authorizeResource (create)
+        // يتم التحقق من الصحة عبر WarehouseStoreRequest
 
         try {
-            // Create the new location associated with the warehouse
-            $location = $warehouse->locations()->create([
-                'name' => $request->input('name'),
-                'code' => $request->input('code'),
-                'description' => $request->input('description'),
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Location added successfully to warehouse.',
-                'data' => $location,
-            ], 201);
+            $this->warehouseService->createWarehouse($request->validated());
+            return redirect()->route('warehouses.index')->with('success', 'تم إنشاء المخزن بنجاح.');
         } catch (\Exception $e) {
-            Log::error('Failed to add location: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to add location.',
-                'error' => $e->getMessage(),
-            ], 500);
+            // معالجة الأخطاء وإعادة التوجيه مع رسالة خطأ
+            return back()->withInput()->with('error', 'فشل إنشاء المخزن: ' . $e->getMessage());
         }
     }
 
     /**
-     * Remove a location from the specified warehouse.
-     *
-     * @param Warehouse $warehouse
-     * @param WarehouseLocation $location
-     * @return JsonResponse
+     * عرض تفاصيل مخزن معين.
      */
-    public function removeLocation(Warehouse $warehouse, WarehouseLocation $location): JsonResponse
+    public function show(Warehouse $warehouse): View
     {
-        // Ensure the location belongs to the warehouse (Route Model Binding should handle this if configured,
-        // but an explicit check is safer for business logic).
-        if ($location->warehouse_id !== $warehouse->id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'The specified location does not belong to this warehouse.',
-            ], 403); // Forbidden
-        }
+        // يتم التحقق من الصلاحية تلقائياً عبر authorizeResource (view)
+        return view('warehouses.show', compact('warehouse'));
+    }
+
+    /**
+     * عرض نموذج تعديل مخزن موجود.
+     */
+    public function edit(Warehouse $warehouse): View
+    {
+        // يتم التحقق من الصلاحية تلقائياً عبر authorizeResource (update)
+        $managers = \App\Models\User::all(); // مثال
+        return view('warehouses.edit', compact('warehouse', 'managers'));
+    }
+
+    /**
+     * تحديث بيانات مخزن موجود في قاعدة البيانات.
+     */
+    public function update(WarehouseUpdateRequest $request, Warehouse $warehouse): RedirectResponse
+    {
+        // يتم التحقق من الصلاحية تلقائياً عبر authorizeResource (update)
+        // يتم التحقق من الصحة عبر WarehouseUpdateRequest
 
         try {
-            // Implement logic to check if the location is empty before deletion
-            // Assuming a relationship 'inventoryItems' exists on the WarehouseLocation model.
-            if ($location->inventoryItems()->exists()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Cannot remove location with existing inventory items.',
-                ], 409); // Conflict
-            }
-
-            $location->delete();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Location removed successfully from warehouse.',
-            ]);
+            $this->warehouseService->updateWarehouse($warehouse, $request->validated());
+            return redirect()->route('warehouses.index')->with('success', 'تم تحديث بيانات المخزن بنجاح.');
         } catch (\Exception $e) {
-            Log::error('Failed to remove location: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to remove location.',
-                'error' => $e->getMessage(),
-            ], 500);
+            return back()->withInput()->with('error', 'فشل تحديث المخزن: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * حذف مخزن من قاعدة البيانات.
+     */
+    public function destroy(Warehouse $warehouse): RedirectResponse
+    {
+        // يتم التحقق من الصلاحية تلقائياً عبر authorizeResource (delete)
+
+        try {
+            $this->warehouseService->deleteWarehouse($warehouse);
+            return redirect()->route('warehouses.index')->with('success', 'تم حذف المخزن بنجاح.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'فشل حذف المخزن: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * تبديل حالة تفعيل المخزن (تفعيل/تعطيل).
+     */
+    public function toggleStatus(Warehouse $warehouse): RedirectResponse
+    {
+        // التحقق من الصلاحية بشكل يدوي للدوال الإضافية
+        $this->authorize('toggleStatus', $warehouse);
+
+        try {
+            $this->warehouseService->toggleStatus($warehouse);
+            $status = $warehouse->is_active ? 'تفعيل' : 'تعطيل';
+            return back()->with('success', "تم $status المخزن بنجاح.");
+        } catch (\Exception $e) {
+            return back()->with('error', 'فشل تغيير حالة المخزن: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * عرض إحصائيات المخازن.
+     */
+    public function statistics(): View
+    {
+        // التحقق من الصلاحية بشكل يدوي
+        $this->authorize('viewStatistics', Warehouse::class);
+
+        $statistics = $this->warehouseService->getWarehousesStatistics();
+
+        return view('warehouses.statistics', compact('statistics'));
     }
 }
