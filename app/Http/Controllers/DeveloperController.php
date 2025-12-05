@@ -58,7 +58,14 @@ class DeveloperController extends Controller
      */
     public function index()
     {
-        return view('developer.dashboard');
+        $system_overview = [
+            'php_version' => PHP_VERSION,
+            'laravel_version' => app()->version(),
+            'environment' => config('app.env'),
+            'debug_mode' => config('app.debug'),
+        ];
+
+        return view('developer.dashboard', compact('system_overview'));
     }
 
     /**
