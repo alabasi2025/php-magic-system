@@ -20,7 +20,7 @@ Route::get('/', function () {
     // ============================================
     // مسارات القيود اليومية (Journal Entries)
     // ============================================
-    Route::prefix('journal-entries')->name('journal_entries.')->controller(JournalEntryController::class)->group(function () {
+    Route::prefix('journal-entries')->name('journal-entries.')->controller(JournalEntryController::class)->group(function () {
         // القائمة الرئيسية
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
