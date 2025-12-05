@@ -11,7 +11,7 @@ use App\Models\JournalEntryDetail;
 try {
     // إنشاء القيد
     $entry = JournalEntry::create([
-        'entry_number' => 'JE-TEST-001',
+        'entry_number' => 'JE-TEST-002',
         'entry_date' => '2025-12-06',
         'description' => 'قيد تجريبي بسيط',
         'status' => 'draft',
