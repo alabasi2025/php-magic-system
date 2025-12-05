@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('journal_entry_id')->references('id')->on('journal_entries')->onDelete('cascade');
-            $table->foreign('account_id')->references('id')->on('accounts')->onDelete('restrict');
+            $table->foreign('account_id')->references('id')->on('chart_accounts')->onDelete('restrict');
         });
     }
 
