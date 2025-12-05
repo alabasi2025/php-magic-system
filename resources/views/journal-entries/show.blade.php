@@ -14,7 +14,7 @@
             </div>
             <div>
                 <span class="font-semibold">التاريخ:</span>
-                <span>{{ $journalEntry->date->format('Y-m-d') }}</span>
+                <span>{{ $journalEntry->entry_date }}</span>
             </div>
             <div>
                 <span class="font-semibold">الوصف:</span>
