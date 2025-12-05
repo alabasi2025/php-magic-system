@@ -600,7 +600,39 @@ class DeveloperController extends Controller
      */
     public function getDatabaseOptimizePage()
     {
-        return view('developer.database-optimize');
+        try {
+            // Get table status from the database
+            $tables = DB::select('SHOW TABLE STATUS');
+            $formattedTables = [];
+            $totalSize = 0;
+
+            foreach ($tables as $table) {
+                $dataSize = $table->Data_length;
+                $indexSize = $table->Index_length;
+                $totalSize += $dataSize + $indexSize;
+
+                $formattedTables[] = [
+                    'name' => $table->Name,
+                    'engine' => $table->Engine,
+                    'rows' => $table->Rows,
+                    'data_size' => $this->formatBytes($dataSize),
+                    'index_size' => $this->formatBytes($indexSize),
+                    'total_size' => $this->formatBytes($dataSize + $indexSize),
+                ];
+            }
+
+            $total_tables = count($formattedTables);
+            $total_size = $this->formatBytes($totalSize);
+
+            return view('developer.database-optimize', compact('formattedTables', 'total_tables', 'total_size'));
+
+        } catch (\Exception $e) {
+            Log::error('Database Optimize Page Error: ' . $e->getMessage());
+            // In a production environment, we should not throw the exception directly
+            // but return a user-friendly error page or redirect.
+            // For now, we will just re-throw to see the error if it persists.
+            throw $e;
+        }
     }
 
     /**
@@ -1185,6 +1217,27 @@ class DeveloperController extends Controller
     // ========================================
     // System Monitor Methods - مفقودة
     // ========================================
+    
+    /**
+     * Helper function to format bytes into human-readable format.
+     *
+     * @param int $bytes
+     * @param int $precision
+     * @return string
+     */
+    private function formatBytes($bytes, $precision = 2)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+
+        // Calculate the value in the appropriate unit
+        $bytes /= (1024 ** $pow);
+
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
     
     public function getSystemInfo()
     {
