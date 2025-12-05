@@ -69,7 +69,7 @@
             <p class="text-sm opacity-90">حفظ التغييرات ونشرها</p>
         </a>
         
-        <a href="{{ route('developer.git.history') }}" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+        <a href="{{ route('developer.git.log') }}" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
             <i class="fas fa-history text-3xl mb-3"></i>
             <h3 class="text-xl font-bold mb-2">سجل التغييرات</h3>
             <p class="text-sm opacity-90">عرض جميع الـ Commits</p>

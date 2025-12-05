@@ -114,7 +114,7 @@
                 </a>
 
                 <!-- Code Generator -->
-                <a href="{{ route('developer.code-generator.index') }}" class="group">
+                <a href="{{ route('developer.code-generator.') }}" class="group">
                     <div class="bg-gradient-to-br from-purple-600 to-purple-800 rounded-lg p-6 h-full border border-purple-500/30 hover:border-purple-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -159,7 +159,7 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Artisan Commands -->
-                <a href="{{ route('developer.artisan.index') }}" class="group">
+                <a href="{{ route('developer.artisan.') }}" class="group">
                     <div class="bg-gradient-to-br from-green-600 to-green-800 rounded-lg p-6 h-full border border-green-500/30 hover:border-green-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -176,7 +176,7 @@
                 </a>
 
                 <!-- Database Manager -->
-                <a href="{{ route('developer.database.info') }}" class="group">
+                <a href="{{ route('developer.database-info') }}" class="group">
                     <div class="bg-gradient-to-br from-cyan-600 to-cyan-800 rounded-lg p-6 h-full border border-cyan-500/30 hover:border-cyan-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -221,7 +221,7 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- System Monitor -->
-                <a href="{{ route('developer.monitor.system-info') }}" class="group">
+                <a href="{{ route('developer.server-info') }}" class="group">
                     <div class="bg-gradient-to-br from-yellow-600 to-yellow-800 rounded-lg p-6 h-full border border-yellow-500/30 hover:border-yellow-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -238,7 +238,7 @@
                 </a>
 
                 <!-- Cache Manager -->
-                <a href="{{ route('developer.cache.overview') }}" class="group">
+                <a href="{{ route('developer.cache') }}" class="group">
                     <div class="bg-gradient-to-br from-orange-600 to-orange-800 rounded-lg p-6 h-full border border-orange-500/30 hover:border-orange-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -255,7 +255,7 @@
                 </a>
 
                 <!-- Logs Viewer -->
-                <a href="{{ route('developer.logs.index') }}" class="group">
+                <a href="{{ route('developer.logs-viewer') }}" class="group">
                     <div class="bg-gradient-to-br from-red-600 to-red-800 rounded-lg p-6 h-full border border-red-500/30 hover:border-red-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>

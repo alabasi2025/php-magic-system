@@ -46,7 +46,7 @@
                     </button>
                 </form>
                 
-                <form action="{{ route('developer.cache.clear') }}" method="POST">
+                <form action="{{ route('developer.cache.clear-single') }}" method="POST">
                     @csrf
                     <input type="hidden" name="type" value="cache">
                     <button type="submit" class="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition">
@@ -54,7 +54,7 @@
                     </button>
                 </form>
 
-                <form action="{{ route('developer.cache.clear') }}" method="POST">
+                <form action="{{ route('developer.cache.clear-single') }}" method="POST">
                     @csrf
                     <input type="hidden" name="type" value="config">
                     <button type="submit" class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
@@ -62,7 +62,7 @@
                     </button>
                 </form>
 
-                <form action="{{ route('developer.cache.clear') }}" method="POST">
+                <form action="{{ route('developer.cache.clear-single') }}" method="POST">
                     @csrf
                     <input type="hidden" name="type" value="route">
                     <button type="submit" class="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition">
@@ -70,7 +70,7 @@
                     </button>
                 </form>
 
-                <form action="{{ route('developer.cache.clear') }}" method="POST">
+                <form action="{{ route('developer.cache.clear-single') }}" method="POST">
                     @csrf
                     <input type="hidden" name="type" value="view">
                     <button type="submit" class="w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition">

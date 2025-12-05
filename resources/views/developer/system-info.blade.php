@@ -8,7 +8,7 @@
                 <i class="fas fa-server text-green-500 mr-2"></i>
                 معلومات النظام
             </h1>
-            <a href="{{ route('dashboard') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
+            <a href="{{ route('developer.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition">
                 <i class="fas fa-arrow-right mr-2"></i>
                 العودة
             </a>
