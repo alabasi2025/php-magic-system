@@ -131,7 +131,7 @@
                 </a>
 
                 <!-- Database Designer -->
-                <a href="{{ route('ai.database-designer') }}" class="group">
+                <a href="{{ route('ai.database-optimizer') }}" class="group">
                     <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-lg p-6 h-full border border-indigo-500/30 hover:border-indigo-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -300,7 +300,7 @@
                 </a>
 
                 <!-- Bug Fixer -->
-                <a href="{{ route('ai.bug-fixer') }}" class="group">
+                <a href="{{ route('ai.bug-detector') }}" class="group">
                     <div class="bg-gradient-to-br from-rose-600 to-rose-800 rounded-lg p-6 h-full border border-rose-500/30 hover:border-rose-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -317,7 +317,7 @@
                 </a>
 
                 <!-- Documentation Generator -->
-                <a href="{{ route('ai.documentation') }}" class="group">
+                <a href="{{ route('ai.documentation-generator') }}" class="group">
                     <div class="bg-gradient-to-br from-fuchsia-600 to-fuchsia-800 rounded-lg p-6 h-full border border-fuchsia-500/30 hover:border-fuchsia-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
