@@ -15,7 +15,7 @@ Route::get('/', function () {
 
 // Temporary: Removed auth middleware for testing
 // Route::middleware(['auth'])->group(function () {
-if (true) {
+// if (true) {
     
     // ============================================
     // مسارات القيود اليومية (Journal Entries)
@@ -93,4 +93,4 @@ if (true) {
         Route::delete('/saved/{id}', 'deleteSavedSearch')->name('delete');
     });
     
-});
+// });
