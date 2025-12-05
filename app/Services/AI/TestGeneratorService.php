@@ -3,6 +3,7 @@
 namespace App\Services\AI;
 
 use Illuminate\Support\Facades\Http;
+use App\Models\AiSetting;
 use Illuminate\Support\Facades\Log;
 
 class TestGeneratorService
@@ -13,7 +14,7 @@ class TestGeneratorService
 
     public function __construct()
     {
-        $this->apiKey = env('MANUS_API_KEY');
+        $this->apiKey = AiSetting::get('manus_api_key', env('MANUS_API_KEY'));
     }
 
     /**
