@@ -1,0 +1,1 @@
+**الملف:** `resources/views/approvals/approval_history.blade.php`

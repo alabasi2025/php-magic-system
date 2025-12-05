@@ -1,0 +1,1 @@
+### `resources/views/templates/create.blade.php`
