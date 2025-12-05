@@ -3,131 +3,302 @@
 namespace App\Http\Controllers;
 
 use App\Models\JournalEntry;
-use App\Models\JournalEntryLine;
+use App\Models\JournalEntryDetail;
+use App\Models\Account;
+use App\Http\Requests\StoreJournalEntryRequest;
+use App\Http\Requests\UpdateJournalEntryRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class JournalEntryController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of journal entries.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
+    public function index(Request $request)
     {
-        $entries = JournalEntry::with('lines')->orderByDesc('date')->paginate(15);
+        $query = JournalEntry::with(['details.account']);
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('entry_number', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('reference', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by date range
+        if ($request->filled('date_from')) {
+            $query->whereDate('entry_date', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('entry_date', '<=', $request->date_to);
+        }
+
+        // Sorting
+        $sortBy = $request->get('sort_by', 'entry_date');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        // Pagination
+        $perPage = $request->get('per_page', 15);
+        $entries = $query->paginate($perPage)->withQueryString();
+
         return view('journal-entries.index', compact('entries'));
     }
 
-    public function show($id)
+    /**
+     * Show the form for creating a new journal entry.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function create()
     {
-        $entry = JournalEntry::with('lines')->findOrFail($id);
-        return view('journal-entries.show', compact('entry'));
+        // Get all active accounts
+        $accounts = Account::where('is_active', true)
+            ->orderBy('account_code')
+            ->get();
+
+        // Generate next entry number
+        $nextEntryNumber = $this->generateEntryNumber();
+
+        return view('journal-entries.create', compact('accounts', 'nextEntryNumber'));
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created journal entry in storage.
+     *
+     * @param  \App\Http\Requests\StoreJournalEntryRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(StoreJournalEntryRequest $request)
     {
-        $data = $request->validate([
-            'date' => 'required|date',
-            'description' => 'nullable|string|max:1000',
-            'lines' => 'required|array|min:1',
-            'lines.*.account_id' => 'required|integer|exists:accounts,id',
-            'lines.*.debit' => 'required|numeric|min:0',
-            'lines.*.credit' => 'required|numeric|min:0',
-            'lines.*.description' => 'nullable|string|max:500',
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $totalDebit = collect($data['lines'])->sum('debit');
-        $totalCredit = collect($data['lines'])->sum('credit');
+            // Calculate totals
+            $totalDebit = collect($request->details)->sum('debit');
+            $totalCredit = collect($request->details)->sum('credit');
 
-        if (bccomp($totalDebit, $totalCredit, 2) !== 0) {
-            throw ValidationException::withMessages(['lines' => ['Total debit and credit must be equal.']]);
-        }
-
-        return DB::transaction(function () use ($data) {
-            $lastNumber = JournalEntry::max('number');
-            $number = $lastNumber ? $lastNumber + 1 : 1;
-
-            $entry = JournalEntry::create([
-                'number' => $number,
-                'date' => $data['date'],
-                'description' => $data['description'] ?? null,
+            // Create journal entry
+            $journalEntry = JournalEntry::create([
+                'entry_number' => $request->entry_number,
+                'entry_date' => $request->entry_date,
+                'description' => $request->description,
+                'reference' => $request->reference,
+                'status' => $request->status ?? 'draft',
+                'notes' => $request->notes,
+                'total_debit' => $totalDebit,
+                'total_credit' => $totalCredit,
+                'created_by' => auth()->id(),
             ]);
 
-            foreach ($data['lines'] as $line) {
-                $entry->lines()->create([
-                    'account_id' => $line['account_id'],
-                    'debit' => $line['debit'],
-                    'credit' => $line['credit'],
-                    'description' => $line['description'] ?? null,
+            // Create journal entry details
+            foreach ($request->details as $detail) {
+                JournalEntryDetail::create([
+                    'journal_entry_id' => $journalEntry->id,
+                    'account_id' => $detail['account_id'],
+                    'debit' => $detail['debit'] ?? 0,
+                    'credit' => $detail['credit'] ?? 0,
+                    'description' => $detail['description'] ?? null,
                 ]);
             }
 
-            return response()->json($entry->load('lines'), 201);
-        });
+            DB::commit();
+
+            return redirect()
+                ->route('journal-entries.show', $journalEntry)
+                ->with('success', 'تم إنشاء القيد اليومي بنجاح.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error creating journal entry: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'حدث خطأ أثناء إنشاء القيد اليومي: ' . $e->getMessage());
+        }
     }
 
-    public function update(Request $request, $id)
+    /**
+     * Display the specified journal entry.
+     *
+     * @param  \App\Models\JournalEntry  $journalEntry
+     * @return \Illuminate\View\View
+     */
+    public function show(JournalEntry $journalEntry)
     {
-        $data = $request->validate([
-            'date' => 'required|date',
-            'description' => 'nullable|string|max:1000',
-            'lines' => 'required|array|min:1',
-            'lines.*.id' => 'nullable|integer|exists:journal_entry_lines,id',
-            'lines.*.account_id' => 'required|integer|exists:accounts,id',
-            'lines.*.debit' => 'required|numeric|min:0',
-            'lines.*.credit' => 'required|numeric|min:0',
-            'lines.*.description' => 'nullable|string|max:500',
-        ]);
+        $journalEntry->load(['details.account', 'creator', 'approver']);
 
-        $totalDebit = collect($data['lines'])->sum('debit');
-        $totalCredit = collect($data['lines'])->sum('credit');
+        return view('journal-entries.show', compact('journalEntry'));
+    }
 
-        if (bccomp($totalDebit, $totalCredit, 2) !== 0) {
-            throw ValidationException::withMessages(['lines' => ['Total debit and credit must be equal.']]);
+    /**
+     * Show the form for editing the specified journal entry.
+     *
+     * @param  \App\Models\JournalEntry  $journalEntry
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function edit(JournalEntry $journalEntry)
+    {
+        // Check if entry can be edited
+        if (in_array($journalEntry->status, ['posted', 'approved'])) {
+            return redirect()
+                ->route('journal-entries.show', $journalEntry)
+                ->with('error', 'لا يمكن تعديل القيد بعد اعتماده أو ترحيله.');
         }
 
-        return DB::transaction(function () use ($data, $id) {
-            $entry = JournalEntry::findOrFail($id);
-            $entry->update([
-                'date' => $data['date'],
-                'description' => $data['description'] ?? null,
-            ]);
+        $journalEntry->load('details.account');
+        
+        $accounts = Account::where('is_active', true)
+            ->orderBy('account_code')
+            ->get();
 
-            $existingLineIds = $entry->lines()->pluck('id')->toArray();
-            $submittedLineIds = collect($data['lines'])->pluck('id')->filter()->toArray();
-
-            $toDelete = array_diff($existingLineIds, $submittedLineIds);
-            if (!empty($toDelete)) {
-                JournalEntryLine::whereIn('id', $toDelete)->delete();
-            }
-
-            foreach ($data['lines'] as $line) {
-                if (!empty($line['id'])) {
-                    $entryLine = JournalEntryLine::findOrFail($line['id']);
-                    $entryLine->update([
-                        'account_id' => $line['account_id'],
-                        'debit' => $line['debit'],
-                        'credit' => $line['credit'],
-                        'description' => $line['description'] ?? null,
-                    ]);
-                } else {
-                    $entry->lines()->create([
-                        'account_id' => $line['account_id'],
-                        'debit' => $line['debit'],
-                        'credit' => $line['credit'],
-                        'description' => $line['description'] ?? null,
-                    ]);
-                }
-            }
-
-            return response()->json($entry->load('lines'));
-        });
+        return view('journal-entries.edit', compact('journalEntry', 'accounts'));
     }
 
-    public function destroy($id)
+    /**
+     * Update the specified journal entry in storage.
+     *
+     * @param  \App\Http\Requests\UpdateJournalEntryRequest  $request
+     * @param  \App\Models\JournalEntry  $journalEntry
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(UpdateJournalEntryRequest $request, JournalEntry $journalEntry)
     {
-        $entry = JournalEntry::findOrFail($id);
-        $entry->lines()->delete();
-        $entry->delete();
+        try {
+            DB::beginTransaction();
 
-        return response()->json(null, 204);
+            // Check if entry can be updated
+            if (in_array($journalEntry->status, ['posted', 'approved'])) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'لا يمكن تعديل القيد بعد اعتماده أو ترحيله.');
+            }
+
+            // Calculate totals
+            $totalDebit = collect($request->details)->sum('debit');
+            $totalCredit = collect($request->details)->sum('credit');
+
+            // Update journal entry
+            $journalEntry->update([
+                'entry_number' => $request->entry_number,
+                'entry_date' => $request->entry_date,
+                'description' => $request->description,
+                'reference' => $request->reference,
+                'status' => $request->status,
+                'notes' => $request->notes,
+                'total_debit' => $totalDebit,
+                'total_credit' => $totalCredit,
+                'updated_by' => auth()->id(),
+            ]);
+
+            // Delete existing details
+            $journalEntry->details()->delete();
+
+            // Create new details
+            foreach ($request->details as $detail) {
+                JournalEntryDetail::create([
+                    'journal_entry_id' => $journalEntry->id,
+                    'account_id' => $detail['account_id'],
+                    'debit' => $detail['debit'] ?? 0,
+                    'credit' => $detail['credit'] ?? 0,
+                    'description' => $detail['description'] ?? null,
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('journal-entries.show', $journalEntry)
+                ->with('success', 'تم تحديث القيد اليومي بنجاح.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating journal entry: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'حدث خطأ أثناء تحديث القيد اليومي: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified journal entry from storage (soft delete).
+     *
+     * @param  \App\Models\JournalEntry  $journalEntry
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(JournalEntry $journalEntry)
+    {
+        try {
+            // Check if entry can be deleted
+            if ($journalEntry->status === 'posted') {
+                return redirect()
+                    ->back()
+                    ->with('error', 'لا يمكن حذف القيد بعد ترحيله.');
+            }
+
+            DB::beginTransaction();
+
+            // Log the deletion
+            Log::info('Journal Entry deleted', [
+                'entry_id' => $journalEntry->id,
+                'entry_number' => $journalEntry->entry_number,
+                'deleted_by' => auth()->id(),
+                'deleted_at' => now(),
+            ]);
+
+            // Soft delete the entry (details will be cascade deleted)
+            $journalEntry->delete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('journal-entries.index')
+                ->with('success', 'تم حذف القيد اليومي بنجاح.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error deleting journal entry: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->with('error', 'حدث خطأ أثناء حذف القيد اليومي: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Generate a unique entry number.
+     *
+     * @return string
+     */
+    private function generateEntryNumber(): string
+    {
+        $year = date('Y');
+        $lastEntry = JournalEntry::whereYear('entry_date', $year)
+            ->orderBy('entry_number', 'desc')
+            ->first();
+
+        if ($lastEntry && preg_match('/JE-' . $year . '-(\d+)/', $lastEntry->entry_number, $matches)) {
+            $nextNumber = intval($matches[1]) + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return sprintf('JE-%s-%04d', $year, $nextNumber);
     }
 }
