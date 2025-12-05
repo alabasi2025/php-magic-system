@@ -13,6 +13,8 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 
 /**
  * DeveloperController
@@ -582,7 +584,40 @@ class DeveloperController extends Controller
      */
     public function getMigrationsPage()
     {
-        return view('developer.migrations');
+        try {
+            // Get all migration files from the file system
+            $migrationFiles = collect(\File::files(database_path('migrations')))->map(function ($file) {
+                return basename($file->getFilename(), '.php');
+            });
+
+            // Get all ran migrations from the database
+            $ranMigrations = \DB::table('migrations')->get()->keyBy('migration');
+
+            $allMigrations = $migrationFiles->map(function ($fileName) use ($ranMigrations) {
+                $ran = $ranMigrations->get($fileName);
+
+                return [
+                    'name' => $fileName,
+                    'ran' => $ran !== null,
+                    'batch' => $ran ? $ran->batch : null,
+                ];
+            })->sortBy('name');
+
+            $ran = $allMigrations->filter(fn($m) => $m['ran'])->values()->all();
+            $pending = $allMigrations->filter(fn($m) => !$m['ran'])->values()->all();
+            $total = $allMigrations->count();
+
+            return view('developer.migrations', compact('total', 'ran', 'pending'));
+
+        } catch (\Exception $e) {
+            \Log::error('Error loading migrations page: ' . $e->getMessage());
+            return view('developer.migrations', [
+                'total' => 0,
+                'ran' => [],
+                'pending' => [],
+                'error' => 'Failed to load migration status: ' . $e->getMessage()
+            ]);
+        }
     }
 
     /**
