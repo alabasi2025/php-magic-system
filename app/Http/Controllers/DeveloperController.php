@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\AI\PerformanceAnalyzerService;
 use App\Services\AI\CodeTranslatorService;
 use App\Services\AI\TestGeneratorService;
+use App\Services\AI\BugDetectorService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -45,6 +46,14 @@ class DeveloperController extends Controller
     protected $testGeneratorService;
 
     /**
+     * خدمة كشف الأخطاء.
+     * The bug detector service instance.
+     *
+     * @var BugDetectorService
+     */
+    protected $bugDetectorService;
+
+    /**
      * إنشاء مثيل جديد للمتحكم.
      * Create a new controller instance.
      *
@@ -54,11 +63,13 @@ class DeveloperController extends Controller
     public function __construct(
         PerformanceAnalyzerService $analyzerService,
         CodeTranslatorService $translatorService,
-        TestGeneratorService $testGeneratorService
+        TestGeneratorService $testGeneratorService,
+        BugDetectorService $bugDetectorService
     ) {
         $this->analyzerService = $analyzerService;
         $this->translatorService = $translatorService;
         $this->testGeneratorService = $testGeneratorService;
+        $this->bugDetectorService = $bugDetectorService;
     }
 
     /**
@@ -780,11 +791,56 @@ class DeveloperController extends Controller
     
     public function detectBugsWithAi(Request $request)
     {
-        return response()->json([
-            'success' => true,
-            'message' => 'Bugs detected successfully',
-            'bugs' => []
-        ]);
+        try {
+            // 1. التحقق من صحة المدخلات
+            $validator = Validator::make($request->all(), [
+                'code' => 'required|string|min:10',
+            ], [
+                'code.required' => 'حقل الكود مطلوب للتحليل.',
+                'code.min' => 'يجب أن يحتوي الكود على 10 أحرف على الأقل.',
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $validated = $validator->validated();
+            $code = $validated['code'];
+
+            // 2. استدعاء BugDetectorService
+            $detectionResult = $this->bugDetectorService->detectBugs($code);
+
+            // 3. إرجاع النتائج بصيغة JSON
+            return response()->json([
+                'status' => 'success',
+                'message' => $detectionResult['message'],
+                'data' => [
+                    'bugs' => $detectionResult['bugs']
+                ],
+            ], 200, [], JSON_UNESCAPED_UNICODE);
+
+        } catch (ValidationException $e) {
+            // معالجة أخطاء التحقق من صحة المدخلات
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطأ في التحقق من صحة المدخلات.',
+                'errors' => $e->errors(),
+            ], 422, [], JSON_UNESCAPED_UNICODE);
+
+        } catch (Exception $e) {
+            // 4. معالجة الأخطاء العامة
+            Log::error('Error during bug detection: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+
+            // إرجاع استجابة خطأ احترافية
+            return response()->json([
+                'status' => 'error',
+                'message' => 'حدث خطأ غير متوقع أثناء كشف الأخطاء. يرجى المحاولة لاحقًا.',
+                'details' => $e->getMessage(),
+            ], 500, [], JSON_UNESCAPED_UNICODE);
+        }
     }
     
     public function generateDocumentationWithAi(Request $request)

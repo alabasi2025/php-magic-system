@@ -77,11 +77,11 @@ class UserController extends Controller
                 </div>
 
                 <div class="mt-4 flex justify-end space-x-3 rtl:space-x-reverse">
-                    <button type="button"
+                    <button type="button" id="analyze-code-btn"
                         class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300">
                         <i class="fas fa-play ml-2"></i> تحليل الكود
                     </button>
-                    <button type="button"
+                    <button type="button" id="clear-editor-btn"
                         class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-300 transition duration-300">
                         مسح المحرر
                     </button>
@@ -187,6 +187,73 @@ class UserController extends Controller
     document.addEventListener('DOMContentLoaded', function() {
         const codeEditor = document.getElementById('code-editor');
         // Placeholder for CodeMirror/Ace Editor initialization
+        const analyzeButton = document.getElementById('analyze-code-btn');
+        const clearButton = document.getElementById('clear-editor-btn');
+        const bugResults = document.getElementById('bug-results');
+        const noBugsMessage = document.getElementById('no-bugs-message');
+
+        if (analyzeButton) {
+            analyzeButton.addEventListener('click', function() {
+                const code = codeEditor.value;
+                // 1. إظهار رسالة تحميل
+                bugResults.innerHTML = '<div class="p-3 border-r-4 border-blue-600 bg-blue-50 rounded-lg shadow-sm"><p class="text-sm text-blue-900 font-semibold">جاري تحليل الكود بواسطة الذكاء الاصطناعي...</p></div>';
+                noBugsMessage.classList.add('hidden');
+
+                // 2. إرسال طلب AJAX
+                fetch('{{ route('developer.ai.bug-detector.post') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ code: code })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    bugResults.innerHTML = ''; // مسح رسالة التحميل
+                    if (data.status === 'success' && data.data && data.data.bugs && data.data.bugs.length > 0) {
+                        // 3. عرض الأخطاء
+                        data.data.bugs.forEach(bug => {
+                            const bugType = bug.type === 'Warning' ? 'تحذير (Warning)' : 'خطأ حرج (Error)';
+                            const bugColor = bug.type === 'Warning' ? 'yellow' : 'red';
+                            const bugHtml = `
+                                <div class="p-3 border-r-4 border-${bugColor}-600 bg-${bugColor}-50 rounded-lg shadow-sm">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-xs font-bold text-${bugColor}-800 bg-${bugColor}-200 px-2 py-0.5 rounded-full">${bugType}</span>
+                                        <span class="text-sm font-mono text-${bugColor}-600">السطر: ${bug.line}</span>
+                                    </div>
+                                    <p class="text-sm text-${bugColor}-900 font-semibold">${bug.message}</p>
+                                    <div class="mt-2 p-2 bg-${bugColor}-100 border-l-2 border-${bugColor}-400 text-xs text-${bugColor}-800">
+                                        <strong class="font-bold">اقتراح الإصلاح:</strong> ${bug.suggestion}
+                                    </div>
+                                </div>
+                            `;
+                            bugResults.innerHTML += bugHtml;
+                        });
+                        noBugsMessage.classList.add('hidden');
+                    } else if (data.status === 'success' && data.data && data.data.bugs && data.data.bugs.length === 0) {
+                        // 4. لا توجد أخطاء
+                        noBugsMessage.classList.remove('hidden');
+                    } else {
+                        // 5. خطأ في الاتصال أو الخادم
+                        bugResults.innerHTML = `<div class="p-3 border-r-4 border-red-600 bg-red-50 rounded-lg shadow-sm"><p class="text-sm text-red-900 font-semibold">خطأ في التحليل: ${data.message || 'حدث خطأ غير متوقع.'}</p></div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during bug detection:', error);
+                    bugResults.innerHTML = '<div class="p-3 border-r-4 border-red-600 bg-red-50 rounded-lg shadow-sm"><p class="text-sm text-red-900 font-semibold">فشل الاتصال بالخادم. تحقق من سجلات الكونسول.</p></div>';
+                });
+            });
+        }
+
+        if (clearButton) {
+            clearButton.addEventListener('click', function() {
+                codeEditor.value = '';
+                bugResults.innerHTML = '';
+                noBugsMessage.classList.add('hidden');
+            });
+        }
+        // نهاية منطق المعالجة
         // if (typeof CodeMirror !== 'undefined') {
         //     const editor = CodeMirror.fromTextArea(codeEditor, {
         //         lineNumbers: true,
