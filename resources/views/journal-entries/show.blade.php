@@ -32,19 +32,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($journalEntry->lines as $line)
+                    @foreach($journalEntry->details as $detail)
                     <tr class="border-b border-gray-200 hover:bg-gray-50">
-                        <td class="py-4 px-6">{{ $line->account->name }}</td>
+                        <td class="py-4 px-6">{{ $detail->account->name }}</td>
                         <td class="py-4 px-6 text-right text-green-600 font-semibold">
-                            @if($line->debit > 0)
-                                {{ number_format($line->debit, 2) }}
+                            @if($detail->debit > 0)
+                                {{ number_format($detail->debit, 2) }}
                             @else
                                 -
                             @endif
                         </td>
                         <td class="py-4 px-6 text-right text-red-600 font-semibold">
-                            @if($line->credit > 0)
-                                {{ number_format($line->credit, 2) }}
+                            @if($detail->credit > 0)
+                                {{ number_format($detail->credit, 2) }}
                             @else
                                 -
                             @endif
