@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\AI\PerformanceAnalyzerService;
 use App\Services\AI\CodeTranslatorService;
+use App\Services\AI\TestGeneratorService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -36,6 +37,14 @@ class DeveloperController extends Controller
     protected $translatorService;
 
     /**
+     * خدمة توليد الاختبارات.
+     * The test generator service instance.
+     *
+     * @var TestGeneratorService
+     */
+    protected $testGeneratorService;
+
+    /**
      * إنشاء مثيل جديد للمتحكم.
      * Create a new controller instance.
      *
@@ -44,10 +53,12 @@ class DeveloperController extends Controller
      */
     public function __construct(
         PerformanceAnalyzerService $analyzerService,
-        CodeTranslatorService $translatorService
+        CodeTranslatorService $translatorService,
+        TestGeneratorService $testGeneratorService
     ) {
         $this->analyzerService = $analyzerService;
         $this->translatorService = $translatorService;
+        $this->testGeneratorService = $testGeneratorService;
     }
 
     /**
@@ -624,11 +635,46 @@ class DeveloperController extends Controller
     
     public function aiTestGenerator(Request $request)
     {
-        return response()->json([
-            'success' => true,
-            'message' => 'AI Test Generator - قيد التطوير',
-            'tests' => '// Generated tests will appear here'
-        ]);
+        try {
+            $validated = $request->validate([
+                'source_code' => 'required|string|min:10',
+                'test_type' => 'required|string|in:unit,feature,integration',
+                'framework' => 'required|string|in:phpunit,pest',
+            ]);
+
+            $result = $this->testGeneratorService->generateTests(
+                $validated['source_code'],
+                $validated['test_type'],
+                $validated['framework']
+            );
+
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم توليد الاختبارات بنجاح',
+                    'tests' => $result['tests']
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => $result['error'] ?? 'فشل توليد الاختبارات',
+                ], 500);
+            }
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في التحقق من صحة المدخلات',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('AI Test Generator Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ غير متوقع',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
     }
     
     public function aiCodeReview(Request $request)
