@@ -51,6 +51,17 @@ class DeveloperController extends Controller
     }
 
     /**
+     * عرض لوحة تحكم نظام المطور.
+     * Display the developer dashboard.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function index()
+    {
+        return view('developer.dashboard');
+    }
+
+    /**
      * دالة لتحليل أداء الكود باستخدام الذكاء الاصطناعي.
      * Analyzes the provided code for performance using AI.
      *
