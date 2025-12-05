@@ -379,4 +379,3 @@ class MiddlewareGeneratorService
             if (!File::isDirectory($directory)) {
                 File::makeDirectory($directory, 0755, true);
             }
-(Content truncated due to size limit. Use page ranges or line ranges to read remaining content)
