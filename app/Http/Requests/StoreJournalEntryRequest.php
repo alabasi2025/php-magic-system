@@ -33,7 +33,7 @@ class StoreJournalEntryRequest extends FormRequest
             
             // Journal Entry Details
             'details' => ['required', 'array', 'min:2', new BalancedJournalEntry],
-            'details.*.account_id' => ['required', 'exists:accounts,id'],
+            'details.*.account_id' => ['required', 'exists:chart_accounts,id'],
             'details.*.debit' => ['required', 'numeric', 'min:0'],
             'details.*.credit' => ['required', 'numeric', 'min:0'],
             'details.*.description' => ['nullable', 'string', 'max:500'],

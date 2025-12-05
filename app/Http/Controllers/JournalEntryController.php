@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JournalEntry;
 use App\Models\JournalEntryDetail;
-use App\Models\Account;
+use App\Models\ChartAccount;
 use App\Http\Requests\StoreJournalEntryRequest;
 use App\Http\Requests\UpdateJournalEntryRequest;
 use Illuminate\Http\Request;
@@ -66,7 +66,7 @@ class JournalEntryController extends Controller
     public function create()
     {
         // Get all active accounts
-        $accounts = Account::where('is_active', true)
+        $accounts = ChartAccount::where('is_active', true)
             ->orderBy('account_code')
             ->get();
 
@@ -162,7 +162,7 @@ class JournalEntryController extends Controller
 
         $journalEntry->load('details.account');
         
-        $accounts = Account::where('is_active', true)
+        $accounts = ChartAccount::where('is_active', true)
             ->orderBy('account_code')
             ->get();
 

@@ -176,10 +176,10 @@ Route::prefix('journal-entries')->name('journal-entries.')->group(function () {
     Route::get('/', [JournalEntryController::class, 'index'])->name('index');
     Route::get('/create', [JournalEntryController::class, 'create'])->name('create');
     Route::post('/', [JournalEntryController::class, 'store'])->name('store');
-    Route::get('/{id}', [JournalEntryController::class, 'show'])->name('show');
-    Route::get('/{id}/edit', [JournalEntryController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [JournalEntryController::class, 'update'])->name('update');
-    Route::delete('/{id}', [JournalEntryController::class, 'destroy'])->name('destroy');
+    Route::get('/{journal_entry}', [JournalEntryController::class, 'show'])->name('show');
+    Route::get('/{journal_entry}/edit', [JournalEntryController::class, 'edit'])->name('edit');
+    Route::put('/{journal_entry}', [JournalEntryController::class, 'update'])->name('update');
+    Route::delete('/{journal_entry}', [JournalEntryController::class, 'destroy'])->name('destroy');
 });
 
 // Intermediate Accounts Routes
