@@ -118,9 +118,7 @@
                             <textarea id="code-editor" name="code"
                                 class="flex-grow w-full p-4 font-mono text-sm border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 resize-none"
                                 placeholder="// اكتب أو الصق كود PHP أو Laravel هنا للتحليل..."
-                                rows="20"><?php
-
-namespace App\Http\Controllers;
+                                rows="20">namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -147,8 +145,7 @@ class UserController extends Controller
         
         return redirect()->back();
     }
-}
-</textarea>
+}</textarea>
                             <div class="mt-4 flex justify-end space-x-3 rtl:space-x-reverse">
                                 <button type="button" id="scan-code-btn"
                                     class="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-300">
