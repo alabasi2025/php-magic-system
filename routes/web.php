@@ -8,7 +8,14 @@ use Illuminate\Support\Facades\Route;
 
 // ... مسارات أخرى
 
-Route::middleware(['auth'])->group(function () {
+// Temporary: Allow access without auth for testing
+Route::get('/', function () {
+    return redirect('/journal-entries');
+});
+
+// Temporary: Removed auth middleware for testing
+// Route::middleware(['auth'])->group(function () {
+if (true) {
     
     // ============================================
     // مسارات القيود اليومية (Journal Entries)
