@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\OptimizedQueries;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -17,7 +18,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class CashBox extends Model
 {
-    use HasFactory;
+    use HasFactory, OptimizedQueries;
+
+    /**
+     * Default relations to eager load
+     * 
+     * @var array
+     */
+    protected $defaultRelations = ['unit', 'intermediateAccount'];
 
     /**
      * The table associated with the model.
