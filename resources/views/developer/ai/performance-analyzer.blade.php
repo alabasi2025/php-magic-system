@@ -50,7 +50,7 @@
             {{ $texts['input_title'] }}
         </h2>
 
-        <form id="analysis-form" action="{{ route('ai-tools.performance-analyzer.analyze') }}" method="POST">
+        <form id="analysis-form" action="{{ route('developer.ai.performance-analyzer.post') }}" method="POST">
             @csrf
             {{-- حقل إدخال الكود --}}
             <textarea
@@ -223,7 +223,7 @@
             errorCard.classList.add('hidden');
 
             // إرسال الطلب عبر fetch API
-            fetch('{{ route('ai-tools.performance-analyzer.analyze') }}', {
+            fetch('{{ route('developer.ai.performance-analyzer.post') }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
