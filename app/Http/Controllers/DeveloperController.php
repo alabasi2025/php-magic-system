@@ -342,4 +342,211 @@ class DeveloperController extends Controller
         // TODO: Implement complete module generation
         return response()->json(['status' => 'success', 'message' => 'Module generated']);
     }
+
+    /**
+     * صفحة مراجعة الأكواد بـ AI
+     * AI Code Review Page
+     */
+    public function getAiCodeReviewPage()
+    {
+        return view('developer.ai.code-review');
+    }
+
+    /**
+     * صفحة كاشف الأخطاء بـ AI
+     * AI Bug Detector Page
+     */
+    public function getAiBugDetectorPage()
+    {
+        return view('developer.ai.bug-detector');
+    }
+
+    /**
+     * صفحة محسن الأكواد
+     * Code Optimizer Page
+     */
+    public function getCodeOptimizer()
+    {
+        return view('developer.ai.code-optimizer');
+    }
+
+    /**
+     * صفحة المساعد الذكي
+     * AI Assistant Page
+     */
+    public function getAiAssistantPage()
+    {
+        return view('developer.ai.assistant');
+    }
+
+    /**
+     * صفحة معلومات قاعدة البيانات
+     * Database Info Page
+     */
+    public function getDatabaseInfoPage()
+    {
+        return view('developer.database-info');
+    }
+
+    /**
+     * صفحة معلومات الخادم
+     * Server Info Page
+     */
+    public function getServerInfoPage()
+    {
+        return view('developer.server-info');
+    }
+
+    /**
+     * صفحة قائمة المسارات
+     * Routes List Page
+     */
+    public function getRoutesListPage()
+    {
+        return view('developer.routes-list');
+    }
+
+    /**
+     * صفحة لوحة تحكم Git
+     * Git Dashboard Page
+     */
+    public function getGitDashboard()
+    {
+        return view('developer.git.dashboard');
+    }
+
+    /**
+     * صفحة الاختبارات
+     * Tests Page
+     */
+    public function getTestsPage()
+    {
+        return view('developer.tests');
+    }
+
+    /**
+     * صفحة محسن قاعدة البيانات بـ AI
+     * AI Database Optimizer Page
+     */
+    public function getAiDatabaseOptimizerPage()
+    {
+        return view('developer.ai.database-optimizer');
+    }
+
+    /**
+     * صفحة مولد الاختبارات بـ AI
+     * AI Test Generator Page
+     */
+    public function getAiTestGeneratorPage()
+    {
+        return view('developer.ai.test-generator');
+    }
+
+    /**
+     * صفحة مولد التوثيق بـ AI
+     * AI Documentation Generator Page
+     */
+    public function getAiDocumentationGeneratorPage()
+    {
+        return view('developer.ai.documentation-generator');
+    }
+
+    /**
+     * صفحة عارض السجلات
+     * Logs Viewer Page
+     */
+    public function getLogsViewerPage()
+    {
+        return view('developer.logs-viewer');
+    }
+
+    /**
+     * صفحة إعادة هيكلة الأكواد بـ AI
+     * AI Code Refactor Page
+     */
+    public function getAiCodeRefactorPage()
+    {
+        return view('developer.ai.code-refactor');
+    }
+
+    /**
+     * صفحة محلل الأداء بـ AI
+     * AI Performance Analyzer Page
+     */
+    public function getAiPerformanceAnalyzerPage()
+    {
+        return view('developer.ai.performance-analyzer');
+    }
+
+    /**
+     * صفحة فاحص الأمان بـ AI
+     * AI Security Scanner Page
+     */
+    public function getAiSecurityScannerPage()
+    {
+        return view('developer.ai.security-scanner');
+    }
+
+    /**
+     * صفحة إدارة الذاكرة المؤقتة
+     * Cache Management Page
+     */
+    public function getCachePage()
+    {
+        return view('developer.cache');
+    }
+
+    /**
+     * صفحة مولد الأكواد بـ AI
+     * AI Code Generator Page
+     */
+    public function getAiCodeGeneratorPage()
+    {
+        return view('developer.ai.code-generator');
+    }
+
+    /**
+     * صفحة مولد API بـ AI
+     * AI API Generator Page
+     */
+    public function getAiApiGeneratorPage()
+    {
+        return view('developer.ai.api-generator');
+    }
+
+    /**
+     * صفحة إدارة الهجرات
+     * Migrations Management Page
+     */
+    public function getMigrationsPage()
+    {
+        return view('developer.migrations');
+    }
+
+    /**
+     * صفحة إدارة البيانات الأولية
+     * Seeders Management Page
+     */
+    public function getSeedersPage()
+    {
+        return view('developer.seeders');
+    }
+
+    /**
+     * صفحة تحسين قاعدة البيانات
+     * Database Optimize Page
+     */
+    public function getDatabaseOptimizePage()
+    {
+        return view('developer.database-optimize');
+    }
+
+    /**
+     * صفحة النسخ الاحتياطي
+     * Database Backup Page
+     */
+    public function getDatabaseBackupPage()
+    {
+        return view('developer.database-backup');
+    }
 }
