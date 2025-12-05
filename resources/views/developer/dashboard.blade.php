@@ -97,7 +97,7 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- AI Code Generator -->
-                <a href="{{ route('developer.ai.code-generator') }}" class="group">
+                <a href="{{ route('ai.code-generator') }}" class="group">
                     <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg p-6 h-full border border-blue-500/30 hover:border-blue-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -131,7 +131,7 @@
                 </a>
 
                 <!-- Database Designer -->
-                <a href="{{ route('developer.ai.database-designer') }}" class="group">
+                <a href="{{ route('ai.database-designer') }}" class="group">
                     <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-lg p-6 h-full border border-indigo-500/30 hover:border-indigo-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -193,7 +193,7 @@
                 </a>
 
                 <!-- Code Review -->
-                <a href="{{ route('developer.ai.code-review') }}" class="group">
+                <a href="{{ route('ai.code-review') }}" class="group">
                     <div class="bg-gradient-to-br from-teal-600 to-teal-800 rounded-lg p-6 h-full border border-teal-500/30 hover:border-teal-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -283,7 +283,7 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Test Generator -->
-                <a href="{{ route('developer.ai.test-generator') }}" class="group">
+                <a href="{{ route('ai.test-generator') }}" class="group">
                     <div class="bg-gradient-to-br from-pink-600 to-pink-800 rounded-lg p-6 h-full border border-pink-500/30 hover:border-pink-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -300,7 +300,7 @@
                 </a>
 
                 <!-- Bug Fixer -->
-                <a href="{{ route('developer.ai.bug-fixer') }}" class="group">
+                <a href="{{ route('ai.bug-fixer') }}" class="group">
                     <div class="bg-gradient-to-br from-rose-600 to-rose-800 rounded-lg p-6 h-full border border-rose-500/30 hover:border-rose-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -317,7 +317,7 @@
                 </a>
 
                 <!-- Documentation Generator -->
-                <a href="{{ route('developer.ai.documentation') }}" class="group">
+                <a href="{{ route('ai.documentation') }}" class="group">
                     <div class="bg-gradient-to-br from-fuchsia-600 to-fuchsia-800 rounded-lg p-6 h-full border border-fuchsia-500/30 hover:border-fuchsia-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
