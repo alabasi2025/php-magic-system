@@ -711,8 +711,8 @@ class DeveloperController extends Controller
             Log::error('Database Optimize Page Error: ' . $e->getMessage());
             // In a production environment, we should not throw the exception directly
             // but return a user-friendly error page or redirect.
-            // For now, we will just re-throw to see the error if it persists.
-            throw $e;
+            // Instead of re-throwing, we return an error view in production.
+            return view('developer.database-optimize', ['error' => 'Failed to load database information: ' . $e->getMessage()]);
         }
     }
 
