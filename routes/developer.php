@@ -192,7 +192,7 @@ Route::get('/developer/git/history', [DeveloperController::class, 'getGitHistory
 Route::get('/developer/git/status', [DeveloperController::class, 'getGitStatus'])->name('developer.git.status');
 
 // Main Developer Dashboard
-Route::get('/developer', [DeveloperController::class, 'getDashboard'])->name('developer.index');
+Route::get('/developer', [DeveloperController::class, 'index'])->name('developer.index');
 Route::get('/developer/vue-dashboard', [DeveloperController::class, 'getVueDashboard'])->name('developer.vue-dashboard');
 
 // AI Assistant Plus v3.18.0
