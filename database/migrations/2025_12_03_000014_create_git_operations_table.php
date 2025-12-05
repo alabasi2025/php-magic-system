@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('git_operations', function (Blueprint $table) {
+        if (!Schema::hasTable('git_operations')) {
+            Schema::create('git_operations', function (Blueprint $table) {
             $table->id();
             $table->string('operation_type', 50)->index();
             $table->text('description')->nullable();

@@ -19,7 +19,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('model_generations', function (Blueprint $table) {
+        if (!Schema::hasTable('model_generations')) {
+            Schema::create('model_generations', function (Blueprint $table) {
             $table->id();
             
             // Basic Info
@@ -109,6 +110,7 @@ return new class extends Migration
             $table->index('created_by');
             $table->index('created_at');
         });
+        }
     }
 
     /**

@@ -18,7 +18,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('factory_generations', function (Blueprint $table) {
+        if (!Schema::hasTable('factory_generations')) {
+            Schema::create('factory_generations', function (Blueprint $table) {
             $table->id();
 
             // الأعمدة الأساسية

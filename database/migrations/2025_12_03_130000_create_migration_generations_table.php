@@ -22,7 +22,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('migration_generations', function (Blueprint $table) {
+        if (!Schema::hasTable('migration_generations')) {
+            Schema::create('migration_generations', function (Blueprint $table) {
             $table->id();
             
             // معلومات أساسية

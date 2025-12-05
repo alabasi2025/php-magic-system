@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('code_metrics', function (Blueprint $table) {
+        if (!Schema::hasTable('code_metrics')) {
+            Schema::create('code_metrics', function (Blueprint $table) {
             $table->id();
             
             // معلومات الإصدار

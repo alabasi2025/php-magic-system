@@ -21,7 +21,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('seeder_templates', function (Blueprint $table) {
+        if (!Schema::hasTable('seeder_templates')) {
+            Schema::create('seeder_templates', function (Blueprint $table) {
             // المعرف الفريد
             $table->id();
             

@@ -19,7 +19,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('resource_generations', function (Blueprint $table) {
+        if (!Schema::hasTable('resource_generations')) {
+            Schema::create('resource_generations', function (Blueprint $table) {
             $table->id();
             
             // معلومات أساسية - Basic Information

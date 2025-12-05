@@ -24,7 +24,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('controller_generations', function (Blueprint $table) {
+        if (!Schema::hasTable('controller_generations')) {
+            Schema::create('controller_generations', function (Blueprint $table) {
             $table->id();
             $table->string('name')->comment('اسم المتحكم');
             $table->enum('type', ['resource', 'api', 'invokable', 'custom'])

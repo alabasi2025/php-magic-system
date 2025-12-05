@@ -19,7 +19,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('model_templates', function (Blueprint $table) {
+        if (!Schema::hasTable('model_templates')) {
+            Schema::create('model_templates', function (Blueprint $table) {
             $table->id();
             
             // Basic Info

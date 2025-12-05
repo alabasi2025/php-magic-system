@@ -22,7 +22,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('migration_templates', function (Blueprint $table) {
+        if (!Schema::hasTable('migration_templates')) {
+            Schema::create('migration_templates', function (Blueprint $table) {
             $table->id();
             
             // معلومات القالب

@@ -31,7 +31,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('generated_requests', function (Blueprint $table) {
+        if (!Schema::hasTable('generated_requests')) {
+            Schema::create('generated_requests', function (Blueprint $table) {
             $table->id();
             
             // معلومات أساسية
