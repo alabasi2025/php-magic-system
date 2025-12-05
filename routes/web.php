@@ -18,6 +18,58 @@ Route::get('/dashboard', function () {
     return redirect('/journal-entries');
 })->name('dashboard');
 
+// ============================================
+// Dummy Routes (Temporary - All redirect to journal-entries)
+// ============================================
+Route::get('/accounting', fn() => redirect('/journal-entries'))->name('accounting.index');
+Route::get('/chart-of-accounts', fn() => redirect('/journal-entries'))->name('chart-of-accounts.index');
+Route::get('/intermediate-accounts', fn() => redirect('/journal-entries'))->name('intermediate-accounts.index');
+Route::get('/cash-boxes', fn() => redirect('/journal-entries'))->name('cash-boxes.index');
+Route::get('/customers', fn() => redirect('/journal-entries'))->name('customers.index');
+Route::get('/inventory', fn() => redirect('/journal-entries'))->name('inventory.index');
+Route::get('/purchases', fn() => redirect('/journal-entries'))->name('purchases.index');
+Route::get('/sales', fn() => redirect('/journal-entries'))->name('sales.index');
+Route::get('/hr', fn() => redirect('/journal-entries'))->name('hr.index');
+Route::get('/manufacturing', fn() => redirect('/journal-entries'))->name('manufacturing.index');
+Route::get('/assets', fn() => redirect('/journal-entries'))->name('assets.index');
+Route::get('/loyalty', fn() => redirect('/journal-entries'))->name('loyalty.index');
+Route::get('/insurance', fn() => redirect('/journal-entries'))->name('insurance.index');
+Route::get('/genes', fn() => redirect('/journal-entries'))->name('genes.index');
+Route::get('/partnership', fn() => redirect('/journal-entries'))->name('partnership.index');
+Route::get('/holdings', fn() => redirect('/journal-entries'))->name('holdings.index');
+Route::get('/units', fn() => redirect('/journal-entries'))->name('units.index');
+Route::get('/departments', fn() => redirect('/journal-entries'))->name('departments.index');
+Route::get('/organization/projects', fn() => redirect('/journal-entries'))->name('organization.projects.index');
+Route::get('/developer', fn() => redirect('/journal-entries'))->name('developer.index');
+Route::get('/developer/ai/code-generator', fn() => redirect('/journal-entries'))->name('developer.ai.code-generator');
+Route::get('/developer/ai/code-refactor', fn() => redirect('/journal-entries'))->name('developer.ai.code-refactor');
+Route::get('/developer/ai/code-review', fn() => redirect('/journal-entries'))->name('developer.ai.code-review');
+Route::get('/developer/ai/bug-detector', fn() => redirect('/journal-entries'))->name('developer.ai.bug-detector');
+Route::get('/developer/ai/documentation-generator', fn() => redirect('/journal-entries'))->name('developer.ai.documentation-generator');
+Route::get('/developer/ai/test-generator', fn() => redirect('/journal-entries'))->name('developer.ai.test-generator');
+Route::get('/developer/ai/performance-analyzer', fn() => redirect('/journal-entries'))->name('developer.ai.performance-analyzer');
+Route::get('/developer/ai/security-scanner', fn() => redirect('/journal-entries'))->name('developer.ai.security-scanner');
+Route::get('/developer/ai/api-generator', fn() => redirect('/journal-entries'))->name('developer.ai.api-generator');
+Route::get('/developer/ai/database-optimizer', fn() => redirect('/journal-entries'))->name('developer.ai.database-optimizer');
+Route::get('/developer/ai/code-translator', fn() => redirect('/journal-entries'))->name('developer.ai.code-translator');
+Route::get('/developer/ai/assistant', fn() => redirect('/journal-entries'))->name('developer.ai.assistant');
+Route::get('/developer/ai/settings', fn() => redirect('/journal-entries'))->name('developer.ai.settings');
+Route::get('/developer/migrations', fn() => redirect('/journal-entries'))->name('developer.migrations');
+Route::get('/developer/seeders', fn() => redirect('/journal-entries'))->name('developer.seeders');
+Route::get('/developer/database-info', fn() => redirect('/journal-entries'))->name('developer.database-info');
+Route::get('/developer/database-optimize', fn() => redirect('/journal-entries'))->name('developer.database-optimize');
+Route::get('/developer/database-backup', fn() => redirect('/journal-entries'))->name('developer.database-backup');
+Route::get('/developer/cache', fn() => redirect('/journal-entries'))->name('developer.cache');
+Route::get('/developer/routes-list', fn() => redirect('/journal-entries'))->name('developer.routes-list');
+Route::get('/developer/pint', fn() => redirect('/journal-entries'))->name('developer.pint');
+Route::get('/developer/tests', fn() => redirect('/journal-entries'))->name('developer.tests');
+Route::get('/developer/debugbar', fn() => redirect('/journal-entries'))->name('developer.debugbar');
+Route::get('/developer/server-info', fn() => redirect('/journal-entries'))->name('developer.server-info');
+Route::get('/developer/logs-viewer', fn() => redirect('/journal-entries'))->name('developer.logs-viewer');
+Route::get('/developer/git/dashboard', fn() => redirect('/journal-entries'))->name('developer.git.dashboard');
+Route::get('/developer/git/commit', fn() => redirect('/journal-entries'))->name('developer.git.commit');
+Route::get('/developer/git/history', fn() => redirect('/journal-entries'))->name('developer.git.history');
+
 // Temporary: Removed auth middleware for testing
 // Route::middleware(['auth'])->group(function () {
 // if (true) {
