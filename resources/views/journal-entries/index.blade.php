@@ -30,7 +30,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($journalEntries as $entry)
+                @foreach($entries as $entry)
                 <tr>
                     <td>{{ $entry->entry_number }}</td>
                     <td>{{ \Carbon\Carbon::parse($entry->date)->format('Y-m-d') }}</td>
