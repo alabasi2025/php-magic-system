@@ -13,7 +13,7 @@ try {
     
     // إنشاء القيد
     $entry = JournalEntry::create([
-        'entry_number' => 'JE-TEST-003',
+        'entry_number' => 'JE-TEST-004',
         'entry_date' => '2025-12-06',
         'description' => 'قيد تجريبي مع details',
         'status' => 'draft',
