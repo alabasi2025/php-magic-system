@@ -86,67 +86,67 @@ Route::prefix('developer/ai')->name('developer.ai.')->group(function () {
 // ========================================
 
 // 1. مولد الأكواد
-Route::get('/developer/ai/code-generator', [DeveloperController::class, 'getAiCodeGeneratorPage'])->name('ai.code-generator');
-Route::post('/developer/ai/code-generator', [DeveloperController::class, 'generateCrudWithAi'])->name('ai.code-generator.post');
+Route::get('/developer/ai/code-generator', [DeveloperController::class, 'getAiCodeGeneratorPage'])->name('developer.ai.code-generator');
+Route::post('/developer/ai/code-generator', [DeveloperController::class, 'generateCrudWithAi'])->name('developer.ai.code-generator.post');
 
 // 2. تحسين الكود
-Route::get('/developer/ai/code-refactor', [DeveloperController::class, 'getAiCodeRefactorPage'])->name('ai.code-refactor');
-Route::post('/developer/ai/code-refactor', [DeveloperController::class, 'refactorCodeWithAi'])->name('ai.code-refactor.post');
+Route::get('/developer/ai/code-refactor', [DeveloperController::class, 'getAiCodeRefactorPage'])->name('developer.ai.code-refactor');
+Route::post('/developer/ai/code-refactor', [DeveloperController::class, 'refactorCodeWithAi'])->name('developer.ai.code-refactor.post');
 
 // 3. مراجعة الكود
-Route::get('/developer/ai/code-review', [DeveloperController::class, 'getAiCodeReviewPage'])->name('ai.code-review');
-Route::post('/developer/ai/code-review', [DeveloperController::class, 'reviewCodeWithAi'])->name('ai.code-review.post');
+Route::get('/developer/ai/code-review', [DeveloperController::class, 'getAiCodeReviewPage'])->name('developer.ai.code-review');
+Route::post('/developer/ai/code-review', [DeveloperController::class, 'reviewCodeWithAi'])->name('developer.ai.code-review.post');
 
 // 4. كشف الأخطاء
-Route::get('/developer/ai/bug-detector', [DeveloperController::class, 'getAiBugDetectorPage'])->name('ai.bug-detector');
-Route::post('/developer/ai/bug-detector', [DeveloperController::class, 'detectBugsWithAi'])->name('ai.bug-detector.post');
+Route::get('/developer/ai/bug-detector', [DeveloperController::class, 'getAiBugDetectorPage'])->name('developer.ai.bug-detector');
+Route::post('/developer/ai/bug-detector', [DeveloperController::class, 'detectBugsWithAi'])->name('developer.ai.bug-detector.post');
 
 // 5. توليد التوثيق
-Route::get('/developer/ai/documentation-generator', [DeveloperController::class, 'getAiDocumentationGeneratorPage'])->name('ai.documentation-generator');
-Route::post('/developer/ai/documentation-generator', [DeveloperController::class, 'generateDocumentationWithAi'])->name('ai.documentation-generator.post');
+Route::get('/developer/ai/documentation-generator', [DeveloperController::class, 'getAiDocumentationGeneratorPage'])->name('developer.ai.documentation-generator');
+Route::post('/developer/ai/documentation-generator', [DeveloperController::class, 'generateDocumentationWithAi'])->name('developer.ai.documentation-generator.post');
 
 // 6. مولد الاختبارات
-Route::get('/developer/ai/test-generator', [DeveloperController::class, 'getAiTestGeneratorPage'])->name('ai.test-generator');
-Route::post('/developer/ai/test-generator', [DeveloperController::class, 'generateTestsWithAi'])->name('ai.test-generator.post');
+Route::get('/developer/ai/test-generator', [DeveloperController::class, 'getAiTestGeneratorPage'])->name('developer.ai.test-generator');
+Route::post('/developer/ai/test-generator', [DeveloperController::class, 'generateTestsWithAi'])->name('developer.ai.test-generator.post');
 
 // 7. تحليل الأداء
-Route::get('/developer/ai/performance-analyzer', [DeveloperController::class, 'getAiPerformanceAnalyzerPage'])->name('ai.performance-analyzer');
-Route::post('/developer/ai/performance-analyzer', [DeveloperController::class, 'analyzePerformanceWithAi'])->name('ai.performance-analyzer.post');
+Route::get('/developer/ai/performance-analyzer', [DeveloperController::class, 'getAiPerformanceAnalyzerPage'])->name('developer.ai.performance-analyzer');
+Route::post('/developer/ai/performance-analyzer', [DeveloperController::class, 'analyzePerformanceWithAi'])->name('developer.ai.performance-analyzer.post');
 
 // 8. فحص الأمان
-Route::get('/developer/ai/security-scanner', [DeveloperController::class, 'getAiSecurityScannerPage'])->name('ai.security-scanner');
-Route::post('/developer/ai/security-scanner', [DeveloperController::class, 'scanSecurityWithAi'])->name('ai.security-scanner.post');
+Route::get('/developer/ai/security-scanner', [DeveloperController::class, 'getAiSecurityScannerPage'])->name('developer.ai.security-scanner');
+Route::post('/developer/ai/security-scanner', [DeveloperController::class, 'scanSecurityWithAi'])->name('developer.ai.security-scanner.post');
 
 // 9. مولد API
-Route::get('/developer/ai/api-generator', [DeveloperController::class, 'getAiApiGeneratorPage'])->name('ai.api-generator');
-Route::post('/developer/ai/api-generator', [DeveloperController::class, 'generateApiWithAi'])->name('ai.api-generator.post');
+Route::get('/developer/ai/api-generator', [DeveloperController::class, 'getAiApiGeneratorPage'])->name('developer.ai.api-generator');
+Route::post('/developer/ai/api-generator', [DeveloperController::class, 'generateApiWithAi'])->name('developer.ai.api-generator.post');
 
 // 10. محسن قاعدة البيانات
-Route::get('/developer/ai/database-optimizer', [DeveloperController::class, 'getAiDatabaseOptimizerPage'])->name('ai.database-optimizer');
-Route::post('/developer/ai/database-optimizer', [DeveloperController::class, 'optimizeDatabaseWithAi'])->name('ai.database-optimizer.post');
+Route::get('/developer/ai/database-optimizer', [DeveloperController::class, 'getAiDatabaseOptimizerPage'])->name('developer.ai.database-optimizer');
+Route::post('/developer/ai/database-optimizer', [DeveloperController::class, 'optimizeDatabaseWithAi'])->name('developer.ai.database-optimizer.post');
 
 // 11. مترجم الأكواد
-Route::get('/developer/ai/code-translator', [DeveloperController::class, 'getAiCodeTranslatorPage'])->name('ai.code-translator');
-Route::post('/developer/ai/code-translator', [DeveloperController::class, 'translateCodeWithAi'])->name('ai.code-translator.post');
+Route::get('/developer/ai/code-translator', [DeveloperController::class, 'getAiCodeTranslatorPage'])->name('developer.ai.code-translator');
+Route::post('/developer/ai/code-translator', [DeveloperController::class, 'translateCodeWithAi'])->name('developer.ai.code-translator.post');
 
 // 12. المساعد الذكي
-Route::get('/developer/ai/assistant', [DeveloperController::class, 'getAiAssistantPage'])->name('ai.assistant');
-Route::post('/developer/ai/assistant', [DeveloperController::class, 'chatWithAiAssistant'])->name('ai.assistant.post');
+Route::get('/developer/ai/assistant', [DeveloperController::class, 'getAiAssistantPage'])->name('developer.ai.assistant');
+Route::post('/developer/ai/assistant', [DeveloperController::class, 'chatWithAiAssistant'])->name('developer.ai.assistant.post');
 
 // 13. إعدادات AI
-Route::get('/developer/ai/settings', [DeveloperController::class, 'getAiSettingsPage'])->name('ai.settings');
-Route::post('/developer/ai/settings', [DeveloperController::class, 'updateAiSettings'])->name('ai.settings.post');
-Route::post('/developer/ai/test-connection', [DeveloperController::class, 'testManusConnection'])->name('ai.test-connection');
+Route::get('/developer/ai/settings', [DeveloperController::class, 'getAiSettingsPage'])->name('developer.ai.settings');
+Route::post('/developer/ai/settings', [DeveloperController::class, 'updateAiSettings'])->name('developer.ai.settings.post');
+Route::post('/developer/ai/test-connection', [DeveloperController::class, 'testManusConnection'])->name('developer.ai.test-connection');
 
 // 14. عارض سجلات المهام
-Route::get('/developer/ai/task-viewer', [DeveloperController::class, 'getTaskViewerPage'])->name('ai.task-viewer');
-Route::get('/developer/ai/task/{taskId}', [DeveloperController::class, 'getTaskDetails'])->name('ai.task-details');
+Route::get('/developer/ai/task-viewer', [DeveloperController::class, 'getTaskViewerPage'])->name('developer.ai.task-viewer');
+Route::get('/developer/ai/task/{taskId}', [DeveloperController::class, 'getTaskDetails'])->name('developer.ai.task-details');
 
 // 15. محسن الكود (Code Optimizer)
-Route::get('/developer/ai/code-optimizer', [DeveloperController::class, 'getCodeOptimizer'])->name('ai.code-optimizer');
-Route::post('/developer/ai/code-optimizer/analyze', [DeveloperController::class, 'analyzeCode'])->name('ai.code-optimizer.analyze');
-Route::post('/developer/ai/code-optimizer/optimize', [DeveloperController::class, 'optimizeCode'])->name('ai.code-optimizer.optimize');
-Route::post('/developer/ai/code-optimizer/quality', [DeveloperController::class, 'checkCodeQuality'])->name('ai.code-optimizer.quality');
+Route::get('/developer/ai/code-optimizer', [DeveloperController::class, 'getCodeOptimizer'])->name('developer.ai.code-optimizer');
+Route::post('/developer/ai/code-optimizer/analyze', [DeveloperController::class, 'analyzeCode'])->name('developer.ai.code-optimizer.analyze');
+Route::post('/developer/ai/code-optimizer/optimize', [DeveloperController::class, 'optimizeCode'])->name('developer.ai.code-optimizer.optimize');
+Route::post('/developer/ai/code-optimizer/quality', [DeveloperController::class, 'checkCodeQuality'])->name('developer.ai.code-optimizer.quality');
 
 
 // ========================================
