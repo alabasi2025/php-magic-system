@@ -1111,7 +1111,7 @@ class DeveloperController extends Controller
     {
         return response()->json([
             'success' => true,
-            'message' => 'Database optimized successfully',
+            'message' => 'Database tables optimized successfully',
             'suggestions' => []
         ]);
     }
@@ -1323,8 +1323,17 @@ class DeveloperController extends Controller
     public function runDatabaseOptimize()
     {
         try {
-            \Artisan::call('optimize');
-            return response()->json(['success' => true, 'message' => 'Database optimized successfully']);
+            // Get all table names
+            $tables = \DB::select('SHOW TABLES');
+            $tableNames = array_map(function($table) {
+                return current((array) $table);
+            }, $tables);
+
+            // Optimize each table
+            foreach ($tableNames as $tableName) {
+                \DB::statement("OPTIMIZE TABLE `{$tableName}`");
+            }
+            return response()->json(['success' => true, 'message' => 'Database tables optimized successfully']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
