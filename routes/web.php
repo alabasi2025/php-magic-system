@@ -248,3 +248,6 @@ require __DIR__."/middleware_generator.php";
 
 // Request Generator Routes (v3.29.0)
 require __DIR__."/request_generator.php";
+
+// Resource Generator Routes (v3.30.0)
+require __DIR__."/resource_generator.php";
