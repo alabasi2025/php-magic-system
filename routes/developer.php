@@ -183,6 +183,7 @@ Route::get('/developer/routes-list', [DeveloperController::class, 'getRoutesList
 
 // معلومات النظام
 Route::get('/developer/server-info', [DeveloperController::class, 'getServerInfoPage'])->name('developer.server-info');
+Route::get('/developer/system-monitor', [DeveloperController::class, 'getSystemMonitorPage'])->name('developer.system-monitor');
 Route::get('/developer/logs-viewer', [DeveloperController::class, 'getLogsViewerPage'])->name('developer.logs-viewer');
 Route::get('/developer/logs-viewer/{file}', [DeveloperController::class, 'viewLogFile'])->name('developer.logs-viewer.file');
 Route::delete('/developer/logs-viewer/{file}', [DeveloperController::class, 'deleteLogFile'])->name('developer.logs-viewer.delete');

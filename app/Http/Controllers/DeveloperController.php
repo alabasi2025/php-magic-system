@@ -497,6 +497,63 @@ class DeveloperController extends Controller
     }
 
     /**
+     * صفحة مراقبة النظام
+     * System Monitor Page
+     */
+    public function getSystemMonitorPage()
+    {
+        $system_info = [
+            'os' => PHP_OS,
+            'os_version' => php_uname('r'),
+            'architecture' => php_uname('m'),
+            'hostname' => gethostname(),
+            'uptime' => $this->getSystemUptime(),
+            'memory_usage' => $this->getMemoryUsage(),
+            'cpu_load' => $this->getCpuLoad(),
+            'disk_usage' => [
+                'total' => disk_total_space(base_path()),
+                'free' => disk_free_space(base_path()),
+                'used' => disk_total_space(base_path()) - disk_free_space(base_path())
+            ]
+        ];
+        
+        return view('developer.system-monitor', compact('system_info'));
+    }
+    
+    private function getSystemUptime()
+    {
+        if (PHP_OS_FAMILY === 'Linux') {
+            $uptime = @file_get_contents('/proc/uptime');
+            if ($uptime) {
+                $seconds = (int)explode(' ', $uptime)[0];
+                return gmdate('H:i:s', $seconds);
+            }
+        }
+        return 'N/A';
+    }
+    
+    private function getMemoryUsage()
+    {
+        return [
+            'current' => memory_get_usage(true),
+            'peak' => memory_get_peak_usage(true)
+        ];
+    }
+    
+    private function getCpuLoad()
+    {
+        if (function_exists('sys_getloadavg')) {
+            $load = sys_getloadavg();
+            return [
+                '1min' => $load[0] ?? 0,
+                '5min' => $load[1] ?? 0,
+                '15min' => $load[2] ?? 0
+            ];
+        }
+        return null;
+    }
+
+    /**
      * صفحة قائمة المسارات
      * Routes List Page
      */
