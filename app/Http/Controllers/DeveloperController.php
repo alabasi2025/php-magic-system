@@ -663,7 +663,7 @@ class DeveloperController extends Controller
      * صفحة مولد الأكواد بـ AI
      * AI Code Generator Page
      */
-    public function getAiCodeGeneratorPage()
+    public function getAiCodeGeneratorPage(Request $request)
     {
         return view('developer.ai.code-generator');
     }
