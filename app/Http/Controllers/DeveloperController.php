@@ -1721,7 +1721,8 @@ class DeveloperController extends Controller
     
     public function getDebugbar()
     {
-        return view('developer.debugbar');
+        // Debugbar works as an overlay, redirect to developer dashboard
+        return redirect()->route('developer.index')->with('info', 'Debugbar is enabled and visible at the bottom of the page');
     }
     
     public function getTelescope()
