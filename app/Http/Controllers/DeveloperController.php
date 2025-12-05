@@ -458,7 +458,39 @@ class DeveloperController extends Controller
      */
     public function getServerInfoPage()
     {
-        return view('developer.server-info');
+        $php_version = phpversion();
+        $laravel_version = app()->version();
+        $server_software = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown';
+        $os = php_uname();
+        $max_execution_time = ini_get('max_execution_time');
+        $memory_limit = ini_get('memory_limit');
+        $upload_max_filesize = ini_get('upload_max_filesize');
+        $post_max_size = ini_get('post_max_size');
+        
+        // PHP Extensions
+        $extensions = get_loaded_extensions();
+        sort($extensions);
+        
+        // Server info
+        $server_info = [
+            'server_name' => $_SERVER['SERVER_NAME'] ?? 'Unknown',
+            'server_addr' => $_SERVER['SERVER_ADDR'] ?? 'Unknown',
+            'server_port' => $_SERVER['SERVER_PORT'] ?? 'Unknown',
+            'document_root' => $_SERVER['DOCUMENT_ROOT'] ?? 'Unknown',
+        ];
+        
+        return view('developer.server-info', compact(
+            'php_version',
+            'laravel_version',
+            'server_software',
+            'os',
+            'max_execution_time',
+            'memory_limit',
+            'upload_max_filesize',
+            'post_max_size',
+            'extensions',
+            'server_info'
+        ));
     }
 
     /**
@@ -543,7 +575,36 @@ class DeveloperController extends Controller
      */
     public function getLogsViewerPage()
     {
-        return view('developer.logs-viewer');
+        try {
+            $logPath = storage_path('logs');
+            $logs = [];
+            
+            if (file_exists($logPath)) {
+                $files = File::files($logPath);
+                
+                foreach ($files as $file) {
+                    $logs[] = [
+                        'name' => $file->getFilename(),
+                        'size' => $this->formatBytes($file->getSize()),
+                        'modified' => date('Y-m-d H:i:s', $file->getMTime()),
+                        'path' => $file->getPathname(),
+                    ];
+                }
+                
+                // Sort by modified date (newest first)
+                usort($logs, function($a, $b) {
+                    return strcmp($b['modified'], $a['modified']);
+                });
+            }
+            
+            $total = count($logs);
+            
+            return view('developer.logs-viewer', compact('logs', 'total'));
+            
+        } catch (\Exception $e) {
+            Log::error('Logs Viewer Page Error: ' . $e->getMessage());
+            return view('developer.logs-viewer', ['logs' => [], 'total' => 0, 'error' => 'Failed to load logs: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -570,7 +631,12 @@ class DeveloperController extends Controller
      */
     public function getAiSecurityScannerPage()
     {
-        return view('developer.ai.security-scanner');
+        try {
+            return view('developer.ai.security-scanner');
+        } catch (\Exception $e) {
+            Log::error('Security Scanner Page Error: ' . $e->getMessage());
+            return response()->view('errors.500', ['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -579,7 +645,15 @@ class DeveloperController extends Controller
      */
     public function getCachePage()
     {
-        return view('developer.cache');
+        try {
+            $cache_driver = config('cache.default');
+            
+            return view('developer.cache', compact('cache_driver'));
+            
+        } catch (\Exception $e) {
+            Log::error('Cache Page Error: ' . $e->getMessage());
+            return view('developer.cache', ['cache_driver' => 'Unknown', 'error' => 'Failed to load cache information: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -1143,7 +1217,23 @@ class DeveloperController extends Controller
     
     public function getAiSettingsPage()
     {
-        return view('developer.ai.settings');
+        try {
+            // Get AI settings from database or config
+            $settings = collect([
+                (object)['key' => 'manus_api_key', 'value' => config('services.manus.api_key', '')],
+                (object)['key' => 'ai_model', 'value' => config('services.manus.model', 'gpt-4')],
+                (object)['key' => 'max_tokens', 'value' => config('services.manus.max_tokens', 2000)],
+                (object)['key' => 'temperature', 'value' => config('services.manus.temperature', 0.7)],
+            ]);
+            
+            return view('developer.ai.settings', compact('settings'));
+            
+        } catch (\Exception $e) {
+            Log::error('AI Settings Page Error: ' . $e->getMessage());
+            // Return empty settings on error
+            $settings = collect([]);
+            return view('developer.ai.settings', compact('settings'));
+        }
     }
     
     public function getTaskViewerPage()
