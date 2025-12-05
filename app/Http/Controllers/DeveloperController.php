@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Exception;
 
 /**
@@ -405,9 +406,48 @@ class DeveloperController extends Controller
      * صفحة معلومات قاعدة البيانات
      * Database Info Page
      */
+    /**
+     * صفحة معلومات قاعدة البيانات
+     * Database Info Page
+     *
+     * @return \Illuminate\View\View
+     */
     public function getDatabaseInfoPage()
     {
-        return view('developer.database-info');
+        try {
+            $database = config('database.connections.mysql.database');
+            $tables = [];
+            $total_tables = 0;
+
+            // Get all tables
+            $tableNames = DB::select('SHOW TABLES');
+            $tableNames = array_map('current', $tableNames);
+
+            $total_tables = count($tableNames);
+
+            foreach ($tableNames as $tableName) {
+                // Get row count for each table
+                $count = DB::table($tableName)->count();
+                $tables[] = [
+                    'name' => $tableName,
+                    'rows' => $count,
+                ];
+            }
+
+            // Sort tables by row count descending
+            usort($tables, function($a, $b) {
+                return $b['rows'] <=> $a['rows'];
+            });
+
+            return view('developer.database-info', compact('database', 'total_tables', 'tables'));
+
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Database Info Error: ' . $e->getMessage());
+
+            // Return view with error message
+            return view('developer.database-info')->with('error', 'حدث خطأ أثناء جلب معلومات قاعدة البيانات: ' . $e->getMessage());
+        }
     }
 
     /**
