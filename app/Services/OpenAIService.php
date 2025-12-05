@@ -1,4 +1,3 @@
-<?php
 
 namespace App\Services;
 
@@ -98,59 +97,3 @@ class OpenAIService
                 'status' => $response->status(),
                 'response' => $response->body(),
                 'prompt' => $prompt,
-            ]);
-
-            return null;
-
-        } catch (Exception $e) {
-            // تسجيل أي استثناءات تحدث أثناء الاتصال
-            Log::error('OpenAI Service Exception: ' . $e->getMessage(), ['prompt' => $prompt]);
-            return null;
-        }
-    }
-
-    /**
-     * توليد صورة باستخدام نموذج DALL-E.
-     *
-     * @param string $prompt وصف الصورة المطلوب توليدها.
-     * @param int $n عدد الصور المطلوب توليدها (بحد أقصى 10).
-     * @param string $size حجم الصورة المطلوب (مثل '1024x1024').
-     * @return array|null مصفوفة بروابط الصور أو null في حالة الفشل.
-     */
-    public function generateImage(string $prompt, int $n = 1, string $size = '1024x1024'): ?array
-    {
-        $payload = [
-            'prompt' => $prompt,
-            'n' => $n,
-            'size' => $size,
-            'response_format' => 'url', // طلب رابط الصورة
-        ];
-
-        try {
-            // إرسال طلب POST إلى نقطة النهاية الخاصة بالصور
-            $response = $this->client()->post('images/generations', $payload);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                // استخراج روابط الصور من الاستجابة
-                if (isset($data['data']) && is_array($data['data'])) {
-                    return array_column($data['data'], 'url');
-                }
-            }
-
-            // تسجيل خطأ في حالة فشل الطلب
-            Log::error('OpenAI API Image Generation Failed.', [
-                'status' => $response->status(),
-                'response' => $response->body(),
-                'prompt' => $prompt,
-            ]);
-
-            return null;
-
-        } catch (Exception $e) {
-            // تسجيل أي استثناءات تحدث أثناء الاتصال
-            Log::error('OpenAI Service Exception: ' . $e->getMessage(), ['prompt' => $prompt]);
-            return null;
-        }
-    }
-}
