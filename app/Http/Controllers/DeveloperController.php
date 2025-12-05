@@ -813,9 +813,30 @@ class DeveloperController extends Controller
     public function getGitHistory()
     {
         try {
-            $history = shell_exec('cd ' . base_path() . ' && git log --oneline -20');
-            return response()->json(['success' => true, 'history' => $history]);
+            $output = shell_exec('cd ' . base_path() . ' && git log --pretty=format:"%h|%an|%ar|%s" -20');
+            
+            if (empty($output)) {
+                return response()->json(['success' => false, 'message' => 'No git history found']);
+            }
+            
+            $commits = [];
+            $lines = explode("\n", trim($output));
+            
+            foreach ($lines as $line) {
+                $parts = explode('|', $line, 4);
+                if (count($parts) === 4) {
+                    $commits[] = [
+                        'hash' => $parts[0],
+                        'author' => $parts[1],
+                        'date' => $parts[2],
+                        'message' => $parts[3]
+                    ];
+                }
+            }
+            
+            return response()->json(['success' => true, 'commits' => $commits]);
         } catch (\Exception $e) {
+            Log::error('Git History Error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
