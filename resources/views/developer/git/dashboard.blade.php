@@ -63,13 +63,13 @@
 
     <!-- Quick Actions -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <a href="{{ route('developer.git.commit') }}" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+        <a href="{{ route('git.commit') }}" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
             <i class="fas fa-check-circle text-3xl mb-3"></i>
             <h3 class="text-xl font-bold mb-2">Commit & Push</h3>
             <p class="text-sm opacity-90">حفظ التغييرات ونشرها</p>
         </a>
         
-        <a href="{{ route('developer.git.log') }}" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+        <a href="{{ route('git.log') }}" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
             <i class="fas fa-history text-3xl mb-3"></i>
             <h3 class="text-xl font-bold mb-2">سجل التغييرات</h3>
             <p class="text-sm opacity-90">عرض جميع الـ Commits</p>
@@ -87,7 +87,7 @@
 // Load Git Status
 async function loadGitStatus() {
     try {
-        const response = await fetch('{{ route('developer.git.status') }}');
+        const response = await fetch('{{ route('git.status') }}');
         const data = await response.json();
         
         // Update UI

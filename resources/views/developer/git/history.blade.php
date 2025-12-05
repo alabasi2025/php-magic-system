@@ -25,7 +25,7 @@
 // Load Git History
 async function loadGitHistory() {
     try {
-        const response = await fetch('{{ route('developer.git.history') }}');
+        const response = await fetch('{{ route('git.history') }}');
         const data = await response.json();
         
         const commitsList = document.getElementById('commitsList');

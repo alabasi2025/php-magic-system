@@ -268,7 +268,7 @@ document.getElementById('generatorForm').addEventListener('submit', async functi
         let response;
         
         if (type === 'crud') {
-            response = await fetch('{{ route("developer.ai.code-generator") }}', {
+            response = await fetch('{{ route("ai.code-generator") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -282,7 +282,7 @@ document.getElementById('generatorForm').addEventListener('submit', async functi
                 })
             });
         } else if (type === 'migration') {
-            response = await fetch('{{ route("developer.ai.database-designer") }}', {
+            response = await fetch('{{ route("ai.database-designer") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -295,7 +295,7 @@ document.getElementById('generatorForm').addEventListener('submit', async functi
                 })
             });
         } else if (type === 'api-resource') {
-            response = await fetch('{{ route("developer.ai.code-generator") }}', {
+            response = await fetch('{{ route("ai.code-generator") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -307,7 +307,7 @@ document.getElementById('generatorForm').addEventListener('submit', async functi
                 })
             });
         } else if (type === 'tests') {
-            response = await fetch('{{ route("developer.ai.test-generator") }}', {
+            response = await fetch('{{ route("ai.test-generator") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

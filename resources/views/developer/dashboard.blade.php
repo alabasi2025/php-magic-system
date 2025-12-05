@@ -114,7 +114,7 @@
                 </a>
 
                 <!-- Code Generator -->
-                <a href="{{ route('developer.code-generator.index') }}" class="group">
+                <a href="{{ route('code-generator.index') }}" class="group">
                     <div class="bg-gradient-to-br from-purple-600 to-purple-800 rounded-lg p-6 h-full border border-purple-500/30 hover:border-purple-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -417,7 +417,7 @@
 function quickAction(action) {
     const actions = {
         'cache-clear': {
-            url: '{{ route("developer.cache.clear") }}',
+            url: '{{ route("cache.clear") }}',
             method: 'POST',
             message: 'جاري مسح الذاكرة المؤقتة...'
         },

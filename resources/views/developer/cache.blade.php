@@ -39,14 +39,14 @@
                 <i class="fas fa-broom text-orange-400 mr-2"></i>إجراءات المسح
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <form action="{{ route('developer.cache.clear-all') }}" method="POST" onsubmit="return confirm('هل تريد مسح جميع أنواع Cache؟')">
+                <form action="{{ route('cache.clear-all') }}" method="POST" onsubmit="return confirm('هل تريد مسح جميع أنواع Cache؟')">
                     @csrf
                     <button type="submit" class="w-full px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition">
                         <i class="fas fa-trash-alt mr-2"></i>مسح جميع Cache
                     </button>
                 </form>
                 
-                <form action="{{ route('developer.cache.clear-single') }}" method="POST">
+                <form action="{{ route('cache.clear-single') }}" method="POST">
                     @csrf
                     <input type="hidden" name="type" value="cache">
                     <button type="submit" class="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition">
@@ -54,7 +54,7 @@
                     </button>
                 </form>
 
-                <form action="{{ route('developer.cache.clear-single') }}" method="POST">
+                <form action="{{ route('cache.clear-single') }}" method="POST">
                     @csrf
                     <input type="hidden" name="type" value="config">
                     <button type="submit" class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
@@ -62,7 +62,7 @@
                     </button>
                 </form>
 
-                <form action="{{ route('developer.cache.clear-single') }}" method="POST">
+                <form action="{{ route('cache.clear-single') }}" method="POST">
                     @csrf
                     <input type="hidden" name="type" value="route">
                     <button type="submit" class="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition">
@@ -70,7 +70,7 @@
                     </button>
                 </form>
 
-                <form action="{{ route('developer.cache.clear-single') }}" method="POST">
+                <form action="{{ route('cache.clear-single') }}" method="POST">
                     @csrf
                     <input type="hidden" name="type" value="view">
                     <button type="submit" class="w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition">
