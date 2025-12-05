@@ -68,7 +68,7 @@
         <div class="bg-white/10 backdrop-blur-md rounded-lg border border-white/20 overflow-hidden">
             <div class="p-6 border-b border-white/10">
                 <h2 class="text-xl font-bold text-white">
-                    <i class="fas fa-list text-indigo-400 mr-2"></i>قائمة الجداول ({{ count($tables) }})
+                    <i class="fas fa-list text-indigo-400 mr-2"></i>قائمة الجداول ({{ count($formattedTables) }})
                 </h2>
             </div>
             <div class="overflow-x-auto">
