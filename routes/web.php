@@ -13,6 +13,11 @@ Route::get('/', function () {
     return redirect('/journal-entries');
 });
 
+// Dashboard route (redirects to journal entries)
+Route::get('/dashboard', function () {
+    return redirect('/journal-entries');
+})->name('dashboard');
+
 // Temporary: Removed auth middleware for testing
 // Route::middleware(['auth'])->group(function () {
 // if (true) {
