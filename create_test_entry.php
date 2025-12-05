@@ -26,7 +26,7 @@ try {
     // إضافة سطر مدين
     JournalEntryDetail::create([
         'journal_entry_id' => $entry->id,
-        'chart_account_id' => 1,
+        'account_id' => 1,
         'debit' => 5000,
         'credit' => 0,
         'description' => 'مدين'
@@ -35,7 +35,7 @@ try {
     // إضافة سطر دائن
     JournalEntryDetail::create([
         'journal_entry_id' => $entry->id,
-        'chart_account_id' => 2,
+        'account_id' => 2,
         'debit' => 0,
         'credit' => 5000,
         'description' => 'دائن'
