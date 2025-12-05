@@ -15,6 +15,7 @@ try {
         'entry_date' => '2025-12-06',
         'description' => 'قيد تجريبي بسيط',
         'status' => 'draft',
+        'unit_id' => 1,
         'created_by' => 1
     ]);
 
