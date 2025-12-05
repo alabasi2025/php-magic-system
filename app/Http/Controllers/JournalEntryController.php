@@ -67,7 +67,7 @@ class JournalEntryController extends Controller
     {
         // Get all active accounts
         $accounts = ChartAccount::where('is_active', true)
-            ->orderBy('account_code')
+            ->orderBy('code')
             ->get();
 
         // Generate next entry number
@@ -163,7 +163,7 @@ class JournalEntryController extends Controller
         $journalEntry->load('details.account');
         
         $accounts = ChartAccount::where('is_active', true)
-            ->orderBy('account_code')
+            ->orderBy('code')
             ->get();
 
         return view('journal-entries.edit', compact('journalEntry', 'accounts'));
