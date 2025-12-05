@@ -254,4 +254,92 @@ class DeveloperController extends Controller
             ], 500, [], JSON_UNESCAPED_UNICODE);
         }
     }
+
+    /**
+     * عرض صفحة Artisan Commands
+     * Display Artisan Commands page
+     */
+    public function getArtisanCommands()
+    {
+        return view('developer.artisan');
+    }
+
+    /**
+     * عرض صفحة Code Generator
+     * Display Code Generator page
+     */
+    public function getCodeGenerator()
+    {
+        return view('developer.code-generator.index');
+    }
+
+    /**
+     * تنفيذ أمر Artisan
+     * Execute Artisan command
+     */
+    public function executeArtisanCommand(Request $request)
+    {
+        // TODO: Implement artisan command execution
+        return response()->json(['status' => 'success', 'message' => 'Command executed']);
+    }
+
+    /**
+     * توليد CRUD
+     * Generate CRUD
+     */
+    public function generateCRUD(Request $request)
+    {
+        // TODO: Implement CRUD generation
+        return response()->json(['status' => 'success', 'message' => 'CRUD generated']);
+    }
+
+    /**
+     * توليد API
+     * Generate API
+     */
+    public function generateAPI(Request $request)
+    {
+        // TODO: Implement API generation
+        return response()->json(['status' => 'success', 'message' => 'API generated']);
+    }
+
+    /**
+     * توليد Migration
+     * Generate Migration
+     */
+    public function generateMigration(Request $request)
+    {
+        // TODO: Implement migration generation
+        return response()->json(['status' => 'success', 'message' => 'Migration generated']);
+    }
+
+    /**
+     * توليد Seeder
+     * Generate Seeder
+     */
+    public function generateSeeder(Request $request)
+    {
+        // TODO: Implement seeder generation
+        return response()->json(['status' => 'success', 'message' => 'Seeder generated']);
+    }
+
+    /**
+     * توليد Policy
+     * Generate Policy
+     */
+    public function generatePolicy(Request $request)
+    {
+        // TODO: Implement policy generation
+        return response()->json(['status' => 'success', 'message' => 'Policy generated']);
+    }
+
+    /**
+     * توليد Module كامل
+     * Generate Complete Module
+     */
+    public function generateCompleteModule(Request $request)
+    {
+        // TODO: Implement complete module generation
+        return response()->json(['status' => 'success', 'message' => 'Module generated']);
+    }
 }

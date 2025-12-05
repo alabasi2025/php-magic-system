@@ -114,7 +114,7 @@
                 </a>
 
                 <!-- Code Generator -->
-                <a href="{{ route('developer.code-generator.') }}" class="group">
+                <a href="{{ route('developer.code-generator.index') }}" class="group">
                     <div class="bg-gradient-to-br from-purple-600 to-purple-800 rounded-lg p-6 h-full border border-purple-500/30 hover:border-purple-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
@@ -159,7 +159,7 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Artisan Commands -->
-                <a href="{{ route('developer.artisan.') }}" class="group">
+                <a href="{{ route('developer.artisan.index') }}" class="group">
                     <div class="bg-gradient-to-br from-green-600 to-green-800 rounded-lg p-6 h-full border border-green-500/30 hover:border-green-400/60 transition transform hover:scale-105">
                         <div class="flex items-start justify-between mb-4">
                             <div>
