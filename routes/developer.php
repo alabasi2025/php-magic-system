@@ -174,6 +174,7 @@ Route::get('/developer/database-backup/download/{file}', [DeveloperController::c
 // أدوات الكود
 Route::get('/developer/cache', [DeveloperController::class, 'getCachePage'])->name('developer.cache');
 Route::post('/developer/cache/clear-all', [DeveloperController::class, 'clearAllCache'])->name('developer.cache.clear-all');
+Route::post('/developer/cache/clear-single', [DeveloperController::class, 'clearSingleCache'])->name('developer.cache.clear-single');
 Route::get('/developer/pint', [DeveloperController::class, 'getPintPage'])->name('developer.pint');
 Route::post('/developer/pint/format', [DeveloperController::class, 'runPintFormat'])->name('developer.pint.format');
 Route::get('/developer/tests', [DeveloperController::class, 'getTestsPage'])->name('developer.tests');

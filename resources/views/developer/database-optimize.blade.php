@@ -84,7 +84,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-white/10">
-                        @foreach($tables as $table)
+                        @foreach($formattedTables as $table)
                         <tr class="hover:bg-white/5 transition">
                             <td class="px-6 py-4">
                                 <div class="flex items-center">

@@ -11,8 +11,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Support\Facades\File;
+
 
 /**
  * DeveloperController
@@ -406,9 +408,48 @@ class DeveloperController extends Controller
      * صفحة معلومات قاعدة البيانات
      * Database Info Page
      */
+    /**
+     * صفحة معلومات قاعدة البيانات
+     * Database Info Page
+     *
+     * @return \Illuminate\View\View
+     */
     public function getDatabaseInfoPage()
     {
-        return view('developer.database-info');
+        try {
+            $database = config('database.connections.mysql.database');
+            $tables = [];
+            $total_tables = 0;
+
+            // Get all tables
+            $tableNames = DB::select('SHOW TABLES');
+            $tableNames = array_map('current', $tableNames);
+
+            $total_tables = count($tableNames);
+
+            foreach ($tableNames as $tableName) {
+                // Get row count for each table
+                $count = DB::table($tableName)->count();
+                $tables[] = [
+                    'name' => $tableName,
+                    'rows' => $count,
+                ];
+            }
+
+            // Sort tables by row count descending
+            usort($tables, function($a, $b) {
+                return $b['rows'] <=> $a['rows'];
+            });
+
+            return view('developer.database-info', compact('database', 'total_tables', 'tables'));
+
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Database Info Error: ' . $e->getMessage());
+
+            // Return view with error message
+            return view('developer.database-info')->with('error', 'حدث خطأ أثناء جلب معلومات قاعدة البيانات: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -543,7 +584,40 @@ class DeveloperController extends Controller
      */
     public function getMigrationsPage()
     {
-        return view('developer.migrations');
+        try {
+            // Get all migration files from the file system
+            $migrationFiles = collect(\File::files(database_path('migrations')))->map(function ($file) {
+                return basename($file->getFilename(), '.php');
+            });
+
+            // Get all ran migrations from the database
+            $ranMigrations = \DB::table('migrations')->get()->keyBy('migration');
+
+            $allMigrations = $migrationFiles->map(function ($fileName) use ($ranMigrations) {
+                $ran = $ranMigrations->get($fileName);
+
+                return [
+                    'name' => $fileName,
+                    'ran' => $ran !== null,
+                    'batch' => $ran ? $ran->batch : null,
+                ];
+            })->sortBy('name');
+
+            $ran = $allMigrations->filter(fn($m) => $m['ran'])->values()->all();
+            $pending = $allMigrations->filter(fn($m) => !$m['ran'])->values()->all();
+            $total = $allMigrations->count();
+
+            return view('developer.migrations', compact('total', 'ran', 'pending'));
+
+        } catch (\Exception $e) {
+            \Log::error('Error loading migrations page: ' . $e->getMessage());
+            return view('developer.migrations', [
+                'total' => 0,
+                'ran' => [],
+                'pending' => [],
+                'error' => 'Failed to load migration status: ' . $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -585,7 +659,39 @@ class DeveloperController extends Controller
      */
     public function getDatabaseOptimizePage()
     {
-        return view('developer.database-optimize');
+        try {
+            // Get table status from the database
+            $tables = DB::select('SHOW TABLE STATUS');
+            $formattedTables = [];
+            $totalSize = 0;
+
+            foreach ($tables as $table) {
+                $dataSize = $table->Data_length;
+                $indexSize = $table->Index_length;
+                $totalSize += $dataSize + $indexSize;
+
+                $formattedTables[] = [
+                    'name' => $table->Name,
+                    'engine' => $table->Engine,
+                    'rows' => $table->Rows,
+                    'data_size' => $this->formatBytes($dataSize),
+                    'index_size' => $this->formatBytes($indexSize),
+                    'total_size' => $this->formatBytes($dataSize + $indexSize),
+                ];
+            }
+
+            $total_tables = count($formattedTables);
+            $total_size = $this->formatBytes($totalSize);
+
+            return view('developer.database-optimize', compact('formattedTables', 'total_tables', 'total_size'));
+
+        } catch (\Exception $e) {
+            Log::error('Database Optimize Page Error: ' . $e->getMessage());
+            // In a production environment, we should not throw the exception directly
+            // but return a user-friendly error page or redirect.
+            // For now, we will just re-throw to see the error if it persists.
+            throw $e;
+        }
     }
 
     /**
@@ -1222,6 +1328,27 @@ class DeveloperController extends Controller
     // System Monitor Methods - مفقودة
     // ========================================
     
+    /**
+     * Helper function to format bytes into human-readable format.
+     *
+     * @param int $bytes
+     * @param int $precision
+     * @return string
+     */
+    private function formatBytes($bytes, $precision = 2)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+
+        // Calculate the value in the appropriate unit
+        $bytes /= (1024 ** $pow);
+
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+    
     public function getSystemInfo()
     {
         return response()->json([
@@ -1332,6 +1459,35 @@ class DeveloperController extends Controller
     public function clearAllCache()
     {
         return $this->clearCache();
+    }
+
+    /**
+     * مسح نوع واحد من Cache
+     * Clear a single type of cache
+     */
+    public function clearSingleCache(Request $request)
+    {
+        $type = $request->input('type');
+        $command = match($type) {
+            'cache' => 'cache:clear',
+            'config' => 'config:clear',
+            'route' => 'route:clear',
+            'view' => 'view:clear',
+            default => null,
+        };
+
+        if ($command) {
+            \Artisan::call($command);
+            return response()->json([
+                'success' => true,
+                'message' => "Cache type '{$type}' cleared successfully"
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => "Invalid cache type: {$type}"
+        ], 400);
     }
 
     // ========================================
