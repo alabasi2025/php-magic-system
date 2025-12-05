@@ -90,7 +90,7 @@
 // Load Modified Files
 async function loadModifiedFiles() {
     try {
-        const response = await fetch('{{ route('git.status') }}');
+        const response = await fetch('{{ route('developer.git.status') }}');
         const data = await response.json();
         
         document.getElementById('currentBranch').textContent = data.branch;
@@ -128,7 +128,7 @@ async function generateCommitMessage() {
     });
     
     try {
-        const response = await fetch('{{ route('git.status') }}');
+        const response = await fetch('{{ route('developer.git.status') }}');
         const data = await response.json();
         
         // Simple AI-like message generation
@@ -177,7 +177,7 @@ document.getElementById('commitForm').addEventListener('submit', async (e) => {
     
     try {
         // Commit
-        const commitResponse = await fetch('{{ route('git.commit.post') }}', {
+        const commitResponse = await fetch('{{ route('developer.git.commit.post') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ document.getElementById('commitForm').addEventListener('submit', async (e) => {
         }
         
         // Push
-        const pushResponse = await fetch('{{ route('git.push') }}', {
+        const pushResponse = await fetch('{{ route('developer.git.push') }}', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -218,7 +218,7 @@ document.getElementById('commitForm').addEventListener('submit', async (e) => {
             `,
             confirmButtonText: 'حسناً'
         }).then(() => {
-            window.location.href = '{{ route('git.dashboard') }}';
+            window.location.href = '{{ route('developer.git.dashboard') }}';
         });
         
     } catch (error) {

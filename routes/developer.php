@@ -59,10 +59,6 @@ Route::prefix('developer/cache')->name('developer.cache.')->group(function () {
     Route::get('/stats', [DeveloperController::class, 'getCacheStats'])->name('stats');
 });
 
-// Cache Manager aliases (without 'developer.' prefix)
-Route::post('/developer/cache/clear', [DeveloperController::class, 'clearCache'])->name('cache.clear');
-Route::post('/developer/cache/clear-all', [DeveloperController::class, 'clearCache'])->name('cache.clear-all');
-Route::post('/developer/cache/clear-single', [DeveloperController::class, 'clearCache'])->name('cache.clear-single');
 
 // Logs Viewer
 Route::prefix('developer/logs')->name('developer.logs.')->group(function () {
@@ -84,13 +80,6 @@ Route::prefix('developer/ai')->name('developer.ai.')->group(function () {
     Route::post('/documentation', [DeveloperController::class, 'aiDocumentationGenerator'])->name('documentation');
 });
 
-// AI Tools - POST routes aliases (without 'developer.' prefix)
-Route::post('/developer/ai/code-generator', [DeveloperController::class, 'aiCodeGenerator'])->name('ai.code-generator.submit');
-Route::post('/developer/ai/database-designer', [DeveloperController::class, 'aiDatabaseDesigner'])->name('ai.database-designer');
-Route::post('/developer/ai/test-generator', [DeveloperController::class, 'aiTestGenerator'])->name('ai.test-generator.submit');
-Route::post('/developer/ai/code-review', [DeveloperController::class, 'aiCodeReview'])->name('ai.code-review.submit');
-Route::post('/developer/ai/bug-fixer', [DeveloperController::class, 'aiBugFixer'])->name('ai.bug-fixer');
-Route::post('/developer/ai/documentation', [DeveloperController::class, 'aiDocumentationGenerator'])->name('ai.documentation');
 
 // ========================================
 // AI Tools - أدوات الذكاء الاصطناعي (13 أداة)
@@ -204,13 +193,6 @@ Route::post('/developer/git/push', [DeveloperController::class, 'gitPush'])->nam
 Route::get('/developer/git/history', [DeveloperController::class, 'getGitHistory'])->name('developer.git.history');
 Route::get('/developer/git/status', [DeveloperController::class, 'getGitStatus'])->name('developer.git.status');
 
-// Git routes aliases (without 'developer.' prefix)
-Route::get('/developer/git/dashboard', [DeveloperController::class, 'getGitDashboard'])->name('git.dashboard');
-Route::get('/developer/git/commit', [DeveloperController::class, 'getGitCommitPage'])->name('git.commit');
-Route::post('/developer/git/commit', [DeveloperController::class, 'gitCommit'])->name('git.commit.post');
-Route::post('/developer/git/push', [DeveloperController::class, 'gitPush'])->name('git.push');
-Route::get('/developer/git/history', [DeveloperController::class, 'getGitHistory'])->name('git.history');
-Route::get('/developer/git/status', [DeveloperController::class, 'getGitStatus'])->name('git.status');
 
 // Main Developer Dashboard
 Route::get('/developer', [DeveloperController::class, 'index'])->name('developer.index');

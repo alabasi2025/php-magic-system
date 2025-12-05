@@ -326,7 +326,7 @@ function calculateSum(a, b) {
                 showLoading();
                 
                 try {
-                    const response = await fetch('{{ route("ai.code-translator.post") }}', {
+                    const response = await fetch('{{ route("developer.ai.code-translator.post") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

@@ -182,7 +182,7 @@ document.getElementById('testConnection').addEventListener('click', async functi
     const apiKey = document.getElementById('manus_api_key').value;
     
     try {
-        const response = await fetch('{{ route("ai.test-connection") }}', {
+        const response = await fetch('{{ route("developer.ai.test-connection") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -233,7 +233,7 @@ document.getElementById('settingsForm').addEventListener('submit', async functio
     const data = Object.fromEntries(formData);
     
     try {
-        const response = await fetch('{{ route("ai.settings.post") }}', {
+        const response = await fetch('{{ route("developer.ai.settings.post") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
