@@ -379,3 +379,10 @@ class MiddlewareGeneratorService
             if (!File::isDirectory($directory)) {
                 File::makeDirectory($directory, 0755, true);
             }
+
+            File::put($filePath, $content);
+        } catch (Throwable $e) {
+            throw new MiddlewareGenerationException("فشل كتابة الملف: " . $e->getMessage(), 0, $e);
+        }
+    }
+}
