@@ -21,10 +21,10 @@ Route::get('/dashboard', function () {
 // ============================================
 // Dummy Routes (Temporary - All redirect to journal-entries)
 // ============================================
-Route::get('/accounting', fn() => redirect('/journal-entries'))->name('accounting.index');
-Route::get('/chart-of-accounts', fn() => redirect('/journal-entries'))->name('chart-of-accounts.index');
-Route::get('/intermediate-accounts', fn() => redirect('/journal-entries'))->name('intermediate-accounts.index');
-Route::get('/cash-boxes', fn() => redirect('/journal-entries'))->name('cash-boxes.index');
+Route::get('/accounting', [\App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.index');
+Route::resource('chart-of-accounts', \App\Http\Controllers\ChartOfAccountsController::class);
+Route::resource('intermediate-accounts', \App\Http\Controllers\IntermediateAccountController::class);
+Route::resource('cash-boxes', \App\Http\Controllers\CashBoxController::class);
 Route::get('/customers', fn() => redirect('/journal-entries'))->name('customers.index');
 Route::get('/inventory', fn() => redirect('/journal-entries'))->name('inventory.index');
 Route::get('/purchases', fn() => redirect('/journal-entries'))->name('purchases.index');
