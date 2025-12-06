@@ -5,6 +5,54 @@ use App\Http\Controllers\JournalEntryTemplateController;
 use App\Http\Controllers\JournalEntryAttachmentController;
 use App\Http\Controllers\JournalEntrySearchController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+// Diagnostic route (temporary - remove in production)
+Route::get('/system-diagnostic', function () {
+    $diagnostics = [];
+    
+    // Check database connection
+    try {
+        DB::connection()->getPdo();
+        $diagnostics['database_connection'] = '✅ Connected';
+    } catch (\Exception $e) {
+        $diagnostics['database_connection'] = '❌ Failed: ' . $e->getMessage();
+    }
+    
+    // Check tables
+    $tables = ['warehouses', 'items', 'item_units', 'stock_movements', 'users'];
+    foreach ($tables as $table) {
+        $diagnostics['table_' . $table] = Schema::hasTable($table) ? '✅ Exists' : '❌ Missing';
+    }
+    
+    // Check migrations
+    try {
+        $migrations = DB::table('migrations')->pluck('migration')->toArray();
+        $diagnostics['migrations_count'] = count($migrations);
+        $inventoryMigrations = array_filter($migrations, function($m) {
+            return str_contains($m, 'warehouse') || str_contains($m, 'item') || str_contains($m, 'stock');
+        });
+        $diagnostics['inventory_migrations'] = array_values($inventoryMigrations);
+    } catch (\Exception $e) {
+        $diagnostics['migrations'] = '❌ Error: ' . $e->getMessage();
+    }
+    
+    // Try to get warehouse count
+    try {
+        $warehouseCount = DB::table('warehouses')->count();
+        $diagnostics['warehouses_count'] = $warehouseCount;
+    } catch (\Exception $e) {
+        $diagnostics['warehouses_query'] = '❌ Error: ' . $e->getMessage();
+    }
+    
+    // Laravel info
+    $diagnostics['laravel_version'] = app()->version();
+    $diagnostics['php_version'] = phpversion();
+    $diagnostics['environment'] = app()->environment();
+    
+    return response()->json($diagnostics, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+});
 
 // ... مسارات أخرى
 
