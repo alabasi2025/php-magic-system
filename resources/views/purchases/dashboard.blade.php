@@ -67,20 +67,8 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <a href="{{ route('purchases.reports.suppliers') }}" class="btn btn-outline-primary btn-block">
-                                <i class="fas fa-chart-bar"></i> تقرير الموردين
-                            </a>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <a href="{{ route('purchases.reports.orders') }}" class="btn btn-outline-success btn-block">
-                                <i class="fas fa-chart-line"></i> تقرير أوامر الشراء
-                            </a>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <a href="{{ route('purchases.reports.summary') }}" class="btn btn-outline-info btn-block">
-                                <i class="fas fa-chart-pie"></i> ملخص المشتريات
-                            </a>
+                        <div class="col-md-12 text-center">
+                            <p class="text-muted">قسم التقارير قيد التطوير</p>
                         </div>
                     </div>
                 </div>
