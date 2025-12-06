@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Genes\BUDGET_PLANNING\Controllers\BudgetController;
-use App\Genes\BUDGET_PLANNING\Controllers\BudgetItemController;
+// use App\Genes\BUDGET_PLANNING\Controllers\BudgetItemController; // Disabled - Controller not implemented yet
 
 /*
 |--------------------------------------------------------------------------
@@ -35,9 +35,10 @@ Route::group(['prefix' => 'budgets', 'as' => 'budgets.', 'middleware' => ['auth'
 
     // مسارات CRUD لبنود الميزانية المتداخلة تحت الميزانية الرئيسية
     // المسار سيكون على شكل: /budgets/main/{main}/items
-    Route::resource('main.items', BudgetItemController::class)
-        ->except(['index']) // يتم عرض بنود الميزانية عادةً ضمن صفحة عرض الميزانية الرئيسية (show)
-        ->names('items');
+    // Route::resource('main.items', BudgetItemController::class)
+    //     ->except(['index']) // يتم عرض بنود الميزانية عادةً ضمن صفحة عرض الميزانية الرئيسية (show)
+    //     ->names('items');
+    // Disabled - BudgetItemController not implemented yet
 
     // ------------------------------------------------------------------
     // مسارات التقارير والإجراءات الخاصة (Reports and Special Actions)
