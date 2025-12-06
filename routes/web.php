@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Route;
 
 // Temporary: Allow access without auth for testing
 Route::get('/', function () {
-    return redirect('/journal-entries');
+    return view('home');
 });
 
-// Dashboard route (redirects to journal entries)
+// Dashboard route
 Route::get('/dashboard', function () {
-    return redirect('/journal-entries');
+    return view('home');
 })->name('dashboard');
 
 // ============================================
