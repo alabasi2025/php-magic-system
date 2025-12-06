@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Genes\ACCOUNTING_REPORTS\Controllers\ReportController;
+use App\Genes\ACCOUNTING_REPORTS\Controllers\AccountingReportController as ReportController;
 // يمكن استيراد وحدات تحكم أخرى من الأجنحة السابقة للتكامل
 // use App\Genes\INTERMEDIATE_ACCOUNTS\Controllers\IntermediateAccountController;
 // use App\Genes\CASH_BOXES\Controllers\CashBoxController;
