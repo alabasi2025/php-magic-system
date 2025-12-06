@@ -117,4 +117,31 @@ class JournalTemplateController extends Controller
 
         return view('journal-entries.create', compact('accounts', 'templateData', 'journalTemplate'));
     }
+
+    /**
+     * تفعيل/تعطيل قالب
+     */
+    public function toggle(Request $request, JournalTemplate $journalTemplate)
+    {
+        $journalTemplate->update([
+            'is_active' => $request->input('is_active', false)
+        ]);
+
+        return redirect()->route('journal-templates.index')
+            ->with('success', 'تم تحديث حالة القالب بنجاح!');
+    }
+
+    /**
+     * نسخ قالب
+     */
+    public function duplicate(JournalTemplate $journalTemplate)
+    {
+        $newTemplate = $journalTemplate->replicate();
+        $newTemplate->name = $journalTemplate->name . ' (نسخة)';
+        $newTemplate->created_by = Auth::id();
+        $newTemplate->save();
+
+        return redirect()->route('journal-templates.index')
+            ->with('success', 'تم نسخ القالب بنجاح!');
+    }
 }

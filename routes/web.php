@@ -155,6 +155,8 @@ Route::get('/developer/git/history', fn() => redirect('/journal-entries'))->name
 // قوالب القيود اليومية الذكية
 Route::resource('journal-templates', \App\Http\Controllers\JournalTemplateController::class);
 Route::get('journal-templates/{journalTemplate}/use', [\App\Http\Controllers\JournalTemplateController::class, 'use'])->name('journal-templates.use');
+Route::patch('journal-templates/{journalTemplate}/toggle', [\App\Http\Controllers\JournalTemplateController::class, 'toggle'])->name('journal-templates.toggle');
+Route::post('journal-templates/{journalTemplate}/duplicate', [\App\Http\Controllers\JournalTemplateController::class, 'duplicate'])->name('journal-templates.duplicate');
 
 
 // إعدادات الترقيم التلقائي
