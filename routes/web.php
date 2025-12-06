@@ -156,3 +156,8 @@ Route::get('/developer/git/history', fn() => redirect('/journal-entries'))->name
 Route::resource('journal-templates', \App\Http\Controllers\JournalTemplateController::class);
 Route::get('journal-templates/{journalTemplate}/use', [\App\Http\Controllers\JournalTemplateController::class, 'use'])->name('journal-templates.use');
 
+
+// إعدادات الترقيم التلقائي
+Route::get('settings/auto-numbering', [\App\Http\Controllers\AutoNumberingSettingController::class, 'index'])->name('auto-numbering.index');
+Route::post('settings/auto-numbering', [\App\Http\Controllers\AutoNumberingSettingController::class, 'store'])->name('auto-numbering.store');
+
