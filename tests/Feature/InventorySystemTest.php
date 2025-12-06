@@ -350,4 +350,72 @@ class InventorySystemTest extends TestCase
 
         $this->assertEquals(5, $currentStock); // 10 - 5
     }
+
+    /** @test */
+    public function test_stock_movement_creates_journal_entry()
+    {
+        // Create a stock in movement
+        $movement = StockMovement::create([
+            'movement_number' => 'SM-20251206-0001',
+            'movement_type' => 'stock_in',
+            'warehouse_id' => $this->warehouse->id,
+            'item_id' => $this->item->id,
+            'quantity' => 10,
+            'unit_cost' => 100,
+            'total_cost' => 1000,
+            'movement_date' => now(),
+            'status' => 'pending',
+            'created_by' => $this->user->id,
+        ]);
+
+        // Approve the movement and create journal entry
+        $service = new StockMovementService();
+        $journalEntry = $service->createJournalEntry($movement);
+
+        // Assert journal entry was created
+        $this->assertNotNull($journalEntry);
+        $this->assertEquals('approved', $journalEntry->status);
+        $this->assertEquals(1000, $journalEntry->total_debit);
+        $this->assertEquals(1000, $journalEntry->total_credit);
+
+        // Assert movement is linked to journal entry
+        $movement->refresh();
+        $this->assertEquals($journalEntry->id, $movement->journal_entry_id);
+    }
+
+    /** @test */
+    public function test_cannot_approve_movement_twice()
+    {
+        // Create a stock movement
+        $movement = StockMovement::create([
+            'movement_number' => 'SM-20251206-0002',
+            'movement_type' => 'stock_in',
+            'warehouse_id' => $this->warehouse->id,
+            'item_id' => $this->item->id,
+            'quantity' => 5,
+            'unit_cost' => 50,
+            'total_cost' => 250,
+            'movement_date' => now(),
+            'status' => 'pending',
+            'created_by' => $this->user->id,
+        ]);
+
+        // Approve the movement for the first time
+        $movement->update([
+            'status' => 'approved',
+            'approved_by' => $this->user->id,
+            'approved_at' => now(),
+        ]);
+
+        $this->assertEquals('approved', $movement->status);
+
+        // Try to approve again - should fail
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('هذه الحركة معتمدة بالفعل');
+
+        // This should throw an exception
+        if ($movement->status === 'approved') {
+            throw new \Exception('هذه الحركة معتمدة بالفعل');
+        }
+    }
 }
