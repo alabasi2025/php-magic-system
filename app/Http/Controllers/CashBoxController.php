@@ -77,12 +77,21 @@ class CashBoxController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'unit_id' => 'required|exists:units,id',
-            'intermediate_account_id' => 'required|exists:chart_accounts,id',
+            'unit_id' => 'nullable|exists:units,id',
+            'intermediate_account_id' => 'nullable|exists:chart_accounts,id',
+            'chart_account_id' => 'required|exists:chart_accounts,id',
+            'responsible_user_id' => 'required|exists:users,id',
             'name' => 'required|string|max:100|unique:cash_boxes,name',
             'code' => 'required|string|max:50|unique:cash_boxes,code',
             'balance' => 'nullable|numeric|min:0',
+            'min_balance' => 'nullable|numeric|min:0',
+            'max_balance' => 'nullable|numeric|min:0',
+            'location' => 'nullable|string|max:200',
             'description' => 'nullable|string',
+            'currencies' => 'nullable|array',
+            'currencies.*.code' => 'required|string|max:3',
+            'currencies.*.exchange_rate' => 'required|numeric|min:0',
+            'currencies.*.is_default' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
         ]);
 
@@ -96,21 +105,41 @@ class CashBoxController extends Controller
                     ->with('error', 'الحساب الوسيط المحدد مرتبط بالفعل بصندوق آخر');
             }
 
+            // معالجة العملات
+            $currencies = [];
+            if ($request->has('currencies')) {
+                foreach ($request->currencies as $currency) {
+                    $currencies[] = [
+                        'code' => $currency['code'],
+                        'exchange_rate' => $currency['exchange_rate'],
+                        'is_default' => isset($currency['is_default']) && $currency['is_default'] == '1'
+                    ];
+                }
+            }
+
             // Create the cash box
             $cashBox = CashBox::create([
                 'unit_id' => $request->unit_id,
                 'intermediate_account_id' => $request->intermediate_account_id,
+                'chart_account_id' => $request->chart_account_id,
+                'responsible_user_id' => $request->responsible_user_id,
                 'name' => $request->name,
                 'code' => $request->code,
                 'balance' => $request->balance ?? 0,
+                'min_balance' => $request->min_balance,
+                'max_balance' => $request->max_balance,
+                'location' => $request->location,
                 'description' => $request->description,
+                'currencies' => !empty($currencies) ? $currencies : null,
                 'is_active' => $request->has('is_active'),
                 'created_by' => Auth::id(),
             ]);
 
-            // Mark the intermediate account as linked
-            $intermediateAccount->is_linked = true;
-            $intermediateAccount->save();
+            // Mark the intermediate account as linked (if exists)
+            if ($intermediateAccount) {
+                $intermediateAccount->is_linked = true;
+                $intermediateAccount->save();
+            }
 
             DB::commit();
 

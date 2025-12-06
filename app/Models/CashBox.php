@@ -25,7 +25,7 @@ class CashBox extends Model
      * 
      * @var array
      */
-    protected $defaultRelations = ['unit', 'intermediateAccount'];
+    protected $defaultRelations = ['unit', 'intermediateAccount', 'chartAccount', 'responsibleUser'];
 
     /**
      * The table associated with the model.
@@ -44,9 +44,15 @@ class CashBox extends Model
         'code',
         'description',
         'balance',
+        'max_balance',
+        'min_balance',
+        'location',
         'is_active',
         'unit_id',
         'intermediate_account_id',
+        'chart_account_id',
+        'responsible_user_id',
+        'currencies',
         'created_by',
         'updated_by',
     ];
@@ -58,6 +64,7 @@ class CashBox extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'currencies' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -94,6 +101,22 @@ class CashBox extends Model
     public function intermediateAccount()
     {
         return $this->belongsTo(ChartAccount::class, 'intermediate_account_id');
+    }
+
+    /**
+     * Get the chart account associated with the cash box.
+     */
+    public function chartAccount()
+    {
+        return $this->belongsTo(ChartAccount::class, 'chart_account_id');
+    }
+
+    /**
+     * Get the responsible user for the cash box.
+     */
+    public function responsibleUser()
+    {
+        return $this->belongsTo(User::class, 'responsible_user_id');
     }
 
     /**
