@@ -3,10 +3,14 @@ env: production
 
 deploy:
   - echo "🚀 Deploying PHP Magic System - Developer Branch"
-  - php artisan migrate --force 2>&1 || true
+  - echo "📦 Running database migrations..."
+  - php artisan migrate --force
+  - echo "✅ Migrations completed successfully!"
+  - echo "🧹 Clearing caches..."
   - php artisan cache:clear
   - php artisan config:clear  
   - php artisan view:clear
+  - echo "⚡ Optimizing application..."
   - php artisan config:cache
   - php artisan route:cache
   - php artisan view:cache
