@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip if table already exists
+        if (Schema::hasTable('items')) {
+            return;
+        }
+        
         Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->string('sku', 100)->unique()->comment('Stock Keeping Unit (unique identifier)');
