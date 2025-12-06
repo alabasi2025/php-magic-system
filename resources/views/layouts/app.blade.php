@@ -343,7 +343,7 @@
                     
                     <!-- المخزون - Dropdown -->
                     <div class="relative">
-                        <button onclick="toggleDropdown(\'inventory\')" class="sidebar-item w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent text-gray-700 hover:text-green-600 transition-all duration-300">
+                        <button onclick="toggleDropdown('inventory')" class="sidebar-item w-full flex items-center justify-between space-x-3 space-x-reverse p-3 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent text-gray-700 hover:text-green-600 transition-all duration-300">
                             <div class="flex items-center space-x-3 space-x-reverse">
                                 <i class="fas fa-box text-2xl icon-gradient-green icon-shadow"></i>
                                 <span class="sidebar-text font-semibold">المخزون</span>
