@@ -407,8 +407,10 @@
             }
         });
 
-        // Initial calculation
-        updateTotalsAndBalance();
+        // Initial calculation on page load
+        setTimeout(function() {
+            updateTotalsAndBalance();
+        }, 100);
     });
 </script>
 @endsection
