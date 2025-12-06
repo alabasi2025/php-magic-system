@@ -47,7 +47,7 @@ class WarehouseController extends Controller
      */
     public function create()
     {
-        $managers = User::where('status', 'active')->get();
+        $managers = User::all();
         return view('inventory.warehouses.create', compact('managers'));
     }
 
@@ -104,7 +104,7 @@ class WarehouseController extends Controller
      */
     public function edit(Warehouse $warehouse)
     {
-        $managers = User::where('status', 'active')->get();
+        $managers = User::all();
         return view('inventory.warehouses.edit', compact('warehouse', 'managers'));
     }
 
