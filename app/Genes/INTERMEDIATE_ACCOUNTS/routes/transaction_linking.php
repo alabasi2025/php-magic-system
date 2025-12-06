@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Genes\INTERMEDIATE_ACCOUNTS\Controllers\TransactionLinkingController;
 
-// افترض أن هناك Controller باسم TransactionLinkingController
-// في مسار مناسب، مثل App\Http\Controllers\IntermediateAccounts\TransactionLinkingController
+// Controller موجود في App\Genes\INTERMEDIATE_ACCOUNTS\Controllers\TransactionLinkingController
 
 // مجموعة Routes لربط المعاملات، مسبوقة بـ 'transaction-linking'
 Route::prefix('transaction-linking')->group(function () {

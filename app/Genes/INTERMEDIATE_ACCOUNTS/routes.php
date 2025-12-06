@@ -19,7 +19,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Genes\INTERMEDIATE_ACCOUNTS\Controllers\IntermediateAccountController;
-use App\Genes\INTERMEDIATE_ACCOUNTS\Controllers\TransactionController;
+// use App\Genes\INTERMEDIATE_ACCOUNTS\Controllers\TransactionController; // Disabled - Controller not implemented yet
 use App\Genes\INTERMEDIATE_ACCOUNTS\Controllers\ReportController;
 
 // Prefix: /api/genes/intermediate-accounts
@@ -46,24 +46,25 @@ Route::prefix('api/genes/intermediate-accounts')->middleware(['auth:api'])->grou
     });
     
     // ========================================
-    // Transactions Management
+    // Transactions Management - DISABLED
     // ========================================
-    Route::prefix('transactions')->group(function () {
-        // CRUD Operations
-        Route::get('/', [TransactionController::class, 'index']); // List all
-        Route::post('/', [TransactionController::class, 'store']); // Create new
-        Route::get('/{id}', [TransactionController::class, 'show']); // View details
-        Route::post('/{id}/cancel', [TransactionController::class, 'cancel']); // Cancel transaction
-        
-        // Linking Operations
-        Route::post('/link', [TransactionController::class, 'link']); // Link transactions
-        Route::delete('/link/{linkId}', [TransactionController::class, 'unlink']); // Unlink transactions
-        Route::post('/auto-link', [TransactionController::class, 'autoLink']); // Auto-link transactions
-        
-        // Queries
-        Route::get('/status/unlinked', [TransactionController::class, 'unlinked']); // Unlinked transactions
-        Route::get('/balance/summary', [TransactionController::class, 'balanceSummary']); // Balance summary
-    });
+    // TransactionController not implemented yet
+    // Route::prefix('transactions')->group(function () {
+    //     // CRUD Operations
+    //     Route::get('/', [TransactionController::class, 'index']); // List all
+    //     Route::post('/', [TransactionController::class, 'store']); // Create new
+    //     Route::get('/{id}', [TransactionController::class, 'show']); // View details
+    //     Route::post('/{id}/cancel', [TransactionController::class, 'cancel']); // Cancel transaction
+    //     
+    //     // Linking Operations
+    //     Route::post('/link', [TransactionController::class, 'link']); // Link transactions
+    //     Route::delete('/link/{linkId}', [TransactionController::class, 'unlink']); // Unlink transactions
+    //     Route::post('/auto-link', [TransactionController::class, 'autoLink']); // Auto-link transactions
+    //     
+    //     // Queries
+    //     Route::get('/status/unlinked', [TransactionController::class, 'unlinked']); // Unlinked transactions
+    //     Route::get('/balance/summary', [TransactionController::class, 'balanceSummary']); // Balance summary
+    // });
     
     // ========================================
     // Reports
