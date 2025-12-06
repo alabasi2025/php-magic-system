@@ -8,8 +8,15 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-// Diagnostic route (temporary - remove in production)
-Route::get('/system-diagnostic', function () {
+// System Setup Routes (temporary - remove in production)
+Route::get('/system-setup', [\App\Http\Controllers\SystemSetupController::class, 'index']);
+Route::post('/system-setup/run-migrations', [\App\Http\Controllers\SystemSetupController::class, 'runMigrations']);
+Route::post('/system-setup/run-seeders', [\App\Http\Controllers\SystemSetupController::class, 'runSeeders']);
+Route::post('/system-setup/clear-cache', [\App\Http\Controllers\SystemSetupController::class, 'clearCache']);
+Route::get('/system-diagnostic', [\App\Http\Controllers\SystemSetupController::class, 'diagnostic']);
+
+// Old diagnostic route
+Route::get('/system-diagnostic-old', function () {
     $diagnostics = [];
     
     // Check database connection
