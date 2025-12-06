@@ -111,4 +111,20 @@ class CashBox extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    /**
+     * Get all receipts for this cash box.
+     */
+    public function receipts()
+    {
+        return $this->morphMany(CashReceipt::class, 'account');
+    }
+
+    /**
+     * Get all payments for this cash box.
+     */
+    public function payments()
+    {
+        return $this->morphMany(CashPayment::class, 'account');
+    }
 }

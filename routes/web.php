@@ -167,3 +167,22 @@ Route::post('settings/auto-numbering', [\App\Http\Controllers\AutoNumberingSetti
 // التحقق الذكي من القيود
 Route::get('journal-entries/{entry}/validate', [\App\Http\Controllers\JournalValidationController::class, 'validate'])->name('journal-entries.validate');
 
+// ============================================
+// البنوك والصناديق والسندات
+// ============================================
+
+// الحسابات البنكية
+Route::resource('bank-accounts', \App\Http\Controllers\BankAccountController::class);
+
+// سندات القبض
+Route::resource('cash-receipts', \App\Http\Controllers\CashReceiptController::class);
+Route::patch('cash-receipts/{cashReceipt}/approve', [\App\Http\Controllers\CashReceiptController::class, 'approve'])->name('cash-receipts.approve');
+Route::patch('cash-receipts/{cashReceipt}/post', [\App\Http\Controllers\CashReceiptController::class, 'post'])->name('cash-receipts.post');
+Route::patch('cash-receipts/{cashReceipt}/cancel', [\App\Http\Controllers\CashReceiptController::class, 'cancel'])->name('cash-receipts.cancel');
+
+// سندات الصرف
+Route::resource('cash-payments', \App\Http\Controllers\CashPaymentController::class);
+Route::patch('cash-payments/{cashPayment}/approve', [\App\Http\Controllers\CashPaymentController::class, 'approve'])->name('cash-payments.approve');
+Route::patch('cash-payments/{cashPayment}/post', [\App\Http\Controllers\CashPaymentController::class, 'post'])->name('cash-payments.post');
+Route::patch('cash-payments/{cashPayment}/cancel', [\App\Http\Controllers\CashPaymentController::class, 'cancel'])->name('cash-payments.cancel');
+
