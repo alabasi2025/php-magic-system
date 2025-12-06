@@ -20,7 +20,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Genes\INTERMEDIATE_ACCOUNTS\Controllers\IntermediateAccountController;
 // use App\Genes\INTERMEDIATE_ACCOUNTS\Controllers\TransactionController; // Disabled - Controller not implemented yet
-use App\Genes\INTERMEDIATE_ACCOUNTS\Controllers\ReportController;
+// use App\Genes\INTERMEDIATE_ACCOUNTS\Controllers\ReportController; // Disabled - Controller not implemented yet
 
 // Prefix: /api/genes/intermediate-accounts
 Route::prefix('api/genes/intermediate-accounts')->middleware(['auth:api'])->group(function () {
@@ -67,20 +67,21 @@ Route::prefix('api/genes/intermediate-accounts')->middleware(['auth:api'])->grou
     // });
     
     // ========================================
-    // Reports
+    // Reports - DISABLED
     // ========================================
-    Route::prefix('reports')->group(function () {
-        // Report Types
-        Route::get('/unlinked-transactions', [ReportController::class, 'unlinkedTransactions']); // Unlinked transactions report
-        Route::get('/balance', [ReportController::class, 'balance']); // Balance report
-        Route::get('/movement', [ReportController::class, 'movement']); // Movement report
-        Route::get('/linking', [ReportController::class, 'linking']); // Linking report
-        Route::get('/performance', [ReportController::class, 'performance']); // Performance report
-        Route::get('/aging', [ReportController::class, 'aging']); // Aging report
-        
-        // Export
-        Route::post('/export', [ReportController::class, 'export']); // Export report (PDF/Excel)
-    });
+    // ReportController not implemented yet
+    // Route::prefix('reports')->group(function () {
+    //     // Report Types
+    //     Route::get('/unlinked-transactions', [ReportController::class, 'unlinkedTransactions']); // Unlinked transactions report
+    //     Route::get('/balance', [ReportController::class, 'balance']); // Balance report
+    //     Route::get('/movement', [ReportController::class, 'movement']); // Movement report
+    //     Route::get('/linking', [ReportController::class, 'linking']); // Linking report
+    //     Route::get('/performance', [ReportController::class, 'performance']); // Performance report
+    //     Route::get('/aging', [ReportController::class, 'aging']); // Aging report
+    //     
+    //     // Export
+    //     Route::post('/export', [ReportController::class, 'export']); // Export report (PDF/Excel)
+    // });
 });
 
 /**
