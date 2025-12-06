@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 // System Setup Routes (temporary - remove in production)
-Route::get('/system-setup', [\App\Http\Controllers\SystemSetupController::class, 'index']);
-Route::post('/system-setup/run-migrations', [\App\Http\Controllers\SystemSetupController::class, 'runMigrations']);
-Route::post('/system-setup/run-seeders', [\App\Http\Controllers\SystemSetupController::class, 'runSeeders']);
-Route::post('/system-setup/clear-cache', [\App\Http\Controllers\SystemSetupController::class, 'clearCache']);
+// Note: These routes bypass CSRF protection for easier setup
+Route::get('/system-setup', [\App\Http\Controllers\SystemSetupController::class, 'index'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/system-setup/run-migrations', [\App\Http\Controllers\SystemSetupController::class, 'runMigrations'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/system-setup/run-seeders', [\App\Http\Controllers\SystemSetupController::class, 'runSeeders'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/system-setup/clear-cache', [\App\Http\Controllers\SystemSetupController::class, 'clearCache'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 Route::get('/system-diagnostic', [\App\Http\Controllers\SystemSetupController::class, 'diagnostic']);
 
 // Old diagnostic route
