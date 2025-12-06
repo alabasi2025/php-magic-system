@@ -239,3 +239,6 @@ Route::get('/developer/tests', [\App\Http\Controllers\DeveloperController::class
 // Debugbar
 Route::get('/developer/debugbar', [\App\Http\Controllers\DeveloperController::class, 'getDebugbarPage'])->name('developer.debugbar');
 
+// System Info
+Route::get('/developer/system-info', [\App\Http\Controllers\DeveloperController::class, 'getSystemInfoPage'])->name('developer.system-info');
+

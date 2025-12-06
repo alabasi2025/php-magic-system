@@ -777,6 +777,10 @@
                                     <i id="system-menu-icon" class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
                                 </button>
                                 <div id="system-menu" class="hidden mr-4 mt-1 space-y-1">
+                                    <a href="{{ route('developer.system-info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors text-sm">
+                                        <i class="far fa-circle text-xs"></i>
+                                        <span>معلومات النظام</span>
+                                    </a>
                                     <a href="{{ route('developer.server-info') }}" class="flex items-center space-x-2 space-x-reverse p-2 rounded-lg hover:bg-orange-50 text-gray-600 hover:text-orange-600 transition-colors text-sm">
                                         <i class="far fa-circle text-xs"></i>
                                         <span>معلومات الخادم</span>

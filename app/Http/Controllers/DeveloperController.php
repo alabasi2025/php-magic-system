@@ -94,6 +94,30 @@ class DeveloperController extends Controller
     }
 
     /**
+     * عرض معلومات النظام الكاملة
+     * Display complete system information
+     *
+     * @return \Illuminate\View\View
+     */
+    public function getSystemInfoPage()
+    {
+        $info = [
+            'php_version' => PHP_VERSION,
+            'laravel_version' => app()->version(),
+            'system_version' => config('version.number', '4.1.0'),
+            'environment' => config('app.env'),
+            'debug_mode' => config('app.debug') ? 'Enabled' : 'Disabled',
+            'database' => config('database.connections.mysql.database'),
+            'database_driver' => config('database.default'),
+            'memory_limit' => ini_get('memory_limit'),
+            'max_execution_time' => ini_get('max_execution_time') . 's',
+            'upload_max_filesize' => ini_get('upload_max_filesize'),
+        ];
+
+        return view('developer.system-info', compact('info'));
+    }
+
+    /**
      * دالة لتحليل أداء الكود باستخدام الذكاء الاصطناعي.
      * Analyzes the provided code for performance using AI.
      *
