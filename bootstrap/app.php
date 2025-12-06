@@ -12,15 +12,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function () {
             // تحميل routes إضافية
-            if (file_exists(__DIR__.'/../routes/developer.php')) {
-                require __DIR__.'/../routes/developer.php';
-            }
-            if (file_exists(__DIR__.'/../routes/manus.php')) {
-                require __DIR__.'/../routes/manus.php';
-            }
-            if (file_exists(__DIR__.'/../routes/inventory.php')) {
-                require __DIR__.'/../routes/inventory.php';
-            }
+            \Illuminate\Support\Facades\Route::middleware('web')
+                ->group(function () {
+                    if (file_exists(base_path('routes/developer.php'))) {
+                        require base_path('routes/developer.php');
+                    }
+                    if (file_exists(base_path('routes/manus.php'))) {
+                        require base_path('routes/manus.php');
+                    }
+                    if (file_exists(base_path('routes/inventory.php'))) {
+                        require base_path('routes/inventory.php');
+                    }
+                });
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
