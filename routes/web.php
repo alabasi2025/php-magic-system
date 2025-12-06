@@ -16,6 +16,25 @@ Route::post('/system-setup/run-seeders', [\App\Http\Controllers\SystemSetupContr
 Route::post('/system-setup/clear-cache', [\App\Http\Controllers\SystemSetupController::class, 'clearCache'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 Route::get('/system-diagnostic', [\App\Http\Controllers\SystemSetupController::class, 'diagnostic']);
 
+// Simple GET route to run migrations (temporary)
+Route::get('/run-migrations-now', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        return response()->json([
+            'success' => true,
+            'message' => 'Migrations executed successfully',
+            'output' => $output
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error running migrations',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
 // Old diagnostic route
 Route::get('/system-diagnostic-old', function () {
     $diagnostics = [];
