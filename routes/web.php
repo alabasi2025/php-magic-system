@@ -28,7 +28,8 @@ Route::resource('chart-types', \App\Http\Controllers\ChartTypeController::class)
 Route::resource('intermediate-accounts', \App\Http\Controllers\IntermediateAccountController::class);
 Route::resource('cash-boxes', \App\Http\Controllers\CashBoxController::class);
 Route::get('/customers', fn() => redirect('/journal-entries'))->name('customers.index');
-Route::get('/inventory', fn() => redirect('/journal-entries'))->name('inventory.index');
+// Inventory System Routes (v4.1.0)
+require __DIR__.'/inventory.php';
 Route::get('/purchases', fn() => redirect('/journal-entries'))->name('purchases.index');
 Route::get('/sales', fn() => redirect('/journal-entries'))->name('sales.index');
 Route::get('/hr', fn() => redirect('/journal-entries'))->name('hr.index');
