@@ -161,3 +161,7 @@ Route::get('journal-templates/{journalTemplate}/use', [\App\Http\Controllers\Jou
 Route::get('settings/auto-numbering', [\App\Http\Controllers\AutoNumberingSettingController::class, 'index'])->name('auto-numbering.index');
 Route::post('settings/auto-numbering', [\App\Http\Controllers\AutoNumberingSettingController::class, 'store'])->name('auto-numbering.store');
 
+
+// التحقق الذكي من القيود
+Route::get('journal-entries/{entry}/validate', [\App\Http\Controllers\JournalValidationController::class, 'validate'])->name('journal-entries.validate');
+
