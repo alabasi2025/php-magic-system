@@ -9,7 +9,7 @@
         {{-- العنوان الرئيسي وزر الإضافة --}}
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-gray-900">إدارة الحسابات البنكية</h1>
-            <a href="{{ route('banks.create') }}"
+            <a href="{{ route('bank-accounts.create') }}"
                style="background-color: #0052CC;"
                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
                 <i class="fas fa-plus ml-2"></i>
@@ -166,13 +166,13 @@
                                             {{-- أزرار الإجراءات --}}
                                             <div class="flex space-x-2 space-x-reverse">
                                                 {{-- عرض --}}
-                                                <a href="{{ route('banks.show', 1) }}"
+                                                <a href="{{ route('bank-accounts.show', 1) }}"
                                                    class="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50 transition duration-150 ease-in-out"
                                                    title="عرض التفاصيل">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                                 {{-- تعديل --}}
-                                                <a href="{{ route('banks.edit', 1) }}"
+                                                <a href="{{ route('bank-accounts.edit', 1) }}"
                                                    class="text-yellow-600 hover:text-yellow-900 p-1 rounded-full hover:bg-yellow-50 transition duration-150 ease-in-out"
                                                    title="تعديل">
                                                     <i class="fas fa-edit"></i>
