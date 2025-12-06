@@ -16,6 +16,26 @@ Route::post('/system-setup/run-seeders', [\App\Http\Controllers\SystemSetupContr
 Route::post('/system-setup/clear-cache', [\App\Http\Controllers\SystemSetupController::class, 'clearCache'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 Route::get('/system-diagnostic', [\App\Http\Controllers\SystemSetupController::class, 'diagnostic']);
 
+// Test warehouse controller (temporary)
+Route::get('/test-warehouses', function () {
+    try {
+        $warehouses = \App\Models\Warehouse::with('manager')->latest()->paginate(15);
+        return response()->json([
+            'success' => true,
+            'count' => $warehouses->total(),
+            'data' => $warehouses->items()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // Simple GET route to run migrations (temporary)
 Route::get('/run-migrations-now', function () {
     try {
