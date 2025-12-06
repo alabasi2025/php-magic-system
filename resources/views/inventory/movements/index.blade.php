@@ -15,19 +15,19 @@
                         إضافة حركة جديدة
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ route('stock-movements.create', ['type' => 'stock_in']) }}">
+                        <li><a class="dropdown-item" href="{{ route('inventory.stock-movements.create', ['type' => 'stock_in']) }}">
                             <i class="fas fa-arrow-down text-success me-2"></i>إدخال بضاعة
                         </a></li>
-                        <li><a class="dropdown-item" href="{{ route('stock-movements.create', ['type' => 'stock_out']) }}">
+                        <li><a class="dropdown-item" href="{{ route('inventory.stock-movements.create', ['type' => 'stock_out']) }}">
                             <i class="fas fa-arrow-up text-danger me-2"></i>إخراج بضاعة
                         </a></li>
-                        <li><a class="dropdown-item" href="{{ route('stock-movements.create', ['type' => 'transfer']) }}">
+                        <li><a class="dropdown-item" href="{{ route('inventory.stock-movements.create', ['type' => 'transfer']) }}">
                             <i class="fas fa-exchange-alt text-primary me-2"></i>نقل بين المخازن
                         </a></li>
-                        <li><a class="dropdown-item" href="{{ route('stock-movements.create', ['type' => 'adjustment']) }}">
+                        <li><a class="dropdown-item" href="{{ route('inventory.stock-movements.create', ['type' => 'adjustment']) }}">
                             <i class="fas fa-balance-scale text-warning me-2"></i>تسوية مخزون
                         </a></li>
-                        <li><a class="dropdown-item" href="{{ route('stock-movements.create', ['type' => 'return']) }}">
+                        <li><a class="dropdown-item" href="{{ route('inventory.stock-movements.create', ['type' => 'return']) }}">
                             <i class="fas fa-undo text-info me-2"></i>إرجاع بضاعة
                         </a></li>
                     </ul>
@@ -54,7 +54,7 @@
 
     <div class="card shadow-sm">
         <div class="card-header bg-white">
-            <form method="GET" action="{{ route('stock-movements.index') }}" class="row g-3">
+            <form method="GET" action="{{ route('inventory.stock-movements.index') }}" class="row g-3">
                 <div class="col-md-3">
                     <input type="text" name="search" class="form-control" placeholder="رقم الحركة" value="{{ request('search') }}">
                 </div>
@@ -92,7 +92,7 @@
                     </button>
                 </div>
                 <div class="col-md-2">
-                    <a href="{{ route('stock-movements.index') }}" class="btn btn-outline-secondary w-100">
+                    <a href="{{ route('inventory.stock-movements.index') }}" class="btn btn-outline-secondary w-100">
                         <i class="fas fa-redo me-1"></i>
                         إعادة تعيين
                     </a>
@@ -147,18 +147,18 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('stock-movements.show', $movement) }}" class="btn btn-info" title="عرض">
+                                        <a href="{{ route('inventory.stock-movements.show', $movement) }}" class="btn btn-info" title="عرض">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         @if($movement->status == 'pending')
-                                            <form action="{{ route('stock-movements.approve', $movement) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('inventory.stock-movements.approve', $movement) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="submit" class="btn btn-success" title="اعتماد" onclick="return confirm('هل أنت متأكد من اعتماد هذه الحركة؟')">
                                                     <i class="fas fa-check"></i>
                                                 </button>
                                             </form>
-                                            <form action="{{ route('stock-movements.destroy', $movement) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه الحركة؟')">
+                                            <form action="{{ route('inventory.stock-movements.destroy', $movement) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه الحركة؟')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger" title="حذف">

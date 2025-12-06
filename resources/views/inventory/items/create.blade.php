@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('items.index') }}">الأصناف</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('inventory.items.index') }}">الأصناف</a></li>
                     <li class="breadcrumb-item active">إضافة صنف جديد</li>
                 </ol>
             </nav>
@@ -21,7 +21,7 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form action="{{ route('items.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('inventory.items.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row mb-3">
@@ -123,7 +123,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('items.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('inventory.items.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-right me-1"></i>
                                 رجوع
                             </a>

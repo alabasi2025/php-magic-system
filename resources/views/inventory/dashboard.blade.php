@@ -97,7 +97,7 @@
                         <i class="fas fa-history me-2"></i>
                         آخر الحركات
                     </h5>
-                    <a href="{{ route('stock-movements.index') }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('inventory.stock-movements.index') }}" class="btn btn-sm btn-outline-primary">
                         عرض الكل
                         <i class="fas fa-arrow-left ms-1"></i>
                     </a>
@@ -187,15 +187,15 @@
                     </h5>
                 </div>
                 <div class="list-group list-group-flush">
-                    <a href="{{ route('warehouses.index') }}" class="list-group-item list-group-item-action">
+                    <a href="{{ route('inventory.warehouses.index') }}" class="list-group-item list-group-item-action">
                         <i class="fas fa-warehouse me-2 text-primary"></i>
                         إدارة المخازن
                     </a>
-                    <a href="{{ route('items.index') }}" class="list-group-item list-group-item-action">
+                    <a href="{{ route('inventory.items.index') }}" class="list-group-item list-group-item-action">
                         <i class="fas fa-boxes me-2 text-success"></i>
                         إدارة الأصناف
                     </a>
-                    <a href="{{ route('stock-movements.index') }}" class="list-group-item list-group-item-action">
+                    <a href="{{ route('inventory.stock-movements.index') }}" class="list-group-item list-group-item-action">
                         <i class="fas fa-exchange-alt me-2 text-info"></i>
                         حركات المخزون
                     </a>

@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('stock-movements.index') }}">حركات المخزون</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('inventory.stock-movements.index') }}">حركات المخزون</a></li>
                     <li class="breadcrumb-item active">إضافة حركة جديدة</li>
                 </ol>
             </nav>
@@ -32,7 +32,7 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form action="{{ route('stock-movements.store') }}" method="POST">
+                    <form action="{{ route('inventory.stock-movements.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="movement_type" value="{{ $movementType }}">
 
@@ -142,7 +142,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('stock-movements.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('inventory.stock-movements.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-right me-1"></i>
                                 رجوع
                             </a>

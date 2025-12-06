@@ -9,7 +9,7 @@
                     <i class="fas fa-warehouse me-2"></i>
                     إدارة المخازن
                 </h2>
-                <a href="{{ route('warehouses.create') }}" class="btn btn-primary">
+                <a href="{{ route('inventory.warehouses.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus me-1"></i>
                     إضافة مخزن جديد
                 </a>
@@ -35,7 +35,7 @@
 
     <div class="card shadow-sm">
         <div class="card-header bg-white">
-            <form method="GET" action="{{ route('warehouses.index') }}" class="row g-3">
+            <form method="GET" action="{{ route('inventory.warehouses.index') }}" class="row g-3">
                 <div class="col-md-4">
                     <input type="text" name="search" class="form-control" placeholder="البحث بالاسم أو الرمز أو الموقع" value="{{ request('search') }}">
                 </div>
@@ -53,7 +53,7 @@
                     </button>
                 </div>
                 <div class="col-md-2">
-                    <a href="{{ route('warehouses.index') }}" class="btn btn-outline-secondary w-100">
+                    <a href="{{ route('inventory.warehouses.index') }}" class="btn btn-outline-secondary w-100">
                         <i class="fas fa-redo me-1"></i>
                         إعادة تعيين
                     </a>
@@ -92,13 +92,13 @@
                                 <td>{{ $warehouse->created_at->format('Y-m-d') }}</td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('warehouses.show', $warehouse) }}" class="btn btn-info" title="عرض">
+                                        <a href="{{ route('inventory.warehouses.show', $warehouse) }}" class="btn btn-info" title="عرض">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('warehouses.edit', $warehouse) }}" class="btn btn-warning" title="تعديل">
+                                        <a href="{{ route('inventory.warehouses.edit', $warehouse) }}" class="btn btn-warning" title="تعديل">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('warehouses.destroy', $warehouse) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المخزن؟')">
+                                        <form action="{{ route('inventory.warehouses.destroy', $warehouse) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المخزن؟')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger" title="حذف">

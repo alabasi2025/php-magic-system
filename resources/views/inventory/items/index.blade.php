@@ -9,7 +9,7 @@
                     <i class="fas fa-boxes me-2"></i>
                     إدارة الأصناف
                 </h2>
-                <a href="{{ route('items.create') }}" class="btn btn-primary">
+                <a href="{{ route('inventory.items.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus me-1"></i>
                     إضافة صنف جديد
                 </a>
@@ -35,7 +35,7 @@
 
     <div class="card shadow-sm">
         <div class="card-header bg-white">
-            <form method="GET" action="{{ route('items.index') }}" class="row g-3">
+            <form method="GET" action="{{ route('inventory.items.index') }}" class="row g-3">
                 <div class="col-md-4">
                     <input type="text" name="search" class="form-control" placeholder="البحث بالاسم أو SKU أو الباركود" value="{{ request('search') }}">
                 </div>
@@ -61,7 +61,7 @@
                     </button>
                 </div>
                 <div class="col-md-2">
-                    <a href="{{ route('items.index') }}" class="btn btn-outline-secondary w-100">
+                    <a href="{{ route('inventory.items.index') }}" class="btn btn-outline-secondary w-100">
                         <i class="fas fa-redo me-1"></i>
                         إعادة تعيين
                     </a>
@@ -114,13 +114,13 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('items.show', $item) }}" class="btn btn-info" title="عرض">
+                                        <a href="{{ route('inventory.items.show', $item) }}" class="btn btn-info" title="عرض">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('items.edit', $item) }}" class="btn btn-warning" title="تعديل">
+                                        <a href="{{ route('inventory.items.edit', $item) }}" class="btn btn-warning" title="تعديل">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('items.destroy', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا الصنف؟')">
+                                        <form action="{{ route('inventory.items.destroy', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا الصنف؟')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger" title="حذف">

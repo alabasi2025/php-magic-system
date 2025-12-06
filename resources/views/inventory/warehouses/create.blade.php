@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('warehouses.index') }}">المخازن</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('inventory.warehouses.index') }}">المخازن</a></li>
                     <li class="breadcrumb-item active">إضافة مخزن جديد</li>
                 </ol>
             </nav>
@@ -21,7 +21,7 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form action="{{ route('warehouses.store') }}" method="POST">
+                    <form action="{{ route('inventory.warehouses.store') }}" method="POST">
                         @csrf
 
                         <div class="row mb-3">
@@ -87,7 +87,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('warehouses.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('inventory.warehouses.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-right me-1"></i>
                                 رجوع
                             </a>
