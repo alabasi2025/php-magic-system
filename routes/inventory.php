@@ -17,6 +17,11 @@ use App\Http\Controllers\InventoryReportController;
 
 Route::middleware(['auth'])->prefix('inventory')->name('inventory.')->group(function () {
     
+    // Index (redirect to dashboard)
+    Route::get('/', function () {
+        return redirect()->route('inventory.dashboard');
+    })->name('index');
+    
     // Dashboard
     Route::get('/dashboard', [InventoryReportController::class, 'dashboard'])->name('dashboard');
 

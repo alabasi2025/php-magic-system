@@ -245,3 +245,6 @@ Route::get('/developer/debugbar', [\App\Http\Controllers\DeveloperController::cl
 // System Info
 Route::get('/developer/system-info', [\App\Http\Controllers\DeveloperController::class, 'getSystemInfoPage'])->name('developer.system-info');
 
+
+// Inventory System Routes
+require __DIR__.'/inventory.php';
