@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'version' => 'v3.34.0',
-    'number' => '3.34.0',
-    'release_date' => '2025-12-05',
-    'codename' => 'Smart Constraints Phase 1',
+    'version' => 'v4.1.0',
+    'number' => '4.1.0',
+    'release_date' => '2025-12-06',
+    'codename' => 'Financial Management Suite',
 ];
