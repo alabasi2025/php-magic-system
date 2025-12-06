@@ -64,8 +64,8 @@ Route::get('/developer/routes-list', fn() => redirect('/journal-entries'))->name
 Route::get('/developer/pint', fn() => redirect('/journal-entries'))->name('developer.pint');
 Route::get('/developer/tests', fn() => redirect('/journal-entries'))->name('developer.tests');
 Route::get('/developer/debugbar', fn() => redirect('/journal-entries'))->name('developer.debugbar');
-Route::get('/developer/server-info', fn() => redirect('/journal-entries'))->name('developer.server-info');
-Route::get('/developer/logs-viewer', fn() => redirect('/journal-entries'))->name('developer.logs-viewer');
+Route::get('/developer/server-info', [\App\Http\Controllers\DeveloperController::class, 'getServerInfoPage'])->name('developer.server-info');
+Route::get('/developer/logs-viewer', [\App\Http\Controllers\DeveloperController::class, 'getLogsViewerPage'])->name('developer.logs-viewer');
 Route::get('/developer/git/dashboard', fn() => redirect('/journal-entries'))->name('developer.git.dashboard');
 Route::get('/developer/git/commit', fn() => redirect('/journal-entries'))->name('developer.git.commit');
 Route::get('/developer/git/history', fn() => redirect('/journal-entries'))->name('developer.git.history');

@@ -252,7 +252,7 @@
                             <i class="fas fa-chevron-down sidebar-text transition-transform duration-300" id="accounting-arrow"></i>
                         </button>
                         <div id="accounting-dropdown" class="hidden pr-6 space-y-1 mt-1">
-                            <a href="{{ route('accounting.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent text-gray-600 hover:text-purple-600 text-sm transition-all duration-200">
+                            <a href="{{ route('chart-of-accounts.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent text-gray-600 hover:text-purple-600 text-sm transition-all duration-200">
                                 <i class="fas fa-calculator text-lg icon-gradient-purple"></i>
                                 <span class="sidebar-text">المحاسبة</span>
                             </a>
