@@ -98,6 +98,13 @@
             background-clip: text;
         }
         
+        .icon-gradient-red {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
         .icon-gradient-indigo {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             -webkit-background-clip: text;
@@ -272,6 +279,29 @@
                             <a href="{{ route('auto-numbering.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-teal-50 hover:to-transparent text-gray-600 hover:text-teal-600 text-sm transition-all duration-200">
                                 <i class="fas fa-hashtag text-lg icon-gradient-teal"></i>
                                 <span class="sidebar-text">نظام الترقيم التلقائي</span>
+                            </a>
+                            
+                            <!-- Separator -->
+                            <div class="border-t border-gray-200 my-2"></div>
+                            
+                            <!-- البنوك والصناديق -->
+                            <div class="px-2 py-1">
+                                <span class="text-xs font-bold text-gray-500 uppercase">البنوك والصناديق</span>
+                            </div>
+                            
+                            <a href="{{ route('bank-accounts.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent text-gray-600 hover:text-blue-600 text-sm transition-all duration-200">
+                                <i class="fas fa-university text-lg icon-gradient-blue"></i>
+                                <span class="sidebar-text">الحسابات البنكية</span>
+                            </a>
+                            
+                            <a href="{{ route('cash-receipts.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent text-gray-600 hover:text-green-600 text-sm transition-all duration-200">
+                                <i class="fas fa-money-bill-wave text-lg icon-gradient-green"></i>
+                                <span class="sidebar-text">سندات القبض</span>
+                            </a>
+                            
+                            <a href="{{ route('cash-payments.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent text-gray-600 hover:text-red-600 text-sm transition-all duration-200">
+                                <i class="fas fa-hand-holding-usd text-lg icon-gradient-red"></i>
+                                <span class="sidebar-text">سندات الصرف</span>
                             </a>
                         </div>
                     </div>
