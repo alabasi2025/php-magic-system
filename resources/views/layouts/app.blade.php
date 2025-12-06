@@ -269,7 +269,7 @@
                                 <i class="fas fa-layer-group text-lg icon-gradient-yellow"></i>
                                 <span class="sidebar-text">قوالب القيود الذكية</span>
                             </a>
-                            <a href="{{ route('settings.auto-numbering') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-teal-50 hover:to-transparent text-gray-600 hover:text-teal-600 text-sm transition-all duration-200">
+                            <a href="{{ route('auto-numbering.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-teal-50 hover:to-transparent text-gray-600 hover:text-teal-600 text-sm transition-all duration-200">
                                 <i class="fas fa-hashtag text-lg icon-gradient-teal"></i>
                                 <span class="sidebar-text">نظام الترقيم التلقائي</span>
                             </a>
