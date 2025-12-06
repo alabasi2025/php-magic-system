@@ -264,10 +264,7 @@
                                 <i class="fas fa-exchange-alt text-lg icon-gradient-pink"></i>
                                 <span class="sidebar-text">الحسابات الوسيطة</span>
                             </a>
-                            <a href="{{ route('cash-boxes.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent text-gray-600 hover:text-green-600 text-sm transition-all duration-200">
-                                <i class="fas fa-cash-register text-lg icon-gradient-green"></i>
-                                <span class="sidebar-text">الصناديق النقدية</span>
-                            </a>
+
                             <a href="{{ route('journal-entries.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent text-gray-600 hover:text-blue-600 text-sm transition-all duration-200">
                                 <i class="fas fa-file-invoice text-lg icon-gradient-blue"></i>
                                 <span class="sidebar-text">القيود المحاسبية</span>
@@ -302,6 +299,11 @@
                             <a href="{{ route('cash-payments.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent text-gray-600 hover:text-red-600 text-sm transition-all duration-200">
                                 <i class="fas fa-hand-holding-usd text-lg icon-gradient-red"></i>
                                 <span class="sidebar-text">سندات الصرف</span>
+                            </a>
+                            
+                            <a href="{{ route('cash-boxes.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent text-gray-600 hover:text-purple-600 text-sm transition-all duration-200">
+                                <i class="fas fa-cash-register text-lg icon-gradient-purple"></i>
+                                <span class="sidebar-text">الصناديق النقدية</span>
                             </a>
                         </div>
                     </div>
