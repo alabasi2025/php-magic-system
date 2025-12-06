@@ -5,12 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\CashReceipt;
 use App\Models\CashBox;
 use App\Models\BankAccount;
+use App\Services\JournalEntryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CashReceiptController extends Controller
 {
+    protected $journalEntryService;
+
+    public function __construct(JournalEntryService $journalEntryService)
+    {
+        $this->journalEntryService = $journalEntryService;
+    }
     /**
      * Display a listing of cash receipts
      */
@@ -179,16 +186,30 @@ class CashReceiptController extends Controller
     public function approve(CashReceipt $cashReceipt)
     {
         if ($cashReceipt->status !== 'pending') {
-            return back()->with('error', 'يمكن اعتماد السندات المعلقة فقط!');
+            return back()->with('error', 'السند ليس قيد المراجعة!');
         }
 
-        $cashReceipt->update([
-            'status' => 'approved',
-            'approved_by' => Auth::id(),
-            'approved_at' => now(),
-        ]);
+        DB::beginTransaction();
+        try {
+            // Create journal entry
+            $journalEntry = $this->journalEntryService->createFromCashReceipt($cashReceipt);
 
-        return back()->with('success', 'تم اعتماد سند القبض بنجاح!');
+            // Approve both receipt and journal entry
+            $cashReceipt->update([
+                'status' => 'approved',
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+            ]);
+
+            $this->journalEntryService->approveJournalEntry($journalEntry);
+
+            DB::commit();
+
+            return back()->with('success', 'تم اعتماد سند القبض وإنشاء القيد المحاسبي بنجاح!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'حدث خطأ أثناء اعتماد السند: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -200,15 +221,26 @@ class CashReceiptController extends Controller
             return back()->with('error', 'يجب اعتماد السند أولاً!');
         }
 
-        // TODO: Create journal entry
+        DB::beginTransaction();
+        try {
+            // Post journal entry
+            if ($cashReceipt->journalEntry) {
+                $this->journalEntryService->postJournalEntry($cashReceipt->journalEntry);
+            }
 
-        $cashReceipt->update([
-            'status' => 'posted',
-            'posted_by' => Auth::id(),
-            'posted_at' => now(),
-        ]);
+            $cashReceipt->update([
+                'status' => 'posted',
+                'posted_by' => Auth::id(),
+                'posted_at' => now(),
+            ]);
 
-        return back()->with('success', 'تم ترحيل سند القبض بنجاح!');
+            DB::commit();
+
+            return back()->with('success', 'تم ترحيل سند القبض والقيد المحاسبي بنجاح!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'حدث خطأ أثناء الترحيل: ' . $e->getMessage());
+        }
     }
 
     /**
