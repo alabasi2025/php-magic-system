@@ -125,7 +125,8 @@ Route::resource('cash-boxes', \App\Http\Controllers\CashBoxController::class);
 Route::get('/customers', fn() => redirect('/journal-entries'))->name('customers.index');
 // Inventory System Routes (v4.1.0)
 require __DIR__.'/inventory.php';
-Route::get('/purchases', fn() => redirect('/journal-entries'))->name('purchases.index');
+// Purchases System Routes (v4.1.0)
+require __DIR__.'/purchases.php';
 Route::get('/sales', fn() => redirect('/journal-entries'))->name('sales.index');
 Route::get('/hr', fn() => redirect('/journal-entries'))->name('hr.index');
 Route::get('/manufacturing', fn() => redirect('/journal-entries'))->name('manufacturing.index');
