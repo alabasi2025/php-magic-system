@@ -14,6 +14,11 @@ use App\Http\Controllers\Purchases\PurchaseReportController;
  * جميع المسارات محمية بـ middleware auth
  */
 
+// الصفحة الرئيسية لنظام المشتريات
+Route::middleware(['auth'])->get('/purchases', function () {
+    return redirect()->route('purchases.dashboard');
+})->name('purchases.index');
+
 Route::middleware(['auth'])->prefix('purchases')->name('purchases.')->group(function () {
     
     // Dashboard
