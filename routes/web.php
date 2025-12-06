@@ -24,6 +24,7 @@ Route::get('/dashboard', function () {
 Route::get('/accounting', [\App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.index');
 Route::resource('chart-of-accounts', \App\Http\Controllers\ChartOfAccountsController::class);
 Route::post('chart-of-accounts/add-account', [\App\Http\Controllers\ChartOfAccountsController::class, 'addAccount'])->name('chart-of-accounts.add-account');
+Route::resource('chart-types', \App\Http\Controllers\ChartTypeController::class);
 Route::resource('intermediate-accounts', \App\Http\Controllers\IntermediateAccountController::class);
 Route::resource('cash-boxes', \App\Http\Controllers\CashBoxController::class);
 Route::get('/customers', fn() => redirect('/journal-entries'))->name('customers.index');

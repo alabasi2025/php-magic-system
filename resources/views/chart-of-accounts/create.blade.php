@@ -80,18 +80,16 @@
                 </label>
                 <select name="type" id="type" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
                     <option value="">-- اختر النوع --</option>
-                    <option value="employees">أعمال الموظفين</option>
-                    <option value="final_accounts">الحسابات النهائية</option>
-                    <option value="budget">الميزانية</option>
-                    <option value="projects">المشاريع</option>
-                    <option value="assets">الأصول</option>
-                    <option value="inventory">المخزون</option>
-                    <option value="sales">المبيعات</option>
-                    <option value="purchases">المشتريات</option>
-                    <option value="expenses">المصروفات</option>
-                    <option value="revenues">الإيرادات</option>
-                    <option value="other">أخرى</option>
+                    @foreach(\App\Models\ChartType::active()->ordered()->get() as $chartType)
+                        <option value="{{ $chartType->code }}">{{ $chartType->name }}</option>
+                    @endforeach
                 </select>
+                <p class="text-gray-500 text-sm mt-1">
+                    <a href="{{ route('chart-types.index') }}" class="text-indigo-600 hover:underline" target="_blank">
+                        <i class="fas fa-cog ml-1"></i>
+                        إدارة أنواع الأدلة
+                    </a>
+                </p>
                 @error('type')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
