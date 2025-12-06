@@ -265,6 +265,14 @@
                                 <i class="fas fa-file-invoice text-lg icon-gradient-blue"></i>
                                 <span class="sidebar-text">القيود المحاسبية</span>
                             </a>
+                            <a href="{{ route('journal-templates.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-yellow-50 hover:to-transparent text-gray-600 hover:text-yellow-600 text-sm transition-all duration-200">
+                                <i class="fas fa-layer-group text-lg icon-gradient-yellow"></i>
+                                <span class="sidebar-text">قوالب القيود الذكية</span>
+                            </a>
+                            <a href="{{ route('settings.auto-numbering') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-teal-50 hover:to-transparent text-gray-600 hover:text-teal-600 text-sm transition-all duration-200">
+                                <i class="fas fa-hashtag text-lg icon-gradient-teal"></i>
+                                <span class="sidebar-text">نظام الترقيم التلقائي</span>
+                            </a>
                         </div>
                     </div>
                     
