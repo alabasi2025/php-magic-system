@@ -186,3 +186,56 @@ Route::patch('cash-payments/{cashPayment}/approve', [\App\Http\Controllers\CashP
 Route::patch('cash-payments/{cashPayment}/post', [\App\Http\Controllers\CashPaymentController::class, 'post'])->name('cash-payments.post');
 Route::patch('cash-payments/{cashPayment}/cancel', [\App\Http\Controllers\CashPaymentController::class, 'cancel'])->name('cash-payments.cancel');
 
+// الصناديق النقدية
+Route::resource('cash-boxes', \App\Http\Controllers\CashBoxController::class);
+
+// ============================================
+// الهيكل التنظيمي
+// ============================================
+
+// الوحدات التنظيمية
+Route::resource('units', \App\Http\Controllers\OrganizationUnitController::class);
+
+// الأقسام
+Route::resource('departments', \App\Http\Controllers\DepartmentController::class);
+
+// الشركات القابضة
+Route::resource('holdings', \App\Http\Controllers\HoldingController::class);
+
+// المشاريع
+Route::resource('projects', \App\Http\Controllers\ProjectController::class);
+
+// ============================================
+// أدوات التطوير الإضافية
+// ============================================
+
+// Migrations
+Route::get('/developer/migrations', [\App\Http\Controllers\DeveloperController::class, 'getMigrationsPage'])->name('developer.migrations');
+
+// Seeders
+Route::get('/developer/seeders', [\App\Http\Controllers\DeveloperController::class, 'getSeedersPage'])->name('developer.seeders');
+
+// Database Info
+Route::get('/developer/database-info', [\App\Http\Controllers\DeveloperController::class, 'getDatabaseInfoPage'])->name('developer.database-info');
+
+// Database Optimize
+Route::get('/developer/database-optimize', [\App\Http\Controllers\DeveloperController::class, 'getDatabaseOptimizePage'])->name('developer.database-optimize');
+
+// Database Backup
+Route::get('/developer/database-backup', [\App\Http\Controllers\DeveloperController::class, 'getDatabaseBackupPage'])->name('developer.database-backup');
+
+// Cache
+Route::get('/developer/cache', [\App\Http\Controllers\DeveloperController::class, 'getCachePage'])->name('developer.cache');
+
+// Routes List
+Route::get('/developer/routes-list', [\App\Http\Controllers\DeveloperController::class, 'getRoutesListPage'])->name('developer.routes-list');
+
+// Pint
+Route::get('/developer/pint', [\App\Http\Controllers\DeveloperController::class, 'getPintPage'])->name('developer.pint');
+
+// Tests
+Route::get('/developer/tests', [\App\Http\Controllers\DeveloperController::class, 'getTestsPage'])->name('developer.tests');
+
+// Debugbar
+Route::get('/developer/debugbar', [\App\Http\Controllers\DeveloperController::class, 'getDebugbarPage'])->name('developer.debugbar');
+
