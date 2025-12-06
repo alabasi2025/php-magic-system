@@ -1,250 +1,431 @@
 @extends('layouts.app')
+
 @section('title', 'تعديل الصندوق: ' . $cashBox->name)
+
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="container-fluid px-4 py-6">
+    <!-- Header -->
     <div class="mb-6">
-        <div class="flex items-center mb-4">
-            <a href="{{ route('cash-boxes.show', $cashBox->id) }}" class="text-blue-600 hover:text-blue-800 mr-4">
-                <i class="fas fa-arrow-right text-xl"></i>
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">تعديل الصندوق: {{ $cashBox->name }}</h1>
+                <p class="text-gray-600">قم بتحديث بيانات الصندوق النقدي</p>
+            </div>
+            <a href="{{ route('cash-boxes.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2 space-x-reverse">
+                <i class="fas fa-arrow-right"></i>
+                <span>العودة للقائمة</span>
             </a>
-            <h1 class="text-3xl font-bold text-gray-800">تعديل الصندوق: {{ $cashBox->name }}</h1>
-        </div>
-        <p class="text-gray-600 mr-12">قم بتحديث معلومات الصندوق النقدي</p>
-    </div>
-
-    @if(session('error'))
-    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md">
-        <div class="flex items-center">
-            <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3"></i>
-            <p class="text-red-700">{{ session('error') }}</p>
         </div>
     </div>
-    @endif
 
-    @if($errors->any())
-    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md">
-        <div class="flex items-center mb-2">
-            <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3"></i>
-            <p class="text-red-700 font-semibold">يوجد أخطاء في النموذج:</p>
-        </div>
-        <ul class="list-disc list-inside text-red-600 mr-8">
-            @foreach($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
+    <!-- Form -->
+    <form action="{{ route('cash-boxes.update', $cashBox->id) }}" method="POST" id="cashBoxForm">
+        @csrf
+        @method('PUT')
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- القسم الأيمن: البيانات الأساسية -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- بطاقة البيانات الأساسية -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center space-x-3 space-x-reverse mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-cash-register text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">البيانات الأساسية</h2>
+                    </div>
 
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <form action="{{ route('cash-boxes.update', $cashBox->id) }}" method="POST" id="cashBoxForm">
-            @csrf
-            @method('PUT')
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- اسم الصندوق -->
+                        <div class="md:col-span-2">
+                            <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
+                                اسم الصندوق <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" 
+                                   id="name" 
+                                   name="name" 
+                                   required
+                                   value="{{ old('name', $cashBox->name) }}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                   placeholder="مثال: صندوق المبيعات الرئيسي">
+                            @error('name')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- الوحدة التنظيمية -->
-                <div class="col-span-2">
-                    <label for="unit_id" class="block text-sm font-medium text-gray-700 mb-2">
-                        الوحدة التنظيمية <span class="text-red-500">*</span>
-                    </label>
-                    <select name="unit_id" 
-                            id="unit_id" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            required>
-                        <option value="">-- اختر الوحدة التنظيمية --</option>
-                        @foreach($units as $unit)
-                        <option value="{{ $unit->id }}" 
-                                {{ (old('unit_id', $cashBox->unit_id) == $unit->id) ? 'selected' : '' }}>
-                            {{ $unit->name }} ({{ $unit->code }})
-                        </option>
-                        @endforeach
-                    </select>
-                    <p class="text-xs text-gray-500 mt-1">
-                        <i class="fas fa-info-circle"></i> سيتم فلترة الحسابات الوسيطة بناءً على الوحدة المختارة
-                    </p>
-                </div>
+                        <!-- رمز الصندوق -->
+                        <div>
+                            <label for="code" class="block text-sm font-semibold text-gray-700 mb-2">
+                                رمز الصندوق <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" 
+                                   id="code" 
+                                   name="code" 
+                                   required
+                                   value="{{ old('code', $cashBox->code) }}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                   placeholder="مثال: CB-001">
+                            @error('code')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                <!-- الحساب الوسيط -->
-                <div class="col-span-2">
-                    <label for="intermediate_account_id" class="block text-sm font-medium text-gray-700 mb-2">
-                        الحساب الوسيط <span class="text-red-500">*</span>
-                    </label>
-                    <select name="intermediate_account_id" 
-                            id="intermediate_account_id" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            required>
-                        <option value="">-- اختر الحساب الوسيط --</option>
-                    </select>
-                    <p class="text-xs text-gray-500 mt-1">
-                        <i class="fas fa-info-circle"></i> الحسابات الوسيطة المتاحة للصناديق (غير المرتبطة بصناديق أخرى)
-                    </p>
-                    <div id="accountInfo" class="hidden mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                        <p class="text-sm text-blue-800">
-                            <strong>الدليل:</strong> <span id="chartGroupName"></span><br>
-                            <strong>الرمز:</strong> <span id="accountCode"></span>
-                        </p>
+                        <!-- موقع الصندوق -->
+                        <div>
+                            <label for="location" class="block text-sm font-semibold text-gray-700 mb-2">
+                                موقع الصندوق
+                            </label>
+                            <input type="text" 
+                                   id="location" 
+                                   name="location"
+                                   value="{{ old('location', $cashBox->location) }}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                   placeholder="مثال: الطابق الأول - قسم المبيعات">
+                            @error('location')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- الوصف -->
+                        <div class="md:col-span-2">
+                            <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
+                                الوصف
+                            </label>
+                            <textarea id="description" 
+                                      name="description" 
+                                      rows="3"
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                      placeholder="وصف تفصيلي للصندوق...">{{ old('description', $cashBox->description) }}</textarea>
+                            @error('description')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 
-                <!-- اسم الصندوق -->
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                        اسم الصندوق <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" 
-                           name="name" 
-                           id="name" 
-                           value="{{ old('name', $cashBox->name) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                           placeholder="مثال: صندوق الاستقبال الرئيسي"
-                           required>
+                <!-- بطاقة الأرصدة والحدود -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center space-x-3 space-x-reverse mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-coins text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">الأرصدة والحدود</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- الرصيد الحالي -->
+                        <div>
+                            <label for="balance" class="block text-sm font-semibold text-gray-700 mb-2">
+                                الرصيد الحالي
+                            </label>
+                            <input type="number" 
+                                   id="balance" 
+                                   name="balance" 
+                                   step="0.01"
+                                   value="{{ old('balance', $cashBox->balance) }}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                                   placeholder="0.00">
+                            <p class="text-xs text-yellow-600 mt-1">
+                                <i class="fas fa-exclamation-triangle"></i> تحديث الرصيد يدوياً قد يؤثر على التقارير
+                            </p>
+                            @error('balance')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- الحد الأدنى -->
+                        <div>
+                            <label for="min_balance" class="block text-sm font-semibold text-gray-700 mb-2">
+                                الحد الأدنى للرصيد
+                            </label>
+                            <input type="number" 
+                                   id="min_balance" 
+                                   name="min_balance" 
+                                   step="0.01"
+                                   value="{{ old('min_balance', $cashBox->min_balance) }}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
+                                   placeholder="0.00">
+                            @error('min_balance')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- الحد الأقصى -->
+                        <div>
+                            <label for="max_balance" class="block text-sm font-semibold text-gray-700 mb-2">
+                                الحد الأقصى للرصيد
+                            </label>
+                            <input type="number" 
+                                   id="max_balance" 
+                                   name="max_balance" 
+                                   step="0.01"
+                                   value="{{ old('max_balance', $cashBox->max_balance) }}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                                   placeholder="0.00">
+                            @error('max_balance')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
-                <!-- رمز الصندوق -->
-                <div>
-                    <label for="code" class="block text-sm font-medium text-gray-700 mb-2">
-                        رمز الصندوق <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" 
-                           name="code" 
-                           id="code" 
-                           value="{{ old('code', $cashBox->code) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                           placeholder="مثال: CASH-001"
-                           required>
-                </div>
+                <!-- بطاقة العملات -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center space-x-3 space-x-reverse mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-dollar-sign text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">العملات المستخدمة</h2>
+                    </div>
 
-                <!-- الرصيد -->
-                <div>
-                    <label for="balance" class="block text-sm font-medium text-gray-700 mb-2">
-                        الرصيد الحالي (ريال)
-                    </label>
-                    <input type="number" 
-                           name="balance" 
-                           id="balance" 
-                           value="{{ old('balance', $cashBox->balance) }}"
-                           step="0.01"
-                           min="0"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                           placeholder="0.00">
-                    <p class="text-xs text-yellow-600 mt-1">
-                        <i class="fas fa-exclamation-triangle"></i> تحديث الرصيد يدوياً قد يؤثر على التقارير المالية
-                    </p>
-                </div>
+                    <div id="currenciesContainer">
+                        @php
+                            $currencies = old('currencies', $cashBox->currencies ?? []);
+                            if (empty($currencies)) {
+                                $currencies = [['code' => 'SAR', 'exchange_rate' => 1, 'is_default' => true]];
+                            }
+                        @endphp
+                        
+                        @foreach($currencies as $index => $currency)
+                        <div class="currency-item mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">العملة</label>
+                                    <select name="currencies[{{ $index }}][code]" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="SAR" {{ ($currency['code'] ?? '') == 'SAR' ? 'selected' : '' }}>ريال سعودي (SAR)</option>
+                                        <option value="USD" {{ ($currency['code'] ?? '') == 'USD' ? 'selected' : '' }}>دولار أمريكي (USD)</option>
+                                        <option value="EUR" {{ ($currency['code'] ?? '') == 'EUR' ? 'selected' : '' }}>يورو (EUR)</option>
+                                        <option value="GBP" {{ ($currency['code'] ?? '') == 'GBP' ? 'selected' : '' }}>جنيه إسترليني (GBP)</option>
+                                        <option value="AED" {{ ($currency['code'] ?? '') == 'AED' ? 'selected' : '' }}>درهم إماراتي (AED)</option>
+                                        <option value="KWD" {{ ($currency['code'] ?? '') == 'KWD' ? 'selected' : '' }}>دينار كويتي (KWD)</option>
+                                        <option value="BHD" {{ ($currency['code'] ?? '') == 'BHD' ? 'selected' : '' }}>دينار بحريني (BHD)</option>
+                                        <option value="OMR" {{ ($currency['code'] ?? '') == 'OMR' ? 'selected' : '' }}>ريال عماني (OMR)</option>
+                                        <option value="QAR" {{ ($currency['code'] ?? '') == 'QAR' ? 'selected' : '' }}>ريال قطري (QAR)</option>
+                                        <option value="EGP" {{ ($currency['code'] ?? '') == 'EGP' ? 'selected' : '' }}>جنيه مصري (EGP)</option>
+                                        <option value="JOD" {{ ($currency['code'] ?? '') == 'JOD' ? 'selected' : '' }}>دينار أردني (JOD)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">سعر الصرف</label>
+                                    <input type="number" name="currencies[{{ $index }}][exchange_rate]" step="0.0001" value="{{ $currency['exchange_rate'] ?? 1 }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="1.0000">
+                                </div>
+                                <div class="flex items-end justify-between">
+                                    <label class="flex items-center space-x-2 space-x-reverse">
+                                        <input type="checkbox" name="currencies[{{ $index }}][is_default]" value="1" {{ ($currency['is_default'] ?? false) ? 'checked' : '' }} class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                        <span class="text-sm font-semibold text-gray-700">العملة الأساسية</span>
+                                    </label>
+                                    @if($index > 0)
+                                    <button type="button" class="remove-currency text-red-500 hover:text-red-700">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
 
-                <!-- الحالة -->
-                <div class="flex items-center">
-                    <input type="checkbox" 
-                           name="is_active" 
-                           id="is_active" 
-                           {{ old('is_active', $cashBox->is_active) ? 'checked' : '' }}
-                           class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="is_active" class="mr-3 text-sm font-medium text-gray-700">
-                        الصندوق نشط
-                    </label>
-                </div>
-
-                <!-- الوصف -->
-                <div class="col-span-2">
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-                        الوصف
-                    </label>
-                    <textarea name="description" 
-                              id="description" 
-                              rows="3"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="وصف إضافي عن الصندوق...">{{ old('description', $cashBox->description) }}</textarea>
+                    <button type="button" id="addCurrency" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2 space-x-reverse">
+                        <i class="fas fa-plus"></i>
+                        <span>إضافة عملة</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- الأزرار -->
-            <div class="flex items-center justify-end space-x-4 space-x-reverse mt-6 pt-6 border-t">
-                <a href="{{ route('cash-boxes.show', $cashBox->id) }}" 
-                   class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                    إلغاء
-                </a>
-                <button type="submit" 
-                        class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
-                    <i class="fas fa-save mr-2"></i>حفظ التعديلات
-                </button>
+            <!-- القسم الأيسر: الربط والإعدادات -->
+            <div class="space-y-6">
+                <!-- بطاقة الربط المحاسبي -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center space-x-3 space-x-reverse mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-link text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">الربط المحاسبي</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- الوحدة التنظيمية -->
+                        <div>
+                            <label for="unit_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                                الوحدة التنظيمية
+                            </label>
+                            <select id="unit_id" 
+                                    name="unit_id"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                                <option value="">-- اختر الوحدة --</option>
+                                @foreach(\App\Models\Unit::all() as $unit)
+                                    <option value="{{ $unit->id }}" {{ old('unit_id', $cashBox->unit_id) == $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('unit_id')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- الحساب في الدليل المحاسبي -->
+                        <div>
+                            <label for="chart_account_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                                الحساب في الدليل المحاسبي <span class="text-red-500">*</span>
+                            </label>
+                            <select id="chart_account_id" 
+                                    name="chart_account_id"
+                                    required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                                <option value="">-- اختر الحساب --</option>
+                                @foreach(\App\Models\ChartAccount::all() as $account)
+                                    <option value="{{ $account->id }}" {{ old('chart_account_id', $cashBox->chart_account_id) == $account->id ? 'selected' : '' }}>{{ $account->account_code }} - {{ $account->account_name }}</option>
+                                @endforeach
+                            </select>
+                            @error('chart_account_id')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- الحساب الوسيط -->
+                        <div>
+                            <label for="intermediate_account_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                                الحساب الوسيط
+                            </label>
+                            <select id="intermediate_account_id" 
+                                    name="intermediate_account_id"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                                <option value="">-- اختر الحساب الوسيط --</option>
+                                @foreach(\App\Models\ChartAccount::all() as $account)
+                                    <option value="{{ $account->id }}" {{ old('intermediate_account_id', $cashBox->intermediate_account_id) == $account->id ? 'selected' : '' }}>{{ $account->account_code }} - {{ $account->account_name }}</option>
+                                @endforeach
+                            </select>
+                            @error('intermediate_account_id')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <!-- بطاقة المسؤولية -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center space-x-3 space-x-reverse mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user-shield text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">المسؤولية</h2>
+                    </div>
+
+                    <div>
+                        <label for="responsible_user_id" class="block text-sm font-semibold text-gray-700 mb-2">
+                            مسؤول الصندوق <span class="text-red-500">*</span>
+                        </label>
+                        <select id="responsible_user_id" 
+                                name="responsible_user_id"
+                                required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200">
+                            <option value="">-- اختر المسؤول --</option>
+                            @foreach(\App\Models\User::all() as $user)
+                                <option value="{{ $user->id }}" {{ old('responsible_user_id', $cashBox->responsible_user_id) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('responsible_user_id')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- بطاقة الحالة -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center space-x-3 space-x-reverse mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-toggle-on text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">الحالة</h2>
+                    </div>
+
+                    <div>
+                        <label class="flex items-center space-x-3 space-x-reverse cursor-pointer">
+                            <input type="checkbox" 
+                                   name="is_active" 
+                                   value="1" 
+                                   {{ old('is_active', $cashBox->is_active) ? 'checked' : '' }}
+                                   class="w-5 h-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+                            <span class="text-sm font-semibold text-gray-700">الصندوق نشط</span>
+                        </label>
+                        <p class="text-xs text-gray-500 mt-2">عند تفعيل هذا الخيار، سيكون الصندوق متاحاً للاستخدام في العمليات المالية</p>
+                    </div>
+                </div>
+
+                <!-- أزرار الحفظ -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="space-y-3">
+                        <button type="submit" class="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 space-x-reverse font-semibold">
+                            <i class="fas fa-save"></i>
+                            <span>حفظ التعديلات</span>
+                        </button>
+                        <a href="{{ route('cash-boxes.index') }}" class="w-full bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 space-x-reverse font-semibold">
+                            <i class="fas fa-times"></i>
+                            <span>إلغاء</span>
+                        </a>
+                    </div>
+                </div>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const unitSelect = document.getElementById('unit_id');
-    const accountSelect = document.getElementById('intermediate_account_id');
-    const accountInfo = document.getElementById('accountInfo');
+    let currencyIndex = {{ count($currencies) }};
     
-    // Initial data
-    const initialAccounts = @json($intermediateAccounts);
-    const currentAccountId = {{ $cashBox->intermediate_account_id ?? 'null' }};
-    const currentUnitId = {{ $cashBox->unit_id ?? 'null' }};
-    
-    // Function to update account select
-    function updateAccountSelect(unitId) {
-        if (!unitId) {
-            accountSelect.innerHTML = '<option value="">-- اختر الوحدة التنظيمية أولاً --</option>';
-            accountInfo.classList.add('hidden');
-            return;
-        }
-        
-        // Filter accounts by unit
-        const filteredAccounts = initialAccounts.filter(account => {
-            return account.chart_group && account.chart_group.unit_id == unitId;
-        });
-        
-        // Update account select
-        accountSelect.innerHTML = '<option value="">-- اختر الحساب الوسيط --</option>';
-        
-        if (filteredAccounts.length === 0) {
-            accountSelect.innerHTML += '<option value="" disabled>لا توجد حسابات وسيطة متاحة لهذه الوحدة</option>';
-        } else {
-            filteredAccounts.forEach(account => {
-                const option = document.createElement('option');
-                option.value = account.id;
-                option.textContent = `${account.name} (${account.code})`;
-                option.dataset.chartGroup = account.chart_group ? account.chart_group.name : '';
-                option.dataset.code = account.code;
-                
-                // Select current account
-                if (account.id == currentAccountId) {
-                    option.selected = true;
-                }
-                
-                accountSelect.appendChild(option);
-            });
-        }
-        
-        // Trigger change to show account info
-        if (accountSelect.value) {
-            accountSelect.dispatchEvent(new Event('change'));
-        }
-    }
-    
-    // Listen to unit change
-    unitSelect.addEventListener('change', function() {
-        updateAccountSelect(this.value);
+    // إضافة عملة جديدة
+    document.getElementById('addCurrency').addEventListener('click', function() {
+        const container = document.getElementById('currenciesContainer');
+        const newCurrency = `
+            <div class="currency-item mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">العملة</label>
+                        <select name="currencies[${currencyIndex}][code]" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="SAR">ريال سعودي (SAR)</option>
+                            <option value="USD">دولار أمريكي (USD)</option>
+                            <option value="EUR">يورو (EUR)</option>
+                            <option value="GBP">جنيه إسترليني (GBP)</option>
+                            <option value="AED">درهم إماراتي (AED)</option>
+                            <option value="KWD">دينار كويتي (KWD)</option>
+                            <option value="BHD">دينار بحريني (BHD)</option>
+                            <option value="OMR">ريال عماني (OMR)</option>
+                            <option value="QAR">ريال قطري (QAR)</option>
+                            <option value="EGP">جنيه مصري (EGP)</option>
+                            <option value="JOD">دينار أردني (JOD)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">سعر الصرف</label>
+                        <input type="number" name="currencies[${currencyIndex}][exchange_rate]" step="0.0001" value="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="1.0000">
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <label class="flex items-center space-x-2 space-x-reverse">
+                            <input type="checkbox" name="currencies[${currencyIndex}][is_default]" value="1" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="text-sm font-semibold text-gray-700">العملة الأساسية</span>
+                        </label>
+                        <button type="button" class="remove-currency text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', newCurrency);
+        currencyIndex++;
     });
     
-    // Listen to account change
-    accountSelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        
-        if (this.value && selectedOption.dataset.chartGroup) {
-            document.getElementById('chartGroupName').textContent = selectedOption.dataset.chartGroup;
-            document.getElementById('accountCode').textContent = selectedOption.dataset.code;
-            accountInfo.classList.remove('hidden');
-        } else {
-            accountInfo.classList.add('hidden');
+    // حذف عملة
+    document.getElementById('currenciesContainer').addEventListener('click', function(e) {
+        if (e.target.closest('.remove-currency')) {
+            const currencyItems = document.querySelectorAll('.currency-item');
+            if (currencyItems.length > 1) {
+                e.target.closest('.currency-item').remove();
+            } else {
+                alert('يجب أن يكون هناك عملة واحدة على الأقل');
+            }
         }
     });
-    
-    // Initialize on page load
-    if (currentUnitId) {
-        updateAccountSelect(currentUnitId);
-    }
 });
 </script>
 @endsection
