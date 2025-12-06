@@ -68,7 +68,7 @@ class WarehouseController extends Controller
         $warehouse = Warehouse::create($validated);
 
         return redirect()
-            ->route('warehouses.index')
+            ->route('inventory.warehouses.index')
             ->with('success', 'تم إنشاء المخزن بنجاح');
     }
 
@@ -125,7 +125,7 @@ class WarehouseController extends Controller
         $warehouse->update($validated);
 
         return redirect()
-            ->route('warehouses.index')
+            ->route('inventory.warehouses.index')
             ->with('success', 'تم تحديث المخزن بنجاح');
     }
 
@@ -137,14 +137,14 @@ class WarehouseController extends Controller
         // Check if warehouse has stock movements
         if ($warehouse->stockMovements()->exists()) {
             return redirect()
-                ->route('warehouses.index')
+                ->route('inventory.warehouses.index')
                 ->with('error', 'لا يمكن حذف المخزن لوجود حركات مخزون مرتبطة به');
         }
 
         $warehouse->delete();
 
         return redirect()
-            ->route('warehouses.index')
+            ->route('inventory.warehouses.index')
             ->with('success', 'تم حذف المخزن بنجاح');
     }
 

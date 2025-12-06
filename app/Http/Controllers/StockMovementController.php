@@ -114,7 +114,7 @@ class StockMovementController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('stock-movements.index')
+                ->route('inventory.stock-movements.index')
                 ->with('success', 'تم إنشاء حركة المخزون بنجاح');
 
         } catch (\Exception $e) {
@@ -169,7 +169,7 @@ class StockMovementController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('stock-movements.show', $stockMovement)
+                ->route('inventory.stock-movements.show', $stockMovement)
                 ->with('success', 'تم اعتماد حركة المخزون بنجاح');
 
         } catch (\Exception $e) {
@@ -199,7 +199,7 @@ class StockMovementController extends Controller
         ]);
 
         return redirect()
-            ->route('stock-movements.index')
+            ->route('inventory.stock-movements.index')
             ->with('success', 'تم رفض حركة المخزون');
     }
 
@@ -211,14 +211,14 @@ class StockMovementController extends Controller
         // Only allow deletion of pending movements
         if ($stockMovement->status !== 'pending') {
             return redirect()
-                ->route('stock-movements.index')
+                ->route('inventory.stock-movements.index')
                 ->with('error', 'لا يمكن حذف حركة مخزون معتمدة أو مرفوضة');
         }
 
         $stockMovement->delete();
 
         return redirect()
-            ->route('stock-movements.index')
+            ->route('inventory.stock-movements.index')
             ->with('success', 'تم حذف حركة المخزون بنجاح');
     }
 }

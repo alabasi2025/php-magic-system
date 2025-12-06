@@ -87,7 +87,7 @@ class ItemController extends Controller
         $item = Item::create($validated);
 
         return redirect()
-            ->route('items.index')
+            ->route('inventory.items.index')
             ->with('success', 'تم إنشاء الصنف بنجاح');
     }
 
@@ -160,7 +160,7 @@ class ItemController extends Controller
         $item->update($validated);
 
         return redirect()
-            ->route('items.index')
+            ->route('inventory.items.index')
             ->with('success', 'تم تحديث الصنف بنجاح');
     }
 
@@ -172,7 +172,7 @@ class ItemController extends Controller
         // Check if item has stock movements
         if ($item->stockMovements()->exists()) {
             return redirect()
-                ->route('items.index')
+                ->route('inventory.items.index')
                 ->with('error', 'لا يمكن حذف الصنف لوجود حركات مخزون مرتبطة به');
         }
 
@@ -184,7 +184,7 @@ class ItemController extends Controller
         $item->delete();
 
         return redirect()
-            ->route('items.index')
+            ->route('inventory.items.index')
             ->with('success', 'تم حذف الصنف بنجاح');
     }
 
