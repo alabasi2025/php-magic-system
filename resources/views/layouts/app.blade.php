@@ -351,23 +351,23 @@
                             <i class="fas fa-chevron-down sidebar-text transition-transform" id="inventory-arrow"></i>
                         </button>
                         <div id="inventory-dropdown" class="hidden pr-6 space-y-1 mt-1">
-                            <a href="{{ route('inventory.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent text-gray-600 hover:text-green-600 text-sm transition-all duration-200">
+                            <a href="{{ route('inventory.dashboard') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent text-gray-600 hover:text-green-600 text-sm transition-all duration-200">
+                                <i class="fas fa-tachometer-alt text-lg"></i>
+                                <span class="sidebar-text">لوحة التحكم</span>
+                            </a>
+                            <a href="{{ route('inventory.items.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent text-gray-600 hover:text-green-600 text-sm transition-all duration-200">
                                 <i class="fas fa-boxes text-lg"></i>
-                                <span class="sidebar-text">المنتجات</span>
+                                <span class="sidebar-text">الأصناف</span>
                             </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent text-gray-600 hover:text-blue-600 text-sm transition-all duration-200">
+                            <a href="{{ route('inventory.warehouses.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent text-gray-600 hover:text-blue-600 text-sm transition-all duration-200">
                                 <i class="fas fa-warehouse text-lg"></i>
-                                <span class="sidebar-text">المستودعات</span>
+                                <span class="sidebar-text">المخازن</span>
                             </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-yellow-50 hover:to-transparent text-gray-600 hover:text-yellow-600 text-sm transition-all duration-200">
+                            <a href="{{ route('inventory.stock-movements.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-yellow-50 hover:to-transparent text-gray-600 hover:text-yellow-600 text-sm transition-all duration-200">
                                 <i class="fas fa-exchange-alt text-lg"></i>
-                                <span class="sidebar-text">حركة المخزون</span>
+                                <span class="sidebar-text">حركات المخزون</span>
                             </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent text-gray-600 hover:text-purple-600 text-sm transition-all duration-200">
-                                <i class="fas fa-barcode text-lg"></i>
-                                <span class="sidebar-text">الجرد</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent text-gray-600 hover:text-red-600 text-sm transition-all duration-200">
+                            <a href="{{ route('inventory.reports.current-stock') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent text-gray-600 hover:text-red-600 text-sm transition-all duration-200">
                                 <i class="fas fa-chart-pie text-lg"></i>
                                 <span class="sidebar-text">تقارير المخزون</span>
                             </a>
