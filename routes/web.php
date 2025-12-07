@@ -356,6 +356,7 @@ Route::prefix('financial-settings')->name('financial-settings.')->group(function
     
     // Account Groups
     Route::get('/account-groups', [\App\Http\Controllers\FinancialSettingsController::class, 'getAccountGroups'])->name('account-groups.index');
+    Route::get('/account-groups/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'getAccountGroup'])->name('account-groups.show');
     Route::post('/account-groups', [\App\Http\Controllers\FinancialSettingsController::class, 'storeAccountGroup'])->name('account-groups.store');
     Route::put('/account-groups/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'updateAccountGroup'])->name('account-groups.update');
     Route::delete('/account-groups/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'deleteAccountGroup'])->name('account-groups.delete');

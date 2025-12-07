@@ -494,9 +494,46 @@ function closeAccountGroupModal() {
     }, 300);
 }
 
-function editAccountGroup(id) {
-    // TODO: Fetch group data and populate form
-    alert('تعديل المجموعة #' + id);
+async function editAccountGroup(id) {
+    try {
+        const response = await fetch(`/financial-settings/account-groups/${id}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+        
+        if (!response.ok) {
+            alert('حدث خطأ أثناء جلب بيانات المجموعة');
+            return;
+        }
+        
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+            const group = result.data;
+            
+            // ملء النموذج بالبيانات
+            document.getElementById('accountGroupId').value = group.id;
+            document.getElementById('groupName').value = group.name;
+            document.getElementById('groupCode').value = group.code || '';
+            document.getElementById('groupDescription').value = group.description || '';
+            document.getElementById('groupIsActive').checked = group.is_active;
+            document.getElementById('groupSortOrder').value = group.sort_order;
+            
+            // تغيير عنوان النموذج
+            document.getElementById('accountGroupModalTitle').textContent = 'تعديل مجموعة حسابات';
+            
+            // فتح النموذج
+            openAccountGroupModal(group.id);
+        } else {
+            alert('حدث خطأ أثناء جلب بيانات المجموعة');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('حدث خطأ أثناء جلب بيانات المجموعة');
+    }
 }
 
 async function deleteAccountGroup(id) {
