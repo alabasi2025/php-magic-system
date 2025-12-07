@@ -1,3 +1,4 @@
+{{-- Updated: Added Account Groups feature - Force cache refresh --}}
 @extends('layouts.app')
 
 @section('title', $chartGroup->name)
