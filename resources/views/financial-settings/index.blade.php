@@ -563,6 +563,44 @@ async function deleteAccountGroup(id) {
     }
 }
 
+async function viewAccountGroup(id) {
+    try {
+        const response = await fetch(`/financial-settings/account-groups/${id}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            const group = result.data;
+            
+            // ملء النموذج بالبيانات
+            document.getElementById('accountGroupId').value = group.id;
+            document.getElementById('groupName').value = group.name;
+            document.getElementById('groupCode').value = group.code || '';
+            document.getElementById('groupDescription').value = group.description || '';
+            document.getElementById('groupSortOrder').value = group.sort_order;
+            document.getElementById('groupIsActive').checked = group.is_active;
+            
+            // تعطيل جميع الحقول (وضع العرض فقط)
+            document.getElementById('groupName').disabled = true;
+            document.getElementById('groupCode').disabled = true;
+            document.getElementById('groupDescription').disabled = true;
+            document.getElementById('groupSortOrder').disabled = true;
+            document.getElementById('groupIsActive').disabled = true;
+            
+            // إخفاء زر الحفظ
+            document.getElementById('submitAccountGroupBtn').style.display = 'none';
+            
+            // فتح النموذج
+            openAccountGroupModal(id);
+            document.getElementById('accountGroupModalTitle').textContent = 'عرض مجموعة حسابات';
+        } else {
+            alert(result.message || 'حدث خطأ');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('حدث خطأ أثناء تحميل البيانات');
+    }
+}
+
 // Account Group Form Submit
 document.getElementById('accountGroupForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -1000,6 +1038,16 @@ function closeAccountGroupModal() {
     const modal = document.getElementById('accountGroupModal');
     const modalContent = document.getElementById('accountGroupModalContent');
     
+    // إعادة تفعيل جميع الحقول (في حالة كانت معطلة من وضع العرض)
+    document.getElementById('groupName').disabled = false;
+    document.getElementById('groupCode').disabled = false;
+    document.getElementById('groupDescription').disabled = false;
+    document.getElementById('groupSortOrder').disabled = false;
+    document.getElementById('groupIsActive').disabled = false;
+    
+    // إظهار زر الحفظ
+    document.getElementById('submitAccountGroupBtn').style.display = 'block';
+    
     modalContent.classList.remove('scale-100', 'opacity-100');
     modalContent.classList.add('scale-95', 'opacity-0');
     
@@ -1091,12 +1139,19 @@ function renderAccountGroups(groups) {
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center gap-2">
+                    <button onclick="viewAccountGroup(${group.id})" 
+                            class="p-2.5 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200"
+                            title="عرض">
+                        <i class="fas fa-eye"></i>
+                    </button>
                     <button onclick="editAccountGroup(${group.id})" 
-                            class="p-2.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200">
+                            class="p-2.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200"
+                            title="تعديل">
                         <i class="fas fa-edit"></i>
                     </button>
                     <button onclick="deleteAccountGroup(${group.id})" 
-                            class="p-2.5 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200">
+                            class="p-2.5 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200"
+                            title="حذف">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
