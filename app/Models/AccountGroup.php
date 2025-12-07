@@ -27,6 +27,6 @@ class AccountGroup extends Model
      */
     public function accounts()
     {
-        return $this->hasMany(ChartOfAccounts::class, 'account_group_id');
+        return $this->hasMany(ChartAccount::class, 'account_group_id');
     }
 }
