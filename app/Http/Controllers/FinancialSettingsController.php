@@ -13,7 +13,7 @@ class FinancialSettingsController extends Controller
      */
     public function index()
     {
-        $accountTypes = AccountType::orderBy('sort_order')->get();
+        $accountTypes = AccountType::orderBy('id')->get();
         $chartGroups = ChartGroup::with('unit')->orderBy('created_at', 'desc')->get();
         
         return view('financial-settings.index', compact('accountTypes', 'chartGroups'));
