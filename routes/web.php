@@ -354,3 +354,20 @@ Route::prefix('financial-settings')->name('financial-settings.')->group(function
     Route::put('/account-types/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'updateAccountType'])->name('account-types.update');
     Route::delete('/account-types/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'deleteAccountType'])->name('account-types.delete');
 });
+
+// Temporary route to run migration
+Route::get('/run-migration-temp', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Migration completed successfully!',
+            'output' => Artisan::output()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Migration failed: ' . $e->getMessage()
+        ], 500);
+    }
+});
