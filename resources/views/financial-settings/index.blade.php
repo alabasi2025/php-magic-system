@@ -563,13 +563,23 @@ async function deleteAccountGroup(id) {
     }
 }
 
-async function viewAccountGroup(id) {
+async function editAccountGroup(id) {
     try {
         const response = await fetch(`/financial-settings/account-groups/${id}`);
         const result = await response.json();
         
         if (result.success) {
             const group = result.data;
+            
+            // إعادة تفعيل جميع الحقول (في حالة كانت معطلة من وضع العرض)
+            document.getElementById('groupName').disabled = false;
+            document.getElementById('groupCode').disabled = false;
+            document.getElementById('groupDescription').disabled = false;
+            document.getElementById('groupSortOrder').disabled = false;
+            document.getElementById('groupIsActive').disabled = false;
+            
+            // إظهار زر الحفظ
+            document.getElementById('submitAccountGroupBtn').style.display = 'block';
             
             // ملء النموذج بالبيانات
             document.getElementById('accountGroupId').value = group.id;
@@ -579,9 +589,9 @@ async function viewAccountGroup(id) {
             document.getElementById('groupSortOrder').value = group.sort_order;
             document.getElementById('groupIsActive').checked = group.is_active;
             
-            // تعطيل جميع الحقول (وضع العرض فقط)
-            document.getElementById('groupName').disabled = true;
-            document.getElementById('groupCode').disabled = true;
+            // فتح النموذج
+            openAccountGroupModal(id);
+            document.getElementById('accountGroupModalTitle').textContent = 'تعديل مجموعة حسابات';disabled = true;
             document.getElementById('groupDescription').disabled = true;
             document.getElementById('groupSortOrder').disabled = true;
             document.getElementById('groupIsActive').disabled = true;
