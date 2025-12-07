@@ -572,6 +572,10 @@ document.getElementById('accountGroupForm').addEventListener('submit', async fun
         
         if (result.success) {
             alert(result.message);
+            // إغلاق النموذج
+            closeAccountGroupModal();
+            // حفظ التبويب النشط قبل إعادة التحميل
+            sessionStorage.setItem('activeTab', 'account-groups');
             location.reload();
         } else {
             console.error('API Error:', result);
@@ -974,8 +978,18 @@ document.getElementById('accountGroupModal').addEventListener('click', function(
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
-    // Set initial opacity for visible tab
-    document.getElementById('content-account-types').style.opacity = '1';
+    // استعادة التبويب النشط بعد إعادة التحميل
+    const activeTab = sessionStorage.getItem('activeTab');
+    if (activeTab) {
+        sessionStorage.removeItem('activeTab');
+        const tabButton = document.getElementById('tab-' + activeTab);
+        if (tabButton) {
+            tabButton.click();
+        }
+    } else {
+        // Set initial opacity for visible tab
+        document.getElementById('content-account-types').style.opacity = '1';
+    }
 });
 </script>
 @endpush
