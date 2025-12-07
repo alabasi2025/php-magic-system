@@ -79,16 +79,42 @@
                                             <a href="{{ route('purchases.suppliers.transactions', $supplier->id) }}" class="btn btn-sm btn-primary" title="المعاملات">
                                                 <i class="fas fa-list"></i>
                                             </a>
-                                            <form action="{{ route('purchases.suppliers.destroy', $supplier->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('هل أنت متأكد من حذف المورد: {{ $supplier->name }}?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" title="حذف">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-sm btn-danger" title="حذف" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteModal{{ $supplier->id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
+                                
+                                <!-- Delete Modal for {{ $supplier->name }} -->
+                                <div class="modal fade" id="deleteModal{{ $supplier->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $supplier->id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title" id="deleteModalLabel{{ $supplier->id }}">تأكيد الحذف</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>هل أنت متأكد من حذف المورد: <strong>{{ $supplier->name }}</strong>؟</p>
+                                                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> هذا الإجراء لا يمكن التراجع عنه!</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    <i class="fas fa-times"></i> إلغاء
+                                                </button>
+                                                <form action="{{ route('purchases.suppliers.destroy', $supplier->id) }}" method="POST" style="display: inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fas fa-trash"></i> حذف
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 @empty
                                 <tr>
                                     <td colspan="8" class="text-center text-muted">
