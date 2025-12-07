@@ -924,6 +924,54 @@ document.getElementById('accountTypeModal').addEventListener('click', function(e
     }
 });
 
+// Account Group Modal Functions
+function openAccountGroupModal(id = null) {
+    const modal = document.getElementById('accountGroupModal');
+    const modalContent = document.getElementById('accountGroupModalContent');
+    const form = document.getElementById('accountGroupForm');
+    const title = document.getElementById('accountGroupModalTitle');
+    
+    // إظهار النموذج
+    modal.style.display = 'flex';
+    setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+    }, 10);
+    
+    // إعادة تعيين النموذج
+    form.reset();
+    document.getElementById('accountGroupId').value = '';
+    document.getElementById('groupIsActive').checked = true;
+    
+    if (id) {
+        // وضع التعديل
+        title.textContent = 'تعديل مجموعة حسابات';
+        // TODO: تحميل البيانات
+    } else {
+        // وضع الإضافة
+        title.textContent = 'إضافة مجموعة حسابات جديدة';
+    }
+}
+
+function closeAccountGroupModal() {
+    const modal = document.getElementById('accountGroupModal');
+    const modalContent = document.getElementById('accountGroupModalContent');
+    
+    modalContent.classList.remove('scale-100', 'opacity-100');
+    modalContent.classList.add('scale-95', 'opacity-0');
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+// Close modal on outside click
+document.getElementById('accountGroupModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeAccountGroupModal();
+    }
+});
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     // Set initial opacity for visible tab
