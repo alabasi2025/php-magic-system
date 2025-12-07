@@ -272,7 +272,8 @@
                             <a href="{{ route('journal-templates.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-yellow-50 hover:to-transparent text-gray-600 hover:text-yellow-600 text-sm transition-all duration-200">
                                 <i class="fas fa-layer-group text-lg icon-gradient-yellow"></i>
                                 <span class="sidebar-text">قوالب القيود الذكية</span>
-                                                     <a href="{{ route('auto-numbering.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-teal-50 hover:to-transparent text-gray-600 hover:text-teal-600 text-sm transition-all duration-200">
+                            </a>
+                            <a href="{{ route('auto-numbering.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-teal-50 hover:to-transparent text-gray-600 hover:text-teal-600 text-sm transition-all duration-200">
                                 <i class="fas fa-hashtag text-lg icon-gradient-teal"></i>
                                 <span class="sidebar-text">نظام الترقيم التلقائي</span>
                             </a>
@@ -280,7 +281,7 @@
                                 <i class="fas fa-cog text-lg icon-gradient-orange"></i>
                                 <span class="sidebar-text">إعدادات النظام المالي</span>
                             </a>
-                            <!-- Separator -->                   <!-- Separator -->
+                            <!-- Separator -->
                             <div class="border-t border-gray-200 my-2"></div>
                             
                             <!-- البنوك والصناديق -->
