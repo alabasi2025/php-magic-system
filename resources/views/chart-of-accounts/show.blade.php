@@ -146,7 +146,7 @@
                     <i class="fas fa-layer-group text-indigo-600 ml-1"></i>
                     نوع الحساب <span class="text-red-500">*</span>
                 </label>
-                <select name="is_parent" id="is_parent" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                <select name="is_parent" id="is_parent" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" onchange="toggleAccountTypeFields()">
                     <option value="">-- اختر النوع --</option>
                     <option value="1">حساب رئيسي (للترتيب الشجري فقط)</option>
                     <option value="0">حساب فرعي (الحساب النهائي)</option>
