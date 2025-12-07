@@ -259,7 +259,7 @@ function toggleAccountTypeFields() {
     const accountGroupField = document.getElementById('accountGroupField');
     const intermediateForField = document.getElementById('intermediateForField');
     
-    if (isParent === '0') {
+    if (isParent == 0) {
         // حساب فرعي - إظهار حقل نوع الحساب ومجموعة الحسابات
         accountTypeField.style.display = 'block';
         accountGroupField.style.display = 'block';
