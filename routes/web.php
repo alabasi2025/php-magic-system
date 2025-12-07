@@ -389,3 +389,27 @@ Route::get('/clear-all-cache-now', function() {
         ], 500);
     }
 });
+
+// Temporary route to add employees account group
+Route::get('/add-employees-group-now', function() {
+    try {
+        $group = \App\Models\AccountGroup::create([
+            'code' => 'EMPLOYEES',
+            'name' => 'حسابات الموظفين',
+            'description' => 'حسابات خاصة بالرواتب والأجور والمستحقات والسلف والخصومات',
+            'sort_order' => 5,
+            'is_active' => 1
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'تم إضافة مجموعة حسابات الموظفين بنجاح!',
+            'data' => $group
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+})->middleware('auth');
