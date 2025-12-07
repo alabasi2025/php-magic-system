@@ -110,12 +110,18 @@ class FinancialSettingsController extends Controller
     public function storeAccountGroup(Request $request)
     {
         try {
-            $validated = $request->validate([
+            // تنظيف البيانات - إزالة القيم الفارغة
+            $data = $request->all();
+            if (empty($data['code'])) {
+                unset($data['code']);
+            }
+            
+            $validated = validator($data, [
                 'name' => 'required|string|max:255',
                 'code' => 'nullable|string|max:50|unique:account_groups,code',
                 'description' => 'nullable|string',
                 'sort_order' => 'nullable|integer',
-            ]);
+            ])->validate();
 
             $validated['is_active'] = $request->has('is_active') ? true : true; // Default to true
             
