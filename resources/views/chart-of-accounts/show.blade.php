@@ -111,7 +111,7 @@
                 </label>
                 <select name="parent_id" id="parent_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                     <option value="">-- حساب رئيسي --</option>
-                    @foreach($chartGroup->accounts as $acc)
+                    @foreach($chartGroup->accounts->where('is_parent', 1) as $acc)
                         <option value="{{ $acc->id }}">{{ str_repeat('— ', $acc->level) }} {{ $acc->name }} ({{ $acc->code }})</option>
                     @endforeach
                 </select>
