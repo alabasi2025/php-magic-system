@@ -344,3 +344,13 @@ Route::get('/developer/system-info', [\App\Http\Controllers\DeveloperController:
 
 // Inventory System Routes
 require __DIR__.'/inventory.php';
+
+// Financial Settings Routes
+Route::prefix('financial-settings')->name('financial-settings.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\FinancialSettingsController::class, 'index'])->name('index');
+    
+    // Account Types
+    Route::post('/account-types', [\App\Http\Controllers\FinancialSettingsController::class, 'storeAccountType'])->name('account-types.store');
+    Route::put('/account-types/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'updateAccountType'])->name('account-types.update');
+    Route::delete('/account-types/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'deleteAccountType'])->name('account-types.delete');
+});
