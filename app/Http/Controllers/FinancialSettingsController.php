@@ -15,7 +15,14 @@ class FinancialSettingsController extends Controller
     public function index()
     {
         $accountTypes = AccountType::orderBy('id')->get();
-        $accountGroups = AccountGroup::withCount('accounts')->orderBy('sort_order')->orderBy('name')->get();
+        
+        // Check if account_groups table exists
+        try {
+            $accountGroups = AccountGroup::withCount('accounts')->orderBy('sort_order')->orderBy('name')->get();
+        } catch (\Exception $e) {
+            $accountGroups = collect(); // Empty collection if table doesn't exist
+        }
+        
         $chartGroups = ChartGroup::with('unit')->orderBy('created_at', 'desc')->get();
         
         return view('financial-settings.index', compact('accountTypes', 'accountGroups', 'chartGroups'));
