@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AccountType;
+use App\Models\AccountGroup;
 use App\Models\ChartGroup;
 use Illuminate\Http\Request;
 
@@ -14,9 +15,10 @@ class FinancialSettingsController extends Controller
     public function index()
     {
         $accountTypes = AccountType::orderBy('id')->get();
+        $accountGroups = AccountGroup::withCount('accounts')->orderBy('sort_order')->orderBy('name')->get();
         $chartGroups = ChartGroup::with('unit')->orderBy('created_at', 'desc')->get();
         
-        return view('financial-settings.index', compact('accountTypes', 'chartGroups'));
+        return view('financial-settings.index', compact('accountTypes', 'accountGroups', 'chartGroups'));
     }
 
     /**
@@ -92,6 +94,77 @@ class FinancialSettingsController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'تم حذف نوع الحساب بنجاح'
+        ]);
+    }
+
+    /**
+     * إضافة مجموعة حسابات جديدة
+     */
+    public function storeAccountGroup(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'nullable|string|max:50|unique:account_groups,code',
+            'description' => 'nullable|string',
+            'sort_order' => 'nullable|integer',
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+        
+        $accountGroup = AccountGroup::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم إضافة مجموعة الحسابات بنجاح',
+            'data' => $accountGroup
+        ]);
+    }
+
+    /**
+     * تحديث مجموعة حسابات
+     */
+    public function updateAccountGroup(Request $request, $id)
+    {
+        $accountGroup = AccountGroup::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'nullable|string|max:50|unique:account_groups,code,' . $id,
+            'description' => 'nullable|string',
+            'sort_order' => 'nullable|integer',
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+        
+        $accountGroup->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تحديث مجموعة الحسابات بنجاح',
+            'data' => $accountGroup
+        ]);
+    }
+
+    /**
+     * حذف مجموعة حسابات
+     */
+    public function deleteAccountGroup($id)
+    {
+        $accountGroup = AccountGroup::findOrFail($id);
+
+        // التحقق من عدم وجود حسابات مربوطة بهذه المجموعة
+        if ($accountGroup->accounts()->count() > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لا يمكن حذف المجموعة لأنها مرتبطة بحسابات. قم بإزالة الحسابات أولاً.'
+            ], 403);
+        }
+
+        $accountGroup->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم حذف مجموعة الحسابات بنجاح'
         ]);
     }
 }

@@ -353,5 +353,10 @@ Route::prefix('financial-settings')->name('financial-settings.')->group(function
     Route::post('/account-types', [\App\Http\Controllers\FinancialSettingsController::class, 'storeAccountType'])->name('account-types.store');
     Route::put('/account-types/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'updateAccountType'])->name('account-types.update');
     Route::delete('/account-types/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'deleteAccountType'])->name('account-types.delete');
+    
+    // Account Groups
+    Route::post('/account-groups', [\App\Http\Controllers\FinancialSettingsController::class, 'storeAccountGroup'])->name('account-groups.store');
+    Route::put('/account-groups/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'updateAccountGroup'])->name('account-groups.update');
+    Route::delete('/account-groups/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'deleteAccountGroup'])->name('account-groups.delete');
 });
 
