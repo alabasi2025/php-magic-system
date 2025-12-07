@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('code-metrics')->name('code-metrics.')->middleware(['auth'])->group(function () {
+Route::prefix('code-metrics')->name('code-metrics.')->group(function () {
     
     // Main dashboard
     Route::get('/', [CodeMetricsController::class, 'index'])->name('index');

@@ -12,7 +12,7 @@ use App\Http\Controllers\ModelGeneratorController;
  * @since 2025-12-03
  */
 
-Route::prefix('model-generator')->name('model-generator.')->middleware(['web', 'auth'])->group(function () {
+Route::prefix('model-generator')->name('model-generator.')->middleware(['web'])->group(function () {
     
     // الصفحة الرئيسية
     Route::get('/', [ModelGeneratorController::class, 'index'])->name('index');
