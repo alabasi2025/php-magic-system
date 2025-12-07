@@ -591,17 +591,7 @@ async function editAccountGroup(id) {
             
             // فتح النموذج
             openAccountGroupModal(id);
-            document.getElementById('accountGroupModalTitle').textContent = 'تعديل مجموعة حسابات';disabled = true;
-            document.getElementById('groupDescription').disabled = true;
-            document.getElementById('groupSortOrder').disabled = true;
-            document.getElementById('groupIsActive').disabled = true;
-            
-            // إخفاء زر الحفظ
-            document.getElementById('submitAccountGroupBtn').style.display = 'none';
-            
-            // فتح النموذج
-            openAccountGroupModal(id);
-            document.getElementById('accountGroupModalTitle').textContent = 'عرض مجموعة حسابات';
+            document.getElementById('accountGroupModalTitle').textContent = 'تعديل مجموعة حسابات';
         } else {
             alert(result.message || 'حدث خطأ');
         }
