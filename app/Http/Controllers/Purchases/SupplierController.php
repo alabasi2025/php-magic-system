@@ -97,7 +97,21 @@ class SupplierController extends Controller
 
     public function transactions($id)
     {
-        return view('purchases.suppliers.transactions', compact('id'));
+        $supplier = Supplier::findOrFail($id);
+        
+        // جلب المعاملات (حالياً فارغة، سيتم إضافتها لاحقاً)
+        $transactions = [];
+        $totalPurchases = 0;
+        $totalPayments = 0;
+        $transactionsCount = 0;
+        
+        return view('purchases.suppliers.transactions', compact(
+            'supplier',
+            'transactions',
+            'totalPurchases',
+            'totalPayments',
+            'transactionsCount'
+        ));
     }
 
     public function search(Request $request)
