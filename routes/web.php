@@ -360,3 +360,32 @@ Route::prefix('financial-settings')->name('financial-settings.')->group(function
     Route::delete('/account-groups/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'deleteAccountGroup'])->name('account-groups.delete');
 });
 
+
+// Temporary route to clear all cache (REMOVE AFTER USE!)
+Route::get('/clear-all-cache-now', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \Illuminate\Support\Facades\Artisan::call('route:clear');
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'تم مسح جميع أنواع الـ Cache بنجاح!',
+            'cleared' => [
+                'view_cache' => 'cleared',
+                'application_cache' => 'cleared',
+                'config_cache' => 'cleared',
+                'route_cache' => 'cleared',
+                'optimization_cache' => 'cleared'
+            ],
+            'next_step' => 'يمكنك الآن تحديث صفحة الدليل المحاسبي وإضافة حساب جديد - حقل مجموعة الحسابات سيظهر!'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
