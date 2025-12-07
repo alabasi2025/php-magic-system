@@ -44,6 +44,45 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @forelse($suppliers as $index => $supplier)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>
+                                        <strong>{{ $supplier->name }}</strong>
+                                        @if($supplier->code)
+                                            <br><small class="text-muted">{{ $supplier->code }}</small>
+                                        @endif
+                                    </td>
+                                    <td>{{ $supplier->phone }}</td>
+                                    <td>{{ $supplier->email ?? '-' }}</td>
+                                    <td>{{ $supplier->address ?? '-' }}</td>
+                                    <td>
+                                        <span class="badge {{ $supplier->balance >= 0 ? 'bg-success' : 'bg-danger' }}">
+                                            {{ number_format($supplier->balance, 2) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if($supplier->status === 'active' || $supplier->is_active)
+                                            <span class="badge bg-success">نشط</span>
+                                        @else
+                                            <span class="badge bg-secondary">غير نشط</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ route('purchases.suppliers.show', $supplier->id) }}" class="btn btn-sm btn-info" title="عرض">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ route('purchases.suppliers.edit', $supplier->id) }}" class="btn btn-sm btn-warning" title="تعديل">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ route('purchases.suppliers.transactions', $supplier->id) }}" class="btn btn-sm btn-primary" title="المعاملات">
+                                                <i class="fas fa-list"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
                                 <tr>
                                     <td colspan="8" class="text-center text-muted">
                                         <i class="fas fa-inbox fa-3x mb-3"></i>
@@ -53,6 +92,7 @@
                                         </a>
                                     </td>
                                 </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
