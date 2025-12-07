@@ -53,24 +53,46 @@ class SupplierController extends Controller
 
     public function show($id)
     {
-        return view('purchases.suppliers.show', compact('id'));
+        $supplier = Supplier::findOrFail($id);
+        return view('purchases.suppliers.show', compact('supplier'));
     }
 
     public function edit($id)
     {
-        return view('purchases.suppliers.edit', compact('id'));
+        $supplier = Supplier::findOrFail($id);
+        return view('purchases.suppliers.edit', compact('supplier'));
     }
 
     public function update(Request $request, $id)
     {
-        // Update logic
-        return redirect()->route('purchases.suppliers.index');
+        $supplier = Supplier::findOrFail($id);
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'tax_number' => 'nullable|string|max:50',
+            'address' => 'nullable|string',
+            'opening_balance' => 'nullable|numeric',
+            'status' => 'required|in:active,inactive',
+            'notes' => 'nullable|string',
+        ]);
+
+        $validated['is_active'] = $validated['status'] === 'active';
+        
+        $supplier->update($validated);
+
+        return redirect()->route('purchases.suppliers.index')
+            ->with('success', 'تم تحديث بيانات المورد بنجاح');
     }
 
     public function destroy($id)
     {
-        // Delete logic
-        return redirect()->route('purchases.suppliers.index');
+        $supplier = Supplier::findOrFail($id);
+        $supplier->delete();
+
+        return redirect()->route('purchases.suppliers.index')
+            ->with('success', 'تم حذف المورد بنجاح');
     }
 
     public function transactions($id)
