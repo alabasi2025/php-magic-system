@@ -171,8 +171,8 @@
                 </select>
             </div>
 
-            <!-- مجموعة الحسابات (يظهر فقط للحسابات الفرعية) -->
-            <div id="accountGroupField" style="display: none;">
+            <!-- مجموعة الحسابات -->
+            <div id="accountGroupField">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                     <i class="fas fa-layer-group text-indigo-600 ml-1"></i>
                     مجموعة الحسابات (اختياري)
@@ -260,13 +260,12 @@ function toggleAccountTypeFields() {
     const intermediateForField = document.getElementById('intermediateForField');
     
     if (isParent == 0) {
-        // حساب فرعي - إظهار حقل نوع الحساب ومجموعة الحسابات
+        // حساب فرعي - إظهار حقل نوع الحساب
         accountTypeField.style.display = 'block';
-        accountGroupField.style.display = 'block';
+        // accountGroupField يظهر دائماً - لا حاجة للتحكم به
     } else {
-        // حساب رئيسي - إخفاء جميع الحقول الإضافية
+        // حساب رئيسي - إخفاء حقل نوع الحساب
         accountTypeField.style.display = 'none';
-        accountGroupField.style.display = 'none';
         intermediateForField.style.display = 'none';
         document.getElementById('account_type').value = '';
         document.getElementById('account_group_id').value = '';
