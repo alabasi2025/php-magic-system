@@ -537,6 +537,10 @@ document.getElementById('accountGroupForm').addEventListener('submit', async fun
     
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
+    
+    // تحويل checkbox إلى boolean
+    data.is_active = document.getElementById('groupIsActive').checked;
+    
     const id = document.getElementById('accountGroupId').value;
     
     const url = id ? `/financial-settings/account-groups/${id}` : '/financial-settings/account-groups';
