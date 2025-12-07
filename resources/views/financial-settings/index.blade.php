@@ -552,19 +552,32 @@ document.getElementById('accountGroupForm').addEventListener('submit', async fun
             body: JSON.stringify(data)
         });
         
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('HTTP Error:', response.status, errorText);
+            alert(`خطأ HTTP ${response.status}`);
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            return;
+        }
+        
         const result = await response.json();
+        console.log('Result:', result);
         
         if (result.success) {
             alert(result.message);
             location.reload();
         } else {
+            console.error('API Error:', result);
             alert(result.message || 'حدث خطأ');
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('حدث خطأ أثناء الحفظ');
+        console.error('Exception:', error);
+        alert('حدث خطأ: ' + error.message);
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
     }
@@ -869,19 +882,32 @@ document.getElementById('accountTypeForm').addEventListener('submit', async func
             body: JSON.stringify(data)
         });
         
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('HTTP Error:', response.status, errorText);
+            alert(`خطأ HTTP ${response.status}`);
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            return;
+        }
+        
         const result = await response.json();
+        console.log('Result:', result);
         
         if (result.success) {
             alert(result.message);
             location.reload();
         } else {
+            console.error('API Error:', result);
             alert(result.message || 'حدث خطأ');
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('حدث خطأ أثناء الحفظ');
+        console.error('Exception:', error);
+        alert('حدث خطأ: ' + error.message);
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
     }
