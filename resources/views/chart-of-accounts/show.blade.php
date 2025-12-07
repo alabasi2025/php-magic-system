@@ -170,6 +170,21 @@
                 </select>
             </div>
 
+            <!-- مجموعة الحسابات (يظهر فقط للحسابات الفرعية) -->
+            <div id="accountGroupField" class="hidden">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-layer-group text-indigo-600 ml-1"></i>
+                    مجموعة الحسابات (اختياري)
+                </label>
+                <select name="account_group_id" id="account_group_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <option value="">-- بدون مجموعة --</option>
+                    @foreach(\App\Models\AccountGroup::where('is_active', true)->orderBy('sort_order')->orderBy('name')->get() as $group)
+                        <option value="{{ $group->id }}">{{ $group->name }}</option>
+                    @endforeach
+                </select>
+                <p class="text-gray-500 text-sm mt-1">تستخدم لتصنيف الحسابات وفلترتها في التقارير</p>
+            </div>
+
             <!-- حساب وسيط لأي فئة (يظهر فقط عند اختيار حساب وسيط) -->
             <div id="intermediateForField" class="hidden">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -240,16 +255,20 @@ function closeAddAccountModal() {
 function toggleAccountTypeFields() {
     const isParent = document.getElementById('is_parent').value;
     const accountTypeField = document.getElementById('accountTypeField');
+    const accountGroupField = document.getElementById('accountGroupField');
     const intermediateForField = document.getElementById('intermediateForField');
     
     if (isParent === '0') {
-        // حساب فرعي - إظهار حقل نوع الحساب
+        // حساب فرعي - إظهار حقل نوع الحساب ومجموعة الحسابات
         accountTypeField.classList.remove('hidden');
+        accountGroupField.classList.remove('hidden');
     } else {
         // حساب رئيسي - إخفاء جميع الحقول الإضافية
         accountTypeField.classList.add('hidden');
+        accountGroupField.classList.add('hidden');
         intermediateForField.classList.add('hidden');
         document.getElementById('account_type').value = '';
+        document.getElementById('account_group_id').value = '';
     }
 }
 

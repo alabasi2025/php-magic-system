@@ -32,13 +32,23 @@
                     </div>
                     <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-600 transform scale-x-100 transition-transform duration-300"></div>
                 </button>
+                <button onclick="switchTab('account-groups')" id="tab-account-groups"
+                        class="tab-button flex-1 py-5 px-8 text-base font-semibold relative overflow-hidden group transition-all duration-300">
+                    <div class="flex items-center justify-center gap-3 relative z-10">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-layer-group text-white"></i>
+                        </div>
+                        <span class="text-gray-600 dark:text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">مجموعات الحسابات</span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-emerald-600 transform scale-x-0 transition-transform duration-300"></div>
+                </button>
                 <button onclick="switchTab('chart-groups')" id="tab-chart-groups"
                         class="tab-button flex-1 py-5 px-8 text-base font-semibold relative overflow-hidden group transition-all duration-300">
                     <div class="flex items-center justify-center gap-3 relative z-10">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                             <i class="fas fa-sitemap text-white"></i>
                         </div>
-                        <span class="text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">مجموعات الحسابات</span>
+                        <span class="text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">الأدلة المحاسبية</span>
                     </div>
                     <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-600 transform scale-x-0 transition-transform duration-300"></div>
                 </button>
@@ -161,6 +171,108 @@
                 </div>
             </div>
 
+            <!-- Account Groups Tab -->
+            <div id="content-account-groups" class="tab-content hidden">
+                <!-- Enhanced Header with Action Button -->
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+                            <div class="w-2 h-8 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></div>
+                            مجموعات الحسابات
+                        </h2>
+                        <p class="text-gray-500 dark:text-gray-400 mt-2 mr-5">تصنيف الحسابات الفرعية لتسهيل الفلترة في التقارير</p>
+                    </div>
+                    <button onclick="openAddAccountGroupModal()" 
+                            class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-plus-circle text-xl"></i>
+                        <span class="font-semibold">إضافة مجموعة جديدة</span>
+                    </button>
+                </div>
+
+                <!-- Enhanced Account Groups Table -->
+                <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                                <tr>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">الكود</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">اسم المجموعة</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">الوصف</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">عدد الحسابات</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">الحالة</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">الترتيب</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @forelse($accountGroups as $group)
+                                <tr class="hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($group->code)
+                                        <code class="px-3 py-1.5 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-lg text-sm font-mono font-semibold text-green-600 dark:text-green-400">{{ $group->code }}</code>
+                                        @else
+                                        <span class="text-gray-400">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="text-gray-900 dark:text-white font-semibold text-base">{{ $group->name }}</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-gray-600 dark:text-gray-400">{{ $group->description ?? '-' }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-3 py-1.5 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900 text-blue-700 dark:text-blue-300 rounded-lg text-sm font-semibold">
+                                            {{ $group->accounts_count }} حساب
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($group->is_active)
+                                        <span class="px-3 py-1.5 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 text-green-700 dark:text-green-300 rounded-lg text-sm font-semibold">
+                                            <i class="fas fa-check-circle mr-1"></i>
+                                            مفعل
+                                        </span>
+                                        @else
+                                        <span class="px-3 py-1.5 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-600 dark:text-gray-400 rounded-lg text-sm font-semibold">
+                                            <i class="fas fa-times-circle mr-1"></i>
+                                            معطل
+                                        </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="text-gray-600 dark:text-gray-400 font-mono">{{ $group->sort_order }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <button onclick="editAccountGroup({{ $group->id }})" 
+                                                    class="p-2.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button onclick="deleteAccountGroup({{ $group->id }})" 
+                                                    class="p-2.5 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="7" class="px-6 py-16 text-center">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center mb-4">
+                                                <i class="fas fa-layer-group text-4xl text-gray-400"></i>
+                                            </div>
+                                            <p class="text-gray-500 dark:text-gray-400 text-lg font-semibold">لا توجد مجموعات حسابات</p>
+                                            <p class="text-gray-400 dark:text-gray-500 text-sm mt-2">ابدأ بإضافة مجموعة جديدة لتصنيف الحسابات</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- Chart Groups Tab -->
             <div id="content-chart-groups" class="tab-content hidden">
                 <!-- Enhanced Header -->
@@ -255,6 +367,216 @@
     </div>
 </div>
 
+
+<!-- Add/Edit Account Group Modal -->
+<div id="accountGroupModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden items-center justify-center z-50" style="display: none;">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full mx-4 transform transition-all duration-300 scale-95 opacity-0" id="accountGroupModalContent">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-green-600 to-emerald-600 p-6 rounded-t-2xl">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-layer-group text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white" id="accountGroupModalTitle">إضافة مجموعة حسابات جديدة</h3>
+                </div>
+                <button onclick="closeAccountGroupModal()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-2 transition-all duration-200">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Modal Body -->
+        <form id="accountGroupForm" class="p-6 space-y-6">
+            <input type="hidden" id="accountGroupId" name="id">
+            
+            <div class="grid grid-cols-2 gap-6">
+                <!-- Name -->
+                <div class="col-span-2">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-tag text-green-500 mr-2"></i>
+                        اسم المجموعة *
+                    </label>
+                    <input type="text" id="groupName" name="name" required
+                           class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
+                           placeholder="مثال: أعمال الموظفين">
+                </div>
+                
+                <!-- Code -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-code text-green-500 mr-2"></i>
+                        الكود
+                    </label>
+                    <input type="text" id="groupCode" name="code"
+                           class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
+                           placeholder="مثال: EMP">
+                </div>
+                
+                <!-- Sort Order -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-sort-numeric-down text-green-500 mr-2"></i>
+                        الترتيب
+                    </label>
+                    <input type="number" id="groupSortOrder" name="sort_order" value="0"
+                           class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200">
+                </div>
+                
+                <!-- Description -->
+                <div class="col-span-2">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-align-right text-green-500 mr-2"></i>
+                        الوصف
+                    </label>
+                    <textarea id="groupDescription" name="description" rows="3"
+                              class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white transition-all duration-200"
+                              placeholder="وصف مختصر للمجموعة..."></textarea>
+                </div>
+                
+                <!-- Is Active -->
+                <div class="col-span-2">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" id="groupIsActive" name="is_active" checked
+                               class="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                            <i class="fas fa-toggle-on text-green-500 mr-2"></i>
+                            مفعل
+                        </span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button type="submit" id="submitAccountGroupBtn"
+                        class="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                    <i class="fas fa-save mr-2"></i>
+                    حفظ
+                </button>
+                <button type="button" onclick="closeAccountGroupModal()"
+                        class="px-6 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold transition-all duration-200">
+                    <i class="fas fa-times mr-2"></i>
+                    إلغاء
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Account Groups Functions
+function openAddAccountGroupModal() {
+    document.getElementById('accountGroupModalTitle').textContent = 'إضافة مجموعة حسابات جديدة';
+    document.getElementById('accountGroupForm').reset();
+    document.getElementById('accountGroupId').value = '';
+    document.getElementById('groupIsActive').checked = true;
+    
+    const modal = document.getElementById('accountGroupModal');
+    const content = document.getElementById('accountGroupModalContent');
+    
+    modal.style.display = 'flex';
+    setTimeout(() => {
+        content.style.transform = 'scale(1)';
+        content.style.opacity = '1';
+    }, 10);
+}
+
+function closeAccountGroupModal() {
+    const modal = document.getElementById('accountGroupModal');
+    const content = document.getElementById('accountGroupModalContent');
+    
+    content.style.transform = 'scale(0.95)';
+    content.style.opacity = '0';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+function editAccountGroup(id) {
+    // TODO: Fetch group data and populate form
+    alert('تعديل المجموعة #' + id);
+}
+
+async function deleteAccountGroup(id) {
+    if (!confirm('هل أنت متأكد من حذف هذه المجموعة؟')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/financial-settings/account-groups/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(result.message);
+            location.reload();
+        } else {
+            alert(result.message || 'حدث خطأ');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('حدث خطأ أثناء الحذف');
+    }
+}
+
+// Account Group Form Submit
+document.getElementById('accountGroupForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitAccountGroupBtn');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> جاري الحفظ...';
+    submitBtn.disabled = true;
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+    const id = document.getElementById('accountGroupId').value;
+    
+    const url = id ? `/financial-settings/account-groups/${id}` : '/financial-settings/account-groups';
+    const method = id ? 'PUT' : 'POST';
+    
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(result.message);
+            location.reload();
+        } else {
+            alert(result.message || 'حدث خطأ');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('حدث خطأ أثناء الحفظ');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+// Close modal on outside click
+document.getElementById('accountGroupModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeAccountGroupModal();
+    }
+});
+</script>
 <!-- Enhanced Add/Edit Account Type Modal -->
 <div id="accountTypeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
     <div class="relative w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl transform transition-all duration-300 scale-95 modal-content">
