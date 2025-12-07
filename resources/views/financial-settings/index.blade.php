@@ -976,6 +976,96 @@ document.getElementById('accountGroupModal').addEventListener('click', function(
     }
 });
 
+// دالة تحميل مجموعات الحسابات
+async function loadAccountGroups() {
+    try {
+        const response = await fetch('/financial-settings/account-groups', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('Failed to load account groups');
+            return;
+        }
+        
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+            renderAccountGroups(result.data);
+        }
+    } catch (error) {
+        console.error('Error loading account groups:', error);
+    }
+}
+
+// دالة عرض مجموعات الحسابات
+function renderAccountGroups(groups) {
+    const tbody = document.querySelector('#content-account-groups tbody');
+    
+    if (!groups || groups.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-layer-group text-4xl text-gray-400 dark:text-gray-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 dark:text-gray-400 text-lg font-semibold">لا توجد مجموعات حسابات</p>
+                            <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">ابدأ بإضافة مجموعة جديدة لتصنيف الحسابات</p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = groups.map(group => `
+        <tr class="hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200">
+            <td class="px-6 py-4 whitespace-nowrap">
+                ${group.code ? `<code class="px-3 py-1.5 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-lg text-sm font-mono font-semibold text-green-600 dark:text-green-400">${group.code}</code>` : '<span class="text-gray-400">-</span>'}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="text-gray-900 dark:text-white font-semibold text-base">${group.name}</span>
+            </td>
+            <td class="px-6 py-4">
+                <span class="text-gray-600 dark:text-gray-400">${group.description || '-'}</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-3 py-1.5 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900 text-blue-700 dark:text-blue-300 rounded-lg text-sm font-semibold">
+                    ${group.accounts_count} حساب
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                ${group.is_active ? 
+                    '<span class="px-3 py-1.5 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 text-green-700 dark:text-green-300 rounded-lg text-sm font-semibold"><i class="fas fa-check-circle mr-1"></i>مفعل</span>' : 
+                    '<span class="px-3 py-1.5 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-600 dark:text-gray-400 rounded-lg text-sm font-semibold"><i class="fas fa-times-circle mr-1"></i>معطل</span>'
+                }
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="text-gray-600 dark:text-gray-400 font-mono">${group.sort_order}</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                    <button onclick="editAccountGroup(${group.id})" 
+                            class="p-2.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteAccountGroup(${group.id})" 
+                            class="p-2.5 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-200">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     // استعادة التبويب النشط بعد إعادة التحميل
@@ -985,6 +1075,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const tabButton = document.getElementById('tab-' + activeTab);
         if (tabButton) {
             tabButton.click();
+            // تحميل مجموعات الحسابات إذا كان التبويب النشط هو مجموعات الحسابات
+            if (activeTab === 'account-groups') {
+                loadAccountGroups();
+            }
         }
     } else {
         // Set initial opacity for visible tab

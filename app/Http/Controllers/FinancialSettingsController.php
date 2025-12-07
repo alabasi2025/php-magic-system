@@ -195,3 +195,24 @@ class FinancialSettingsController extends Controller
         ]);
     }
 }
+
+    public function getAccountGroups()
+    {
+        try {
+            $accountGroups = AccountGroup::withCount('accounts')
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $accountGroups
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء جلب البيانات: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+}
