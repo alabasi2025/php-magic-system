@@ -155,7 +155,7 @@
             </div>
 
             <!-- نوع الحساب الفرعي (يظهر فقط للحسابات الفرعية) -->
-            <div id="accountTypeField" class="hidden">
+            <div id="accountTypeField" style="display: none;">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                     <i class="fas fa-tag text-indigo-600 ml-1"></i>
                     نوع الحساب الفرعي <span class="text-red-500">*</span>
@@ -172,7 +172,7 @@
             </div>
 
             <!-- مجموعة الحسابات (يظهر فقط للحسابات الفرعية) -->
-            <div id="accountGroupField" class="hidden">
+            <div id="accountGroupField" style="display: none;">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                     <i class="fas fa-layer-group text-indigo-600 ml-1"></i>
                     مجموعة الحسابات (اختياري)
@@ -187,7 +187,7 @@
             </div>
 
             <!-- حساب وسيط لأي فئة (يظهر فقط عند اختيار حساب وسيط) -->
-            <div id="intermediateForField" class="hidden">
+            <div id="intermediateForField" style="display: none;">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                     <i class="fas fa-link text-indigo-600 ml-1"></i>
                     حساب وسيط لأي فئة؟ <span class="text-red-500">*</span>
@@ -261,13 +261,13 @@ function toggleAccountTypeFields() {
     
     if (isParent === '0') {
         // حساب فرعي - إظهار حقل نوع الحساب ومجموعة الحسابات
-        accountTypeField.classList.remove('hidden');
-        accountGroupField.classList.remove('hidden');
+        accountTypeField.style.display = 'block';
+        accountGroupField.style.display = 'block';
     } else {
         // حساب رئيسي - إخفاء جميع الحقول الإضافية
-        accountTypeField.classList.add('hidden');
-        accountGroupField.classList.add('hidden');
-        intermediateForField.classList.add('hidden');
+        accountTypeField.style.display = 'none';
+        accountGroupField.style.display = 'none';
+        intermediateForField.style.display = 'none';
         document.getElementById('account_type').value = '';
         document.getElementById('account_group_id').value = '';
     }
@@ -280,10 +280,10 @@ function toggleIntermediateField() {
     
     if (accountType === 'intermediate') {
         // حساب وسيط - إظهار حقل الفئة
-        intermediateForField.classList.remove('hidden');
+        intermediateForField.style.display = 'block';
     } else {
         // نوع آخر - إخفاء حقل الفئة
-        intermediateForField.classList.add('hidden');
+        intermediateForField.style.display = 'none';
     }
 }
 
