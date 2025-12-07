@@ -90,8 +90,8 @@
                                 <label for="status" class="form-label">الحالة <span class="text-danger">*</span></label>
                                 <select class="form-select @error('status') is-invalid @enderror" 
                                         id="status" name="status" required>
-                                    <option value="1" {{ old('status', 1) == 1 ? 'selected' : '' }}>نشط</option>
-                                    <option value="0" {{ old('status') == 0 ? 'selected' : '' }}>غير نشط</option>
+                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>نشط</option>
+                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>غير نشط</option>
                                 </select>
                                 @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>
