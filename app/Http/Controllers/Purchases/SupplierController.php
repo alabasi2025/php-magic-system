@@ -105,7 +105,7 @@ class SupplierController extends Controller
         $totalPayments = 0;
         $transactionsCount = 0;
         
-        return view('purchases.suppliers.transactions', compact(
+        return view('purchases.suppliers.transactions-simple', compact(
             'supplier',
             'transactions',
             'totalPurchases',
