@@ -984,17 +984,14 @@ function openAccountGroupModal(id = null) {
         modalContent.classList.add('scale-100', 'opacity-100');
     }, 10);
     
-    // إعادة تعيين النموذج
-    form.reset();
-    document.getElementById('accountGroupId').value = '';
-    document.getElementById('groupIsActive').checked = true;
-    
     if (id) {
-        // وضع التعديل
+        // وضع التعديل - لا تعيد تعيين النموذج
         title.textContent = 'تعديل مجموعة حسابات';
-        // TODO: تحميل البيانات
     } else {
-        // وضع الإضافة
+        // وضع الإضافة - إعادة تعيين النموذج
+        form.reset();
+        document.getElementById('accountGroupId').value = '';
+        document.getElementById('groupIsActive').checked = true;
         title.textContent = 'إضافة مجموعة حسابات جديدة';
     }
 }
