@@ -194,7 +194,6 @@ class FinancialSettingsController extends Controller
             'message' => 'تم حذف مجموعة الحسابات بنجاح'
         ]);
     }
-}
 
     public function getAccountGroups()
     {
