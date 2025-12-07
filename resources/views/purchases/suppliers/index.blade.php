@@ -79,6 +79,13 @@
                                             <a href="{{ route('purchases.suppliers.transactions', $supplier->id) }}" class="btn btn-sm btn-primary" title="المعاملات">
                                                 <i class="fas fa-list"></i>
                                             </a>
+                                            <form action="{{ route('purchases.suppliers.destroy', $supplier->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('هل أنت متأكد من حذف المورد: {{ $supplier->name }}?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" title="حذف">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
