@@ -810,6 +810,11 @@ function switchTab(tabName) {
     if (activeIndicator) {
         activeIndicator.style.transform = 'scaleX(1)';
     }
+    
+    // تحميل مجموعات الحسابات عند فتح التبويب
+    if (tabName === 'account-groups') {
+        loadAccountGroups();
+    }
 }
 
 // Enhanced Modal Functions
