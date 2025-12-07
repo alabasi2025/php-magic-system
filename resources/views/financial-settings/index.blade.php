@@ -539,7 +539,7 @@ document.getElementById('accountGroupForm').addEventListener('submit', async fun
     const data = Object.fromEntries(formData);
     const id = document.getElementById('accountGroupId').value;
     
-    const url = id ? `/financial-settings/account-groups/${id}` : '/financial-settings/account-groups';
+    const url = id ? `/account-groups/${id}` : '/account-groups';
     const method = id ? 'PUT' : 'POST';
     
     try {
