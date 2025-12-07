@@ -109,22 +109,36 @@ class FinancialSettingsController extends Controller
      */
     public function storeAccountGroup(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:50|unique:account_groups,code',
-            'description' => 'nullable|string',
-            'sort_order' => 'nullable|integer',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'code' => 'nullable|string|max:50|unique:account_groups,code',
+                'description' => 'nullable|string',
+                'sort_order' => 'nullable|integer',
+            ]);
 
-        $validated['is_active'] = $request->has('is_active');
-        
-        $accountGroup = AccountGroup::create($validated);
+            $validated['is_active'] = $request->has('is_active') ? true : true; // Default to true
+            
+            $accountGroup = AccountGroup::create($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم إضافة مجموعة الحسابات بنجاح',
-            'data' => $accountGroup
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إضافة مجموعة الحسابات بنجاح',
+                'data' => $accountGroup
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في التحقق من البيانات',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error creating account group: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء الحفظ: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
