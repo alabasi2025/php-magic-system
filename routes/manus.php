@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
  * جميع المسارات محمية بـ middleware auth
  */
 
-Route::prefix('manus')->middleware(['auth'])->name('manus.')->group(function () {
+Route::prefix('manus')->name('manus.')->group(function () {
     
     // Dashboard
     Route::get('/dashboard', [ManusApiController::class, 'dashboard'])->name('dashboard');
