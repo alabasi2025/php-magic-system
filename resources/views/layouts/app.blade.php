@@ -384,23 +384,27 @@
                             <i class="fas fa-chevron-down sidebar-text transition-transform" id="purchases-arrow"></i>
                         </button>
                         <div id="purchases-dropdown" class="hidden pr-6 space-y-1 mt-1">
-                            <a href="{{ route('purchases.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent text-gray-600 hover:text-orange-600 text-sm transition-all duration-200">
-                                <i class="fas fa-file-invoice-dollar text-lg"></i>
-                                <span class="sidebar-text">فواتير الشراء</span>
+                            <a href="{{ route('purchases.dashboard') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent text-gray-600 hover:text-blue-600 text-sm transition-all duration-200">
+                                <i class="fas fa-tachometer-alt text-lg"></i>
+                                <span class="sidebar-text">لوحة التحكم</span>
                             </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent text-gray-600 hover:text-blue-600 text-sm transition-all duration-200">
-                                <i class="fas fa-clipboard-list text-lg"></i>
-                                <span class="sidebar-text">طلبات الشراء</span>
-                            </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent text-gray-600 hover:text-green-600 text-sm transition-all duration-200">
+                            <a href="{{ route('purchases.suppliers.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent text-gray-600 hover:text-green-600 text-sm transition-all duration-200">
                                 <i class="fas fa-truck text-lg"></i>
                                 <span class="sidebar-text">الموردين</span>
                             </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent text-gray-600 hover:text-purple-600 text-sm transition-all duration-200">
-                                <i class="fas fa-undo text-lg"></i>
-                                <span class="sidebar-text">مرتجعات المشتريات</span>
+                            <a href="{{ route('purchases.orders.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent text-gray-600 hover:text-blue-600 text-sm transition-all duration-200">
+                                <i class="fas fa-clipboard-list text-lg"></i>
+                                <span class="sidebar-text">أوامر الشراء</span>
                             </a>
-                            <a href="#" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent text-gray-600 hover:text-red-600 text-sm transition-all duration-200">
+                            <a href="{{ route('purchases.receipts.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent text-gray-600 hover:text-purple-600 text-sm transition-all duration-200">
+                                <i class="fas fa-box-open text-lg"></i>
+                                <span class="sidebar-text">استلام البضائع</span>
+                            </a>
+                            <a href="{{ route('purchases.invoices.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent text-gray-600 hover:text-orange-600 text-sm transition-all duration-200">
+                                <i class="fas fa-file-invoice-dollar text-lg"></i>
+                                <span class="sidebar-text">فواتير الموردين</span>
+                            </a>
+                            <a href="{{ route('purchases.reports.orders') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent text-gray-600 hover:text-red-600 text-sm transition-all duration-200">
                                 <i class="fas fa-chart-line text-lg"></i>
                                 <span class="sidebar-text">تقارير المشتريات</span>
                             </a>
