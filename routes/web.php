@@ -360,3 +360,31 @@ Route::prefix('financial-settings')->name('financial-settings.')->group(function
     Route::delete('/account-groups/{id}', [\App\Http\Controllers\FinancialSettingsController::class, 'deleteAccountGroup'])->name('account-groups.delete');
 });
 
+
+// Temporary route to run migration
+Route::get('/run-account-groups-migration', function() {
+    try {
+        \Illuminate\Support\Facades\Schema::dropIfExists('account_groups');
+        
+        \Illuminate\Support\Facades\Schema::create('account_groups', function ($table) {
+            $table->id();
+            $table->string('name');
+            $table->string('code')->nullable()->unique();
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->integer('sort_order')->default(0);
+            $table->timestamps();
+        });
+        
+        // Add column to chart_of_accounts if not exists
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('chart_of_accounts', 'account_group_id')) {
+            \Illuminate\Support\Facades\Schema::table('chart_of_accounts', function ($table) {
+                $table->foreignId('account_group_id')->nullable()->after('intermediate_for')->constrained('account_groups')->onDelete('set null');
+            });
+        }
+        
+        return 'Migration executed successfully!';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
