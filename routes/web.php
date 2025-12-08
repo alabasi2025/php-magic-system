@@ -563,3 +563,75 @@ Route::get('/add-account-types-now', function() {
         ], 500);
     }
 });
+
+// Temporary route to add three sub accounts
+Route::get('/add-three-accounts-now', function() {
+    try {
+        $accounts = [];
+        
+        // 1. صناديق التحصيل والتوريد (نوع: صندوق نقدي)
+        $account1 = \App\Models\ChartAccount::create([
+            'chart_group_id' => 8,
+            'parent_id' => null,
+            'level' => 1,
+            'code' => '1110',
+            'name' => 'صناديق التحصيل والتوريد',
+            'name_en' => 'Collection and Supply Cash Boxes',
+            'is_parent' => false,
+            'account_type' => 'cash',
+            'account_group_id' => null,
+            'description' => 'حساب لإدارة صناديق التحصيل والتوريد',
+            'is_active' => true,
+            'created_by' => 1,
+        ]);
+        $accounts[] = $account1;
+        
+        // 2. بنك الكريمي (نوع: بنك)
+        $account2 = \App\Models\ChartAccount::create([
+            'chart_group_id' => 8,
+            'parent_id' => null,
+            'level' => 1,
+            'code' => '1120',
+            'name' => 'بنك الكريمي',
+            'name_en' => 'Al-Kuraimi Bank',
+            'is_parent' => false,
+            'account_type' => 'bank',
+            'account_group_id' => null,
+            'description' => 'حساب بنك الكريمي',
+            'is_active' => true,
+            'created_by' => 1,
+        ]);
+        $accounts[] = $account2;
+        
+        // 3. موردين الديزل (نوع: مورد)
+        $account3 = \App\Models\ChartAccount::create([
+            'chart_group_id' => 8,
+            'parent_id' => null,
+            'level' => 1,
+            'code' => '2110',
+            'name' => 'موردين الديزل',
+            'name_en' => 'Diesel Suppliers',
+            'is_parent' => false,
+            'account_type' => 'supplier',
+            'account_group_id' => null,
+            'description' => 'حساب موردين الديزل',
+            'is_active' => true,
+            'created_by' => 1,
+        ]);
+        $accounts[] = $account3;
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'تم إضافة الحسابات الثلاثة بنجاح!',
+            'accounts' => $accounts,
+            'next_step' => 'افتح الدليل المحاسبي: /chart-of-accounts/8'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile()
+        ], 500);
+    }
+});
