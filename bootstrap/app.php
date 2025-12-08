@@ -26,6 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
                     if (file_exists(base_path('routes/purchases.php'))) {
                         require base_path('routes/purchases.php');
                     }
+                    if (file_exists(base_path('routes/setup.php'))) {
+                        require base_path('routes/setup.php');
+                    }
                 });
         },
     )
