@@ -55,6 +55,35 @@ Route::prefix('setup')->name('setup.')->group(function () {
         }
     });
     
+    // Check and create item_unit_conversions table
+    Route::get('/check-item-unit-conversions', function() {
+        try {
+            $exists = \DB::getSchemaBuilder()->hasTable('item_unit_conversions');
+            
+            if (!$exists) {
+                // Run the specific migration
+                \Artisan::call('migrate', [
+                    '--path' => 'database/migrations/2025_12_09_000001_create_item_unit_conversions_table.php',
+                    '--force' => true
+                ]);
+                
+                $exists = \DB::getSchemaBuilder()->hasTable('item_unit_conversions');
+            }
+            
+            return response()->json([
+                'success' => true,
+                'table_exists' => $exists,
+                'message' => $exists ? 'Table exists and ready' : 'Failed to create table',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
+    });
+    
     // Clear all caches
     Route::get('/clear-cache', function() {
         try {
