@@ -211,7 +211,7 @@ Route::prefix('setup')->name('setup.')->group(function () {
             }
             
             // Check if already exists
-            $existing = \App\Models\Item::where('sku', 'DIESEL-001')->first();
+            $existing = \App\Models\Item::where('code', 'DIESEL-001')->first();
             if ($existing) {
                 return response()->json([
                     'success' => true,
@@ -220,15 +220,27 @@ Route::prefix('setup')->name('setup.')->group(function () {
                 ]);
             }
             
+            // Get first category or create one
+            $category = \App\Models\Category::first();
+            if (!$category) {
+                $category = \App\Models\Category::create([
+                    'name' => 'مواد وقود',
+                    'description' => 'مواد وقود ومحروقات',
+                    'is_active' => true,
+                ]);
+            }
+            
             $item = \App\Models\Item::create([
-                'sku' => 'DIESEL-001',
+                'code' => 'DIESEL-001',
                 'name' => 'الديزل',
                 'description' => 'ديزل للمحركات',
+                'category_id' => $category->id,
                 'unit_id' => $literUnit->id,
                 'min_stock' => 100,
                 'max_stock' => 10000,
-                'unit_price' => 5.00,
-                'status' => 'active',
+                'cost_price' => 5.00,
+                'selling_price' => 5.00,
+                'is_active' => true,
             ]);
             
             $units = [
