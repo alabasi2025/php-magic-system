@@ -305,10 +305,18 @@ document.getElementById('addAccountForm').addEventListener('submit', async funct
     
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
+    const accountId = document.getElementById('account_id').value;
+    
+    // Determine if it's add or update
+    const isUpdate = accountId && accountId !== '';
+    const url = isUpdate 
+        ? `/chart-of-accounts/update-account/${accountId}` 
+        : '{{ route("chart-of-accounts.add-account") }}';
+    const method = isUpdate ? 'PUT' : 'POST';
     
     try {
-        const response = await fetch('{{ route("chart-of-accounts.add-account") }}', {
-            method: 'POST',
+        const response = await fetch(url, {
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -400,10 +408,114 @@ function printTree() {
     window.print();
 }
 
+// View account (read-only)
+async function viewAccount(accountId) {
+    try {
+        const response = await fetch(`/chart-of-accounts/get-account/${accountId}`);
+        const account = await response.json();
+        
+        if (!account.success) {
+            alert('حدث خطأ في تحميل بيانات الحساب');
+            return;
+        }
+        
+        const data = account.account;
+        
+        // Fill form with account data
+        document.getElementById('account_id').value = data.id;
+        document.getElementById('parent_id').value = data.parent_id || '';
+        document.getElementById('code').value = data.code;
+        document.getElementById('name').value = data.name;
+        document.getElementById('name_en').value = data.name_en || '';
+        document.getElementById('is_parent').checked = data.is_parent;
+        document.getElementById('account_type').value = data.account_type || '';
+        document.getElementById('account_group_id').value = data.account_group_id || '';
+        document.getElementById('intermediate_for').value = data.intermediate_for || '';
+        document.getElementById('description').value = data.description || '';
+        document.getElementById('is_active').checked = data.is_active;
+        
+        // Make all fields readonly
+        document.querySelectorAll('#addAccountModal input, #addAccountModal select, #addAccountModal textarea').forEach(field => {
+            field.readOnly = true;
+            if (field.tagName === 'SELECT') {
+                field.disabled = true;
+            }
+        });
+        document.querySelectorAll('#addAccountModal input[type="checkbox"]').forEach(field => {
+            field.disabled = true;
+        });
+        
+        // Hide save button
+        document.getElementById('saveAccountBtn').style.display = 'none';
+        
+        // Change modal title
+        document.querySelector('#addAccountModal h2').innerHTML = '<i class="fas fa-eye text-green-600 ml-2"></i> عرض الحساب';
+        
+        // Show modal
+        document.getElementById('addAccountModal').classList.remove('hidden');
+        document.getElementById('addAccountModal').classList.add('flex');
+        
+    } catch (error) {
+        alert('حدث خطأ في الاتصال بالخادم');
+        console.error(error);
+    }
+}
+
 // Edit account
-function editAccount(accountId) {
-    // This is a placeholder - implement edit modal similar to add modal
-    alert('وظيفة التعديل قيد التطوير');
+async function editAccount(accountId) {
+    try {
+        const response = await fetch(`/chart-of-accounts/get-account/${accountId}`);
+        const account = await response.json();
+        
+        if (!account.success) {
+            alert('حدث خطأ في تحميل بيانات الحساب');
+            return;
+        }
+        
+        const data = account.account;
+        
+        // Fill form with account data
+        document.getElementById('account_id').value = data.id;
+        document.getElementById('parent_id').value = data.parent_id || '';
+        document.getElementById('code').value = data.code;
+        document.getElementById('name').value = data.name;
+        document.getElementById('name_en').value = data.name_en || '';
+        document.getElementById('is_parent').checked = data.is_parent;
+        document.getElementById('account_type').value = data.account_type || '';
+        document.getElementById('account_group_id').value = data.account_group_id || '';
+        document.getElementById('intermediate_for').value = data.intermediate_for || '';
+        document.getElementById('description').value = data.description || '';
+        document.getElementById('is_active').checked = data.is_active;
+        
+        // Make all fields editable
+        document.querySelectorAll('#addAccountModal input, #addAccountModal select, #addAccountModal textarea').forEach(field => {
+            field.readOnly = false;
+            if (field.tagName === 'SELECT') {
+                field.disabled = false;
+            }
+        });
+        document.querySelectorAll('#addAccountModal input[type="checkbox"]').forEach(field => {
+            field.disabled = false;
+        });
+        
+        // Show save button
+        document.getElementById('saveAccountBtn').style.display = 'block';
+        
+        // Change modal title
+        document.querySelector('#addAccountModal h2').innerHTML = '<i class="fas fa-edit text-blue-600 ml-2"></i> تعديل الحساب';
+        
+        // Show modal
+        document.getElementById('addAccountModal').classList.remove('hidden');
+        document.getElementById('addAccountModal').classList.add('flex');
+        
+        // Toggle fields visibility based on account type
+        toggleAccountFields();
+        toggleIntermediateField();
+        
+    } catch (error) {
+        alert('حدث خطأ في الاتصال بالخادم');
+        console.error(error);
+    }
 }
 
 // Delete account

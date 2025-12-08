@@ -187,18 +187,24 @@ class ChartOfAccountsController extends Controller
         $request->validate([
             'code' => 'required|string|max:50',
             'name' => 'required|string|max:255',
-            'type' => 'required|in:group,detail',
+            'is_parent' => 'required|boolean',
         ]);
 
         try {
             $account = ChartAccount::findOrFail($id);
             
             $account->update([
+                'parent_id' => $request->parent_id,
                 'code' => $request->code,
                 'name' => $request->name,
-                'type' => $request->type,
+                'name_en' => $request->name_en,
+                'is_parent' => $request->is_parent,
+                'account_type' => $request->account_type,
+                'account_group_id' => $request->account_group_id,
+                'intermediate_for' => $request->intermediate_for,
                 'description' => $request->description,
                 'is_active' => $request->has('is_active'),
+                'updated_by' => auth()->id(),
             ]);
 
             return response()->json([
@@ -210,6 +216,26 @@ class ChartOfAccountsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'حدث خطأ أثناء تحديث الحساب: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get account details
+     */
+    public function getAccount($id)
+    {
+        try {
+            $account = ChartAccount::findOrFail($id);
+            
+            return response()->json([
+                'success' => true,
+                'account' => $account
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء تحميل الحساب: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -46,6 +46,11 @@
                     <i class="fas fa-plus"></i>
                 </button>
             @endif
+            <button onclick="viewAccount({{ $account->id }})" 
+                    class="text-green-600 hover:text-green-800 px-3 py-1 rounded hover:bg-green-50 transition-colors"
+                    title="عرض">
+                <i class="fas fa-eye"></i>
+            </button>
             <button onclick="editAccount({{ $account->id }})" 
                     class="text-blue-600 hover:text-blue-800 px-3 py-1 rounded hover:bg-blue-50 transition-colors"
                     title="تعديل">

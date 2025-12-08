@@ -119,6 +119,9 @@ Route::get('/dashboard', function () {
 Route::get('/accounting', [\App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.index');
 Route::resource('chart-of-accounts', \App\Http\Controllers\ChartOfAccountsController::class);
 Route::post('chart-of-accounts/add-account', [\App\Http\Controllers\ChartOfAccountsController::class, 'addAccount'])->name('chart-of-accounts.add-account');
+Route::get('chart-of-accounts/get-account/{id}', [\App\Http\Controllers\ChartOfAccountsController::class, 'getAccount'])->name('chart-of-accounts.get-account');
+Route::put('chart-of-accounts/update-account/{id}', [\App\Http\Controllers\ChartOfAccountsController::class, 'updateAccount'])->name('chart-of-accounts.update-account');
+Route::delete('chart-of-accounts/delete-account/{id}', [\App\Http\Controllers\ChartOfAccountsController::class, 'deleteAccount'])->name('chart-of-accounts.delete-account');
 Route::resource('chart-types', \App\Http\Controllers\ChartTypeController::class);
 Route::resource('intermediate-accounts', \App\Http\Controllers\IntermediateAccountController::class);
 Route::resource('cash-boxes', \App\Http\Controllers\CashBoxController::class);
