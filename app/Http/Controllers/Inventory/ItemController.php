@@ -60,9 +60,8 @@ class ItemController extends Controller
      */
     public function create()
     {
-        // إزالة شرط status مؤقتاً للاختبار
-        $units = ItemUnit::orderBy('name')->get();
-        \Log::info('Units count in create:', ['count' => $units->count()]);
+        $units = ItemUnit::where('status', 'active')->orderBy('name')->get();
+        return view('inventory.items.create_new', compact('units'));
         return view('inventory.items.create_new', compact('units'));
     }
 
