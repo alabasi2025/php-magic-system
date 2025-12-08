@@ -151,6 +151,25 @@ Route::prefix('setup')->name('setup.')->group(function () {
         }
     });
     
+    // Check units table
+    Route::get('/check-units', function() {
+        try {
+            $itemUnits = \DB::table('item_units')->get();
+            $units = \DB::table('units')->get();
+            
+            return response()->json([
+                'success' => true,
+                'item_units' => $itemUnits,
+                'units' => $units
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
+    
     // Check items table structure
     Route::get('/check-items-table', function() {
         try {
