@@ -221,9 +221,9 @@ Route::prefix('setup')->name('setup.')->group(function () {
             }
             
             // Get first category or create one
-            $category = \App\Models\Category::first();
+            $category = \App\Models\Inventory\Category::first();
             if (!$category) {
-                $category = \App\Models\Category::create([
+                $category = \App\Models\Inventory\Category::create([
                     'name' => 'مواد وقود',
                     'description' => 'مواد وقود ومحروقات',
                     'is_active' => true,
