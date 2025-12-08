@@ -84,6 +84,49 @@ Route::prefix('setup')->name('setup.')->group(function () {
         }
     });
     
+    // Seed item_units
+    Route::get('/seed-item-units', function() {
+        try {
+            $units = [
+                ['name' => 'قطعة', 'symbol' => 'قطعة', 'description' => 'قطعة واحدة', 'status' => 'active'],
+                ['name' => 'كيلوجرام', 'symbol' => 'كجم', 'description' => 'كيلوجرام', 'status' => 'active'],
+                ['name' => 'لتر', 'symbol' => 'لتر', 'description' => 'لتر', 'status' => 'active'],
+                ['name' => 'متر', 'symbol' => 'م', 'description' => 'متر', 'status' => 'active'],
+                ['name' => 'كرتون', 'symbol' => 'كرتون', 'description' => 'كرتون', 'status' => 'active'],
+                ['name' => 'دزينة', 'symbol' => 'دزينة', 'description' => '12 قطعة', 'status' => 'active'],
+                ['name' => 'حزمة', 'symbol' => 'حزمة', 'description' => 'حزمة', 'status' => 'active'],
+                ['name' => 'طقم', 'symbol' => 'طقم', 'description' => 'طقم', 'status' => 'active'],
+                ['name' => 'جرام', 'symbol' => 'جم', 'description' => 'جرام', 'status' => 'active'],
+                ['name' => 'ملليلتر', 'symbol' => 'مل', 'description' => 'ملليلتر', 'status' => 'active'],
+                ['name' => 'سنتيمتر', 'symbol' => 'سم', 'description' => 'سنتيمتر', 'status' => 'active'],
+                ['name' => 'باليت', 'symbol' => 'باليت', 'description' => 'باليت', 'status' => 'active'],
+            ];
+            
+            $inserted = 0;
+            foreach ($units as $unit) {
+                $exists = \App\Models\ItemUnit::where('name', $unit['name'])->exists();
+                if (!$exists) {
+                    \App\Models\ItemUnit::create($unit);
+                    $inserted++;
+                }
+            }
+            
+            $total = \App\Models\ItemUnit::count();
+            
+            return response()->json([
+                'success' => true,
+                'inserted' => $inserted,
+                'total' => $total,
+                'message' => "تم إضافة {$inserted} وحدة جديدة. الإجمالي: {$total}"
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
+    
     // Clear all caches
     Route::get('/clear-cache', function() {
         try {
