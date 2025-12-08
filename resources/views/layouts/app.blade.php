@@ -366,6 +366,10 @@
                                 <i class="fas fa-warehouse text-lg"></i>
                                 <span class="sidebar-text">المخازن</span>
                             </a>
+                            <a href="{{ route('inventory.warehouse-groups.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent text-gray-600 hover:text-purple-600 text-sm transition-all duration-200">
+                                <i class="fas fa-layer-group text-lg"></i>
+                                <span class="sidebar-text">مجموعات المخازن</span>
+                            </a>
                             <a href="{{ route('inventory.stock-movements.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-yellow-50 hover:to-transparent text-gray-600 hover:text-yellow-600 text-sm transition-all duration-200">
                                 <i class="fas fa-exchange-alt text-lg"></i>
                                 <span class="sidebar-text">حركات المخزون</span>
