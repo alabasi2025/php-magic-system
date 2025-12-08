@@ -16,6 +16,25 @@ Route::post('/system-setup/run-seeders', [\App\Http\Controllers\SystemSetupContr
 Route::post('/system-setup/clear-cache', [\App\Http\Controllers\SystemSetupController::class, 'clearCache'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 Route::get('/system-diagnostic', [\App\Http\Controllers\SystemSetupController::class, 'diagnostic']);
 
+// Check account_types structure (temporary)
+Route::get('/check-account-types-structure', function () {
+    try {
+        $sample = DB::table('account_types')->first();
+        $columns = $sample ? array_keys((array)$sample) : [];
+        
+        return response()->json([
+            'success' => true,
+            'columns' => $columns,
+            'sample_data' => $sample
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
 // Test warehouse controller (temporary)
 Route::get('/test-warehouses', function () {
     try {
