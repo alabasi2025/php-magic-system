@@ -170,6 +170,36 @@ class ChartOfAccountsController extends Controller
                 'message' => 'تم إضافة الحساب بنجاح',
                 'account' => $account
             ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            
+            // Check if it's a duplicate entry error
+            if ($e->getCode() == 23000 && strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                // Extract the duplicate code from error message
+                preg_match("/Duplicate entry '([^']+)'/", $e->getMessage(), $matches);
+                $duplicateCode = $matches[1] ?? $request->code;
+                
+                // Get suggested alternative codes
+                $baseCode = preg_replace('/[0-9]+$/', '', $request->code);
+                $number = (int) preg_replace('/[^0-9]/', '', $request->code);
+                $suggestions = [];
+                for ($i = 1; $i <= 3; $i++) {
+                    $suggestions[] = $baseCode . ($number + $i);
+                }
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => "❌ خطأ: الكود '{$duplicateCode}' مستخدم بالفعل!",
+                    'suggestion' => "💡 الأكواد المتاحة المقترحة: " . implode(', ', $suggestions),
+                    'duplicate_code' => $duplicateCode,
+                    'suggested_codes' => $suggestions
+                ], 422);
+            }
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء إضافة الحساب: ' . $e->getMessage()
+            ], 500);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
