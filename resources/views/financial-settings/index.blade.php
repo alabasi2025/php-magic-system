@@ -360,7 +360,7 @@ function closeAccountGroupModal() {
 
 async function loadAccountGroups() {
     try {
-        const response = await fetch('/financial-settings/account-groups-data');
+        const response = await fetch('/financial-settings/account-groups');
         const result = await response.json();
         if (result.success) {
             const tbody = document.getElementById('account-groups-tbody');
