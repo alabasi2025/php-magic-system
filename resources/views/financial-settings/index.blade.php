@@ -405,10 +405,11 @@ function closeAccountTypeModal() {
     }, 300);
 }
 
-// Account Group Modal Functions
-function openAccountGroupModal(mode = 'add') {
-    const modal = document.getElementById('accountGroupModal');
-    const modalContent = document.getElementById('accountGroupModalContent');
+// Account Group Modal Functions - Simple and Clear
+function openAccountGroupModal() {
+    // For ADD: Reset form
+    document.getElementById('accountGroupForm').reset();
+    document.getElementById('accountGroupId').value = '';
     
     // Enable all fields
     document.getElementById('groupName').readOnly = false;
@@ -418,19 +419,14 @@ function openAccountGroupModal(mode = 'add') {
     document.getElementById('groupIsActive').disabled = false;
     document.getElementById('submitAccountGroupBtn').style.display = 'block';
     
-    // Reset form only for add mode
-    if (mode === 'add') {
-        document.getElementById('accountGroupForm').reset();
-        document.getElementById('accountGroupId').value = '';
-        document.getElementById('accountGroupModalTitle').textContent = 'إضافة مجموعة حسابات جديدة';
-    } else if (mode === 'edit') {
-        document.getElementById('accountGroupModalTitle').textContent = 'تعديل مجموعة حسابات';
-    }
+    // Set title
+    document.getElementById('accountGroupModalTitle').textContent = 'إضافة مجموعة حسابات جديدة';
 
+    // Open modal
+    const modal = document.getElementById('accountGroupModal');
+    const modalContent = document.getElementById('accountGroupModalContent');
     modal.classList.remove('hidden');
-    setTimeout(() => {
-        modalContent.classList.remove('scale-95');
-    }, 10);
+    setTimeout(() => modalContent.classList.remove('scale-95'), 10);
 }
 
 function closeAccountGroupModal() {
@@ -547,22 +543,38 @@ async function editAccountGroup(id) {
         const response = await fetch(`/financial-settings/account-groups/${id}`);
         const result = await response.json();
         
-        if (result.success) {
-            const group = result.data;
-            
-            // Open the modal in edit mode
-            openAccountGroupModal('edit');
-            
-            // Fill the form with data
-            document.getElementById('accountGroupId').value = group.id;
-            document.getElementById('groupName').value = group.name;
-            document.getElementById('groupCode').value = group.code || '';
-            document.getElementById('groupDescription').value = group.description || '';
-            document.getElementById('groupSortOrder').value = group.sort_order;
-            document.getElementById('groupIsActive').checked = group.is_active;
-        } else {
+        if (!result.success) {
             alert(result.message || 'حدث خطأ');
+            return;
         }
+        
+        const group = result.data;
+        
+        // Fill form WITHOUT reset
+        document.getElementById('accountGroupId').value = group.id;
+        document.getElementById('groupName').value = group.name;
+        document.getElementById('groupCode').value = group.code || '';
+        document.getElementById('groupDescription').value = group.description || '';
+        document.getElementById('groupSortOrder').value = group.sort_order;
+        document.getElementById('groupIsActive').checked = group.is_active;
+        
+        // Enable all fields
+        document.getElementById('groupName').readOnly = false;
+        document.getElementById('groupCode').readOnly = false;
+        document.getElementById('groupDescription').readOnly = false;
+        document.getElementById('groupSortOrder').readOnly = false;
+        document.getElementById('groupIsActive').disabled = false;
+        document.getElementById('submitAccountGroupBtn').style.display = 'block';
+        
+        // Set title
+        document.getElementById('accountGroupModalTitle').textContent = 'تعديل مجموعة حسابات';
+        
+        // Open modal
+        const modal = document.getElementById('accountGroupModal');
+        const modalContent = document.getElementById('accountGroupModalContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => modalContent.classList.remove('scale-95'), 10);
+        
     } catch (error) {
         console.error('Error:', error);
         alert('حدث خطأ أثناء تحميل البيانات');
