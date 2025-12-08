@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Select</title>
+</head>
+<body>
+    <h1>Test Auto-Select</h1>
+    
+    <select id="testSelect">
+        <option value="">اختر...</option>
+        <option value="1">خيار 1</option>
+        <option value="2">خيار 2</option>
+        <option value="3">خيار 3</option>
+    </select>
+    
+    <script>
+        console.log('Testing auto-select...');
+        const select = document.getElementById('testSelect');
+        console.log('Options:', select.options.length);
+        
+        // Test 1: selectedIndex
+        select.selectedIndex = 1;
+        console.log('After selectedIndex=1:', select.value);
+        
+        // Test 2: value
+        select.value = "2";
+        console.log('After value=2:', select.value);
+        
+        // Test 3: with data
+        const data = [{id: 1, name: 'Test'}];
+        select.value = data[0].id;
+        console.log('After value=data[0].id:', select.value);
+    </script>
+</body>
+</html>

@@ -472,8 +472,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // إذا كان الصف الأول (الرئيسي)، اختر أول وحدة متاحة
         if (isPrimary && unitsData.length > 0) {
-            // حدد أول وحدة مباشرة
-            unitSelect.value = unitsData[0].id;
+            // حدد أول وحدة مباشرة (تحويل إلى string)
+            unitSelect.value = String(unitsData[0].id);
+            console.log('Auto-selected unit:', unitsData[0].name, 'with ID:', unitsData[0].id);
         }
         
         unitIndex++;
