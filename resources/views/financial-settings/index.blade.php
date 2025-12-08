@@ -266,6 +266,11 @@ function switchTab(tabId) {
 
     // Store active tab in session storage
     sessionStorage.setItem('activeTab', tabId);
+    
+    // Load data when switching to account groups tab
+    if (tabId === 'account-groups') {
+        loadAccountGroups();
+    }
 }
 
 // On page load, check for active tab in session storage
@@ -273,8 +278,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const activeTab = sessionStorage.getItem('activeTab');
     if (activeTab) {
         switchTab(activeTab);
+    } else {
+        // If no active tab, load account groups data for when user switches to that tab
+        loadAccountGroups();
     }
-    loadAccountGroups(); // Load account groups on page load
 });
 
 // Account Type Modal Functions
