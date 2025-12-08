@@ -162,11 +162,9 @@
                 </label>
                 <select name="account_type" id="account_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                     <option value="">-- اختر النوع --</option>
-                    <option value="general">حساب عام</option>
-                    <option value="cash_box">صندوق</option>
-                    <option value="bank">بنك</option>
-                    <option value="wallet">محفظة إلكترونية</option>
-                    <option value="atm">صراف آلي</option>
+                    @foreach(\App\Models\AccountType::where('is_active', true)->orderBy('sort_order')->get() as $accountType)
+                        <option value="{{ $accountType->key }}">{{ $accountType->name_ar }}</option>
+                    @endforeach
                     <option value="intermediate">حساب وسيط</option>
                 </select>
             </div>
