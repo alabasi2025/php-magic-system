@@ -84,7 +84,7 @@ class WarehouseGroupsSeeder extends Seeder
                 'name' => $groupData['name'],
                 'description' => $groupData['description'],
                 'account_id' => $account->id,
-                'is_active' => true,
+                'status' => 'active',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
