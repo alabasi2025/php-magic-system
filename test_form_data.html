@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Form Data</title>
+</head>
+<body>
+    <h1>Test Form Submission</h1>
+    <form action="https://php-magic-system-main-4kqldr.laravel.cloud/inventory/items" method="POST">
+        <input type="hidden" name="_token" value="test">
+        <input type="text" name="sku" value="TEST-001">
+        <input type="text" name="name" value="Test Item">
+        <input type="number" name="min_stock" value="10">
+        <input type="number" name="max_stock" value="100">
+        <select name="status">
+            <option value="active">Active</option>
+        </select>
+        
+        <!-- Unit 1 -->
+        <input type="hidden" name="units[0][unit_id]" value="10">
+        <input type="hidden" name="units[0][capacity]" value="1">
+        <input type="hidden" name="units[0][price]" value="">
+        
+        <!-- Primary unit -->
+        <input type="hidden" name="primary_unit" value="0">
+        
+        <button type="submit">Submit</button>
+    </form>
+    
+    <script>
+        // Log form data before submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            console.log('Form Data:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+        });
+    </script>
+</body>
+</html>

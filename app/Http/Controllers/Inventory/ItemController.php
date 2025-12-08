@@ -69,6 +69,13 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
+        // Debug: Check received data
+        \Log::info('Item Store Request', [
+            'all_data' => $request->all(),
+            'units' => $request->input('units'),
+            'primary_unit' => $request->input('primary_unit')
+        ]);
+        
         // Validation
         $validated = $request->validate([
             'sku' => 'required|string|max:100|unique:items,sku',
