@@ -129,7 +129,7 @@ class ChartOfAccountsController extends Controller
             'code' => 'required|string|max:50',
             'name' => 'required|string|max:255',
             'is_parent' => 'required|boolean',
-            'account_type' => 'nullable|in:general,cash_box,bank,wallet,atm,intermediate',
+            'account_type' => 'nullable|string|max:50',
             'intermediate_for' => 'nullable|in:cash_boxes,banks,wallets,atms',
         ]);
 
