@@ -405,6 +405,72 @@ function closeAccountTypeModal() {
     }, 300);
 }
 
+// Account Type Form Submit Handler
+document.addEventListener('DOMContentLoaded', function() {
+    const accountTypeForm = document.getElementById('accountTypeForm');
+    if (accountTypeForm) {
+        accountTypeForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> جاري الحفظ...';
+            submitBtn.disabled = true;
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Convert checkbox to boolean
+            data.is_active = document.getElementById('is_active').checked;
+            
+            const id = document.getElementById('accountTypeId').value;
+            
+            const url = id ? `/financial-settings/account-types/${id}` : '/financial-settings/account-types';
+            const method = id ? 'PUT' : 'POST';
+            
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    let errorMessage = `خطأ ${response.status}: ${errorData.message}`;
+                    if(errorData.errors) {
+                        errorMessage += '\n' + Object.values(errorData.errors).map(e => e.join(', ')).join('\n');
+                    }
+                    alert(errorMessage);
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message);
+                    closeAccountTypeModal();
+                    location.reload(); // Reload the page to show the new type
+                } else {
+                    alert(result.message || 'حدث خطأ');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Exception:', error);
+                alert('حدث خطأ: ' + error.message);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+});
+
 // Account Group Modal Functions - Simple and Clear
 function openAccountGroupModal() {
     // For ADD: Reset form
