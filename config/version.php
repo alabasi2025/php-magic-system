@@ -19,7 +19,7 @@ try {
 }
 
 // إزالة حرف v من البداية إن وجد
-$versionNumber = $gitVersion ? ltrim($gitVersion, 'v') : '4.1.5';
+$versionNumber = $gitVersion ? ltrim($gitVersion, 'v') : '5.0.1';
 $versionFull = $gitVersion ?: 'v' . $versionNumber;
 
 return [
