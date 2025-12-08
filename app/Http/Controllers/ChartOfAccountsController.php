@@ -194,7 +194,7 @@ class ChartOfAccountsController extends Controller
             $account = ChartAccount::findOrFail($id);
             
             // Convert is_parent to boolean
-            $isParent = filter_var($request->is_parent, FILTER_VALIDATE_BOOLEAN);
+            $isParent = in_array($request->is_parent, [1, '1', true, 'true'], true);
             
             // Convert is_active to boolean
             $isActive = $request->has('is_active') && $request->is_active ? true : false;
