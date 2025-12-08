@@ -199,14 +199,26 @@ class ChartOfAccountsController extends Controller
             // Convert is_active to boolean
             $isActive = $request->has('is_active') && $request->is_active ? true : false;
             
+            // Handle account_group_id - convert empty string to null
+            $accountGroupId = $request->account_group_id;
+            if ($accountGroupId === '' || $accountGroupId === null) {
+                $accountGroupId = null;
+            }
+            
+            // Handle parent_id - convert empty string to null
+            $parentId = $request->parent_id;
+            if ($parentId === '' || $parentId === null) {
+                $parentId = null;
+            }
+            
             $account->update([
-                'parent_id' => $request->filled('parent_id') ? $request->parent_id : null,
+                'parent_id' => $parentId,
                 'code' => $request->code,
                 'name' => $request->name,
                 'name_en' => $request->name_en,
                 'is_parent' => $isParent,
                 'account_type' => $request->account_type,
-                'account_group_id' => $request->filled('account_group_id') ? $request->account_group_id : null,
+                'account_group_id' => $accountGroupId,
                 'intermediate_for' => $request->intermediate_for,
                 'description' => $request->description,
                 'is_active' => $isActive,
