@@ -17,6 +17,7 @@ class SupplierController extends Controller
     public function create()
     {
         $accounts = \App\Models\ChartAccount::where('is_active', true)
+            ->where('account_type', 'supplier') // حسابات الموردين فقط
             ->orderBy('code')
             ->get();
         
@@ -67,6 +68,7 @@ class SupplierController extends Controller
         $supplier = Supplier::findOrFail($id);
         
         $accounts = \App\Models\ChartAccount::where('is_active', true)
+            ->where('account_type', 'supplier') // حسابات الموردين فقط
             ->orderBy('code')
             ->get();
         
