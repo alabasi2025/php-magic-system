@@ -151,6 +151,35 @@ Route::prefix('setup')->name('setup.')->group(function () {
         }
     });
     
+    // Check items table structure
+    Route::get('/check-items-table', function() {
+        try {
+            $exists = \Schema::hasTable('items');
+            
+            if (!$exists) {
+                return response()->json([
+                    'success' => false,
+                    'table_exists' => false,
+                    'message' => 'جدول items غير موجود'
+                ]);
+            }
+            
+            $columns = \DB::select('DESCRIBE items');
+            
+            return response()->json([
+                'success' => true,
+                'table_exists' => true,
+                'columns' => $columns,
+                'sample_data' => \DB::table('items')->limit(3)->get()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
+    
     // Run all migrations
     Route::get('/run-migrations', function() {
         try {
