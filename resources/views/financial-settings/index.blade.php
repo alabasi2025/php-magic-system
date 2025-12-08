@@ -282,6 +282,80 @@ document.addEventListener('DOMContentLoaded', function() {
         // If no active tab, load account groups data for when user switches to that tab
         loadAccountGroups();
     }
+    
+    // Register Account Group Form Submit Handler
+    const accountGroupForm = document.getElementById('accountGroupForm');
+    if (accountGroupForm) {
+        accountGroupForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitAccountGroupBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> جاري الحفظ...';
+            submitBtn.disabled = true;
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Convert checkbox to boolean
+            data.is_active = document.getElementById('groupIsActive').checked;
+            
+            const id = document.getElementById('accountGroupId').value;
+            
+            const url = id ? `/financial-settings/account-groups/${id}` : '/financial-settings/account-groups';
+            const method = id ? 'PUT' : 'POST';
+            
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    let errorMessage = `خطأ ${response.status}: ${errorData.message}`;
+                    if(errorData.errors) {
+                        errorMessage += '\n' + Object.values(errorData.errors).map(e => e.join(', ')).join('\n');
+                    }
+                    alert(errorMessage);
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message);
+                    closeAccountGroupModal();
+                    loadAccountGroups(); // Reload the table data
+                } else {
+                    alert(result.message || 'حدث خطأ');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Exception:', error);
+                alert('حدث خطأ: ' + error.message);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+    
+    // Close modal on outside click
+    const accountGroupModal = document.getElementById('accountGroupModal');
+    if (accountGroupModal) {
+        accountGroupModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAccountGroupModal();
+            }
+        });
+    }
 });
 
 // Account Type Modal Functions
@@ -530,73 +604,7 @@ async function deleteAccountGroup(id) {
     }
 }
 
-// Account Group Form Submit
-document.getElementById('accountGroupForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const submitBtn = document.getElementById('submitAccountGroupBtn');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> جاري الحفظ...';
-    submitBtn.disabled = true;
-    
-    const formData = new FormData(this);
-    const data = Object.fromEntries(formData);
-    
-    // Convert checkbox to boolean
-    data.is_active = document.getElementById('groupIsActive').checked;
-    
-    const id = document.getElementById('accountGroupId').value;
-    
-    const url = id ? `/financial-settings/account-groups/${id}` : '/financial-settings/account-groups';
-    const method = id ? 'PUT' : 'POST';
-    
-    try {
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify(data)
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            let errorMessage = `خطأ ${response.status}: ${errorData.message}`;
-            if(errorData.errors) {
-                errorMessage += '\n' + Object.values(errorData.errors).map(e => e.join(', ')).join('\n');
-            }
-            alert(errorMessage);
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-            return;
-        }
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            alert(result.message);
-            closeAccountGroupModal();
-            loadAccountGroups(); // Reload the table data
-        } else {
-            alert(result.message || 'حدث خطأ');
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
-    } catch (error) {
-        console.error('Exception:', error);
-        alert('حدث خطأ: ' + error.message);
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }
-});
 
-// Close modal on outside click
-document.getElementById('accountGroupModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeAccountGroupModal();
-    }
-});
 </script>
 <!-- Enhanced Add/Edit Account Type Modal -->
 <div id="accountTypeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
