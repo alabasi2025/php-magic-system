@@ -415,3 +415,30 @@ Route::get('/add-employees-group-now', function() {
         ], 500);
     }
 })->middleware('auth');
+
+// Temporary route to run AccountTypeSeeder
+Route::get('/run-account-type-seeder', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => 'AccountTypeSeeder',
+            '--force' => true
+        ]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        
+        $count = \App\Models\AccountType::count();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تشغيل AccountTypeSeeder بنجاح!',
+            'output' => $output,
+            'account_types_count' => $count,
+            'next_step' => 'افتح صفحة الإعدادات المالية لمشاهدة أنواع الحسابات: /financial-settings'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
