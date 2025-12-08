@@ -439,7 +439,7 @@ async function viewAccount(accountId) {
         document.getElementById('code').value = data.code;
         document.getElementById('name').value = data.name;
         document.getElementById('name_en').value = data.name_en || '';
-        document.getElementById('is_parent').checked = data.is_parent;
+        document.getElementById('is_parent').value = data.is_parent ? '1' : '0';
         document.getElementById('account_type').value = data.account_type || '';
         document.getElementById('account_group_id').value = data.account_group_id || '';
         document.getElementById('intermediate_for').value = data.intermediate_for || '';
@@ -492,7 +492,7 @@ async function editAccount(accountId) {
         document.getElementById('code').value = data.code;
         document.getElementById('name').value = data.name;
         document.getElementById('name_en').value = data.name_en || '';
-        document.getElementById('is_parent').checked = data.is_parent;
+        document.getElementById('is_parent').value = data.is_parent ? '1' : '0';
         document.getElementById('account_type').value = data.account_type || '';
         document.getElementById('account_group_id').value = data.account_group_id || '';
         document.getElementById('intermediate_for').value = data.intermediate_for || '';
