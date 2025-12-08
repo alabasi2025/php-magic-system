@@ -1,0 +1,5 @@
+Deploy trigger: <?php echo date('Y-m-d H:i:s'); ?>
+
+Last commit: e0662e37 Fix: Add static first row with selected unit in HTML
+
+This file is created to trigger Laravel Cloud auto-deployment.
