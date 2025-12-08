@@ -407,9 +407,7 @@ function openAccountGroupModal(mode = 'add') {
     const modal = document.getElementById('accountGroupModal');
     const modalContent = document.getElementById('accountGroupModalContent');
     
-    // Reset form and enable all fields
-    document.getElementById('accountGroupForm').reset();
-    document.getElementById('accountGroupId').value = '';
+    // Enable all fields
     document.getElementById('groupName').readOnly = false;
     document.getElementById('groupCode').readOnly = false;
     document.getElementById('groupDescription').readOnly = false;
@@ -417,8 +415,10 @@ function openAccountGroupModal(mode = 'add') {
     document.getElementById('groupIsActive').disabled = false;
     document.getElementById('submitAccountGroupBtn').style.display = 'block';
     
-    // Set title based on mode
+    // Reset form only for add mode
     if (mode === 'add') {
+        document.getElementById('accountGroupForm').reset();
+        document.getElementById('accountGroupId').value = '';
         document.getElementById('accountGroupModalTitle').textContent = 'إضافة مجموعة حسابات جديدة';
     } else if (mode === 'edit') {
         document.getElementById('accountGroupModalTitle').textContent = 'تعديل مجموعة حسابات';
