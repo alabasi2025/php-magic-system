@@ -521,8 +521,10 @@ async function editAccount(accountId) {
         document.getElementById('addAccountModal').classList.add('flex');
         
         // Toggle fields visibility based on account type
-        toggleAccountFields();
-        toggleIntermediateField();
+        toggleAccountTypeFields();
+        if (typeof toggleIntermediateField === 'function') {
+            toggleIntermediateField();
+        }
         
     } catch (error) {
         alert('حدث خطأ في الاتصال بالخادم');

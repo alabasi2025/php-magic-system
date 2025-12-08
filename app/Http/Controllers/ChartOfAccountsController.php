@@ -200,13 +200,13 @@ class ChartOfAccountsController extends Controller
             $isActive = $request->has('is_active') && $request->is_active ? true : false;
             
             $account->update([
-                'parent_id' => $request->parent_id ?: null,
+                'parent_id' => $request->filled('parent_id') ? $request->parent_id : null,
                 'code' => $request->code,
                 'name' => $request->name,
                 'name_en' => $request->name_en,
                 'is_parent' => $isParent,
                 'account_type' => $request->account_type,
-                'account_group_id' => $request->account_group_id ?: null,
+                'account_group_id' => $request->filled('account_group_id') ? $request->account_group_id : null,
                 'intermediate_for' => $request->intermediate_for,
                 'description' => $request->description,
                 'is_active' => $isActive,
