@@ -218,7 +218,23 @@ Route::prefix('setup')->name('setup.')->group(function () {
         }
     });
     
-    // Add Diesel Item
+    // Delete failed items
+    Route::get('/delete-failed-items', function() {
+        try {
+            \DB::table('items')->whereIn('id', [2, 3])->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف الأصناف الفاشلة'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
+    
+    // Add diesel item
     Route::get('/add-diesel', function() {
         try {
             \DB::beginTransaction();
