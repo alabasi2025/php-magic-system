@@ -54,4 +54,25 @@ Route::prefix('setup')->name('setup.')->group(function () {
             ], 500);
         }
     });
+    
+    // Clear all caches
+    Route::get('/clear-cache', function() {
+        try {
+            \Artisan::call('cache:clear');
+            \Artisan::call('config:clear');
+            \Artisan::call('route:clear');
+            \Artisan::call('view:clear');
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'تم مسح جميع الـ caches بنجاح',
+                'caches_cleared' => ['cache', 'config', 'route', 'view']
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
 });
