@@ -59,6 +59,7 @@ class ChartAccount extends Model
      */
     protected $fillable = [
         'chart_group_id',
+        'account_group_id',
         'parent_id',
         'level',
         'is_parent',
