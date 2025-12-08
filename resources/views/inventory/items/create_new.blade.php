@@ -352,6 +352,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const unitsTableBody = document.getElementById('unitsTableBody');
     const addUnitBtn = document.getElementById('addUnitBtn');
     
+    // بيانات الوحدات من Laravel
+    const unitsData = @json($units);
+    
     // إضافة صف واحد افتراضي
     addUnitRow();
     
@@ -375,14 +378,17 @@ document.addEventListener('DOMContentLoaded', function() {
             row.classList.add('primary-row');
         }
         
+        // بناء options للوحدات
+        let unitsOptions = '<option value="">اختر الوحدة...</option>';
+        unitsData.forEach(unit => {
+            unitsOptions += `<option value="${unit.id}">${unit.name}</option>`;
+        });
+        unitsOptions += '<option value="new" class="text-success fw-bold">+ إضافة وحدة جديدة</option>';
+        
         row.innerHTML = `
             <td>
                 <select class="form-select unit-select" name="units[${unitIndex}][unit_id]" required>
-                    <option value="">اختر الوحدة...</option>
-                    @foreach($units as $unit)
-                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                    @endforeach
-                    <option value="new" class="text-success fw-bold">+ إضافة وحدة جديدة</option>
+                    ${unitsOptions}
                 </select>
             </td>
             <td>
