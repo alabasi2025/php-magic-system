@@ -125,7 +125,36 @@
                                     </tr>
                                 </thead>
                                 <tbody id="unitsTableBody">
-                                    <!-- سيتم إضافة الصفوف هنا ديناميكياً -->
+                                    @if($units->count() > 0)
+                                    <!-- الصف الأول الرئيسي -->
+                                    <tr class="primary-row" data-unit-index="0">
+                                        <td>
+                                            <select class="form-select unit-select" name="units[0][unit_id]" required>
+                                                <option value="">اختر الوحدة...</option>
+                                                @foreach($units as $unit)
+                                                    <option value="{{ $unit->id }}" {{ $loop->first ? 'selected' : '' }}>{{ $unit->name }}</option>
+                                                @endforeach
+                                                <option value="new" class="text-success fw-bold">+ إضافة وحدة جديدة</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control capacity-input" name="units[0][capacity]" value="1" step="0.0001" min="0.0001" readonly required placeholder="مثال: 20">
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control price-input" name="units[0][price]" step="0.01" min="0" placeholder="0.00">
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="form-check d-inline-block">
+                                                <input class="form-check-input primary-radio" type="radio" name="primary_unit" value="0" id="primary_0" checked required>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-danger btn-sm remove-unit-btn">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -355,8 +384,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // بيانات الوحدات من Laravel
     const unitsData = @json($units);
     
-    // إضافة صف واحد افتراضي
-    addUnitRow();
+    // الصف الأول موجود بالفعل في HTML
+    // إضافة event listeners للصف الثابت
+    const firstRow = document.querySelector('#unitsTableBody tr[data-unit-index="0"]');
+    if (firstRow) {
+        // معالجة زر الحذف
+        firstRow.querySelector('.remove-unit-btn').addEventListener('click', function() {
+            if (document.querySelectorAll('#unitsTableBody tr').length > 1) {
+                firstRow.remove();
+                updatePrimaryUnit();
+            } else {
+                alert('يجب وجود وحدة واحدة على الأقل');
+            }
+        });
+        
+        // معالجة اختيار "إضافة وحدة جديدة"
+        firstRow.querySelector('.unit-select').addEventListener('change', function() {
+            if (this.value === 'new') {
+                const modal = new bootstrap.Modal(document.getElementById('addUnitModal'));
+                modal.show();
+                document.getElementById('addUnitModal').dataset.targetRow = 0;
+                this.value = unitsData[0].id; // ارجع للوحدة الأولى
+            }
+        });
+    }
+    
+    unitIndex = 1; // ابدأ من 1 لأن 0 موجود
     
     // زر إضافة وحدة
     addUnitBtn.addEventListener('click', function() {
