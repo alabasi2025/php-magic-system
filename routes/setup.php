@@ -172,3 +172,22 @@ Route::prefix('setup')->name('setup.')->group(function () {
         }
     });
 });
+
+// Fix units status to active
+Route::get('/setup/fix-units-status', function() {
+    try {
+        $updated = \App\Models\ItemUnit::query()->update(['status' => 'active']);
+        
+        return response()->json([
+            'success' => true,
+            'updated' => $updated,
+            'total' => \App\Models\ItemUnit::count(),
+            'message' => "تم تحديث {$updated} وحدة إلى active"
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
