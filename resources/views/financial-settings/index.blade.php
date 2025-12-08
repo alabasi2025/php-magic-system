@@ -403,25 +403,25 @@ function closeAccountTypeModal() {
 }
 
 // Account Group Modal Functions
-function openAccountGroupModal(id = null) {
+function openAccountGroupModal(mode = 'add') {
     const modal = document.getElementById('accountGroupModal');
     const modalContent = document.getElementById('accountGroupModalContent');
     
-    if (!id) {
-        // This is for adding a new group
-        document.getElementById('accountGroupForm').reset();
-        document.getElementById('accountGroupId').value = '';
+    // Reset form and enable all fields
+    document.getElementById('accountGroupForm').reset();
+    document.getElementById('accountGroupId').value = '';
+    document.getElementById('groupName').readOnly = false;
+    document.getElementById('groupCode').readOnly = false;
+    document.getElementById('groupDescription').readOnly = false;
+    document.getElementById('groupSortOrder').readOnly = false;
+    document.getElementById('groupIsActive').disabled = false;
+    document.getElementById('submitAccountGroupBtn').style.display = 'block';
+    
+    // Set title based on mode
+    if (mode === 'add') {
         document.getElementById('accountGroupModalTitle').textContent = 'إضافة مجموعة حسابات جديدة';
-        
-        // Ensure all fields are enabled for adding
-        document.getElementById('groupName').readOnly = false;
-        document.getElementById('groupCode').readOnly = false;
-        document.getElementById('groupDescription').readOnly = false;
-        document.getElementById('groupSortOrder').readOnly = false;
-        document.getElementById('groupIsActive').disabled = false;
-        
-        // Show the save button
-        document.getElementById('submitAccountGroupBtn').style.display = 'block';
+    } else if (mode === 'edit') {
+        document.getElementById('accountGroupModalTitle').textContent = 'تعديل مجموعة حسابات';
     }
 
     modal.classList.remove('hidden');
@@ -547,8 +547,8 @@ async function editAccountGroup(id) {
         if (result.success) {
             const group = result.data;
             
-            // Open the modal first (without id to enable edit mode)
-            openAccountGroupModal();
+            // Open the modal in edit mode
+            openAccountGroupModal('edit');
             
             // Fill the form with data
             document.getElementById('accountGroupId').value = group.id;
@@ -557,9 +557,6 @@ async function editAccountGroup(id) {
             document.getElementById('groupDescription').value = group.description || '';
             document.getElementById('groupSortOrder').value = group.sort_order;
             document.getElementById('groupIsActive').checked = group.is_active;
-            
-            // Update modal title for edit mode
-            document.getElementById('accountGroupModalTitle').textContent = 'تعديل مجموعة حسابات';
         } else {
             alert(result.message || 'حدث خطأ');
         }
