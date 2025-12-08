@@ -26,8 +26,10 @@ class WarehouseGroupController extends Controller
      */
     public function create()
     {
-        // Get all chart accounts for dropdown
-        $accounts = ChartAccount::orderBy('code')->get();
+        // Get only warehouse type accounts for dropdown
+        $accounts = ChartAccount::where('account_type', 'warehouse')
+            ->orderBy('code')
+            ->get();
         
         return view('inventory.warehouse-groups.create', compact('accounts'));
     }
@@ -74,8 +76,10 @@ class WarehouseGroupController extends Controller
      */
     public function edit(WarehouseGroup $warehouseGroup)
     {
-        // Get all chart accounts for dropdown
-        $accounts = ChartAccount::orderBy('code')->get();
+        // Get only warehouse type accounts for dropdown
+        $accounts = ChartAccount::where('account_type', 'warehouse')
+            ->orderBy('code')
+            ->get();
         
         return view('inventory.warehouse-groups.edit', compact('warehouseGroup', 'accounts'));
     }
