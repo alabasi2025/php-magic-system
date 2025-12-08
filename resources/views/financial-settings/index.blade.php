@@ -547,15 +547,8 @@ async function editAccountGroup(id) {
         if (result.success) {
             const group = result.data;
             
-            // Make fields editable and enable checkbox
-            document.getElementById('groupName').readOnly = false;
-            document.getElementById('groupCode').readOnly = false;
-            document.getElementById('groupDescription').readOnly = false;
-            document.getElementById('groupSortOrder').readOnly = false;
-            document.getElementById('groupIsActive').disabled = false;
-            
-            // Show the save button
-            document.getElementById('submitAccountGroupBtn').style.display = 'block';
+            // Open the modal first (without id to enable edit mode)
+            openAccountGroupModal();
             
             // Fill the form with data
             document.getElementById('accountGroupId').value = group.id;
@@ -565,8 +558,7 @@ async function editAccountGroup(id) {
             document.getElementById('groupSortOrder').value = group.sort_order;
             document.getElementById('groupIsActive').checked = group.is_active;
             
-            // Open the modal
-            openAccountGroupModal(id);
+            // Update modal title for edit mode
             document.getElementById('accountGroupModalTitle').textContent = 'تعديل مجموعة حسابات';
         } else {
             alert(result.message || 'حدث خطأ');
