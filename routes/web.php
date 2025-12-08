@@ -421,6 +421,16 @@ Route::get('/add-account-types-now', function() {
     try {
         $accountTypes = [
             [
+                'key' => 'general',
+                'name_ar' => 'عام',
+                'name_en' => 'General',
+                'icon' => 'fas fa-folder',
+                'description' => 'حسابات عامة',
+                'is_active' => true,
+                'is_system' => true,
+                'sort_order' => 0,
+            ],
+            [
                 'key' => 'customer',
                 'name_ar' => 'عميل',
                 'name_en' => 'Customer',
