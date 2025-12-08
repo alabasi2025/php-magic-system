@@ -471,15 +471,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // إذا كان الصف الأول (الرئيسي)، اختر أول وحدة متاحة
-        if (isPrimary) {
-            // انتظر قليلاً ثم حدد أول وحدة
-            setTimeout(function() {
-                if (unitSelect.options.length > 2) {
-                    unitSelect.selectedIndex = 1;
-                    // Trigger change event
-                    unitSelect.dispatchEvent(new Event('change'));
-                }
-            }, 100);
+        if (isPrimary && unitsData.length > 0) {
+            // حدد أول وحدة مباشرة
+            unitSelect.value = unitsData[0].id;
         }
         
         unitIndex++;
