@@ -727,7 +727,7 @@ document.getElementById('accountGroupModal').addEventListener('click', function(
         </div>
 
         <!-- Modal Body -->
-        <form id="accountGroupForm" class="p-8 space-y-6">
+        <form id="accountGroupForm" class="p-8 space-y-6" action="javascript:void(0);">
             @csrf
             <input type="hidden" id="accountGroupId" name="id">
 
