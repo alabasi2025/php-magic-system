@@ -16,7 +16,12 @@ class SupplierController extends Controller
 
     public function create()
     {
-        return view('purchases.suppliers.create');
+        $accounts = \App\Models\ChartAccount::where('status', 'active')
+            ->whereIn('account_type', ['payable', 'expense']) // حسابات الموردين والمصروفات
+            ->orderBy('code')
+            ->get();
+        
+        return view('purchases.suppliers.create', compact('accounts'));
     }
 
     public function store(Request $request)
@@ -27,6 +32,7 @@ class SupplierController extends Controller
             'email' => 'nullable|email|max:255',
             'tax_number' => 'nullable|string|max:50',
             'address' => 'nullable|string',
+            'account_id' => 'nullable|exists:chart_accounts,id',
             'opening_balance' => 'nullable|numeric',
             'status' => 'required|in:active,inactive',
             'notes' => 'nullable|string',
@@ -60,7 +66,13 @@ class SupplierController extends Controller
     public function edit($id)
     {
         $supplier = Supplier::findOrFail($id);
-        return view('purchases.suppliers.edit', compact('supplier'));
+        
+        $accounts = \App\Models\ChartAccount::where('status', 'active')
+            ->whereIn('account_type', ['payable', 'expense'])
+            ->orderBy('code')
+            ->get();
+        
+        return view('purchases.suppliers.edit', compact('supplier', 'accounts'));
     }
 
     public function update(Request $request, $id)
@@ -73,6 +85,7 @@ class SupplierController extends Controller
             'email' => 'nullable|email|max:255',
             'tax_number' => 'nullable|string|max:50',
             'address' => 'nullable|string',
+            'account_id' => 'nullable|exists:chart_accounts,id',
             'opening_balance' => 'nullable|numeric',
             'status' => 'required|in:active,inactive',
             'notes' => 'nullable|string',

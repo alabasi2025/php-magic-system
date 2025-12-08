@@ -79,6 +79,23 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
+                                <label for="account_id" class="form-label">الحساب المحاسبي</label>
+                                <select class="form-select @error('account_id') is-invalid @enderror" 
+                                        id="account_id" name="account_id">
+                                    <option value="">-- اختر الحساب (اختياري) --</option>
+                                    @foreach($accounts as $account)
+                                        <option value="{{ $account->id }}" {{ old('account_id', $supplier->account_id) == $account->id ? 'selected' : '' }}>
+                                            {{ $account->code }} - {{ $account->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('account_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="form-text text-muted">اختر الحساب المحاسبي المرتبط بهذا المورد</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
                                 <label for="current_balance" class="form-label">الرصيد الحالي</label>
                                 <input type="text" class="form-control" 
                                        id="current_balance" value="{{ number_format($supplier->balance ?? 0, 2) }}" disabled>
