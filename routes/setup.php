@@ -151,6 +151,25 @@ Route::prefix('setup')->name('setup.')->group(function () {
         }
     });
     
+    // Run all migrations
+    Route::get('/run-migrations', function() {
+        try {
+            \Artisan::call('migrate', ['--force' => true]);
+            $output = \Artisan::output();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تشغيل migrations بنجاح',
+                'output' => $output
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
+    
     // Add Diesel Item
     Route::get('/add-diesel', function() {
         try {
