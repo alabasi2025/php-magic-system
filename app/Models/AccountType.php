@@ -11,6 +11,7 @@ class AccountType extends Model
 
     protected $fillable = [
         'key',
+        'name',
         'name_ar',
         'name_en',
         'icon',

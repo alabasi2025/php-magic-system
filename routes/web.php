@@ -524,6 +524,9 @@ Route::get('/add-account-types-now', function() {
 
         $added = [];
         foreach ($accountTypes as $type) {
+            // إضافة حقل name للتوافق مع الجدول القديم
+            $type['name'] = $type['name_ar'];
+            
             $existing = \App\Models\AccountType::where('key', $type['key'])->first();
             if (!$existing) {
                 $created = \App\Models\AccountType::create($type);
