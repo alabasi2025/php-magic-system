@@ -20,6 +20,12 @@ class SetupController extends Controller
     public function runInventoryMigrations()
     {
         try {
+            // Always run the fix migration for deleted_at columns
+            Artisan::call('migrate', [
+                '--path' => 'database/migrations/2025_12_08_180000_add_deleted_at_to_inventory_tables.php',
+                '--force' => true
+            ]);
+            
             // Check if tables already exist
             $tablesExist = Schema::hasTable('item_units') && 
                           Schema::hasTable('warehouses') && 
@@ -29,13 +35,14 @@ class SetupController extends Controller
             if ($tablesExist) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'جداول نظام المخازن موجودة بالفعل',
+                    'message' => 'جداول نظام المخازن موجودة وتم تحديثها',
                     'tables' => [
                         'item_units' => true,
                         'warehouses' => true,
                         'items' => true,
                         'stock_movements' => true,
-                    ]
+                    ],
+                    'fix_applied' => true
                 ]);
             }
 
