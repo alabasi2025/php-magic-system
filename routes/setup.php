@@ -283,7 +283,7 @@ Route::prefix('setup')->name('setup.')->group(function () {
                 if ($unit) {
                     \App\Models\ItemUnitConversion::create([
                         'item_id' => $item->id,
-                        'item_unit_id' => $unit->id,
+                        'unit_id' => $unit->id, // Fixed: use unit_id not item_unit_id
                         'capacity' => $unitData['capacity'],
                         'price' => $unitData['price'],
                         'is_primary' => $unitData['is_primary'],
