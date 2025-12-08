@@ -99,6 +99,30 @@ Route::get('/run-warehouse-accounts-seeder', function () {
     }
 });
 
+// Check for duplicate accounts (debugging)
+Route::get('/check-duplicate-accounts', function () {
+    $chartGroupId = 8;
+    
+    // Get all accounts for this chart group
+    $accounts = \Illuminate\Support\Facades\DB::table('chart_accounts')
+        ->where('chart_group_id', $chartGroupId)
+        ->orderBy('code')
+        ->get(['id', 'code', 'name', 'name_en', 'account_type']);
+    
+    // Find duplicates
+    $codes = $accounts->pluck('code')->toArray();
+    $duplicates = array_filter(array_count_values($codes), function($count) {
+        return $count > 1;
+    });
+    
+    return response()->json([
+        'total_accounts' => $accounts->count(),
+        'accounts' => $accounts,
+        'duplicate_codes' => array_keys($duplicates),
+        'duplicates_detail' => $duplicates
+    ]);
+});
+
 // Simple GET route to run warehouse account type seeder (temporary)
 Route::get('/run-warehouse-seeder', function () {
     try {
