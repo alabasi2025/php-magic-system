@@ -638,3 +638,14 @@ Route::get('/add-three-accounts-now', function() {
         ], 500);
     }
 });
+
+// Clear cache and refresh version
+Route::get('/clear-cache-version', function() {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    return response()->json([
+        'success' => true,
+        'version' => config('version.version'),
+        'number' => config('version.number')
+    ]);
+});
