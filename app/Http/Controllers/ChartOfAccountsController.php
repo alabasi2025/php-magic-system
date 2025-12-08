@@ -187,23 +187,29 @@ class ChartOfAccountsController extends Controller
         $request->validate([
             'code' => 'required|string|max:50',
             'name' => 'required|string|max:255',
-            'is_parent' => 'required|boolean',
+            'is_parent' => 'required|in:0,1,true,false',
         ]);
 
         try {
             $account = ChartAccount::findOrFail($id);
             
+            // Convert is_parent to boolean
+            $isParent = filter_var($request->is_parent, FILTER_VALIDATE_BOOLEAN);
+            
+            // Convert is_active to boolean
+            $isActive = $request->has('is_active') && $request->is_active ? true : false;
+            
             $account->update([
-                'parent_id' => $request->parent_id,
+                'parent_id' => $request->parent_id ?: null,
                 'code' => $request->code,
                 'name' => $request->name,
                 'name_en' => $request->name_en,
-                'is_parent' => $request->is_parent,
+                'is_parent' => $isParent,
                 'account_type' => $request->account_type,
-                'account_group_id' => $request->account_group_id,
+                'account_group_id' => $request->account_group_id ?: null,
                 'intermediate_for' => $request->intermediate_for,
                 'description' => $request->description,
-                'is_active' => $request->has('is_active'),
+                'is_active' => $isActive,
                 'updated_by' => auth()->id(),
             ]);
 
