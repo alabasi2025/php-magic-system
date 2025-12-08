@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <select class="form-select unit-select" name="units[${unitIndex}][unit_id]" required>
                     <option value="">اختر الوحدة...</option>
                     @foreach($units as $unit)
-                        <option value="{{ $unit->id }}" ${isPrimary && '{{ $unit->name }}' === 'لتر' ? 'selected' : ''}>{{ $unit->name }}</option>
+                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
                     @endforeach
                     <option value="new" class="text-success fw-bold">+ إضافة وحدة جديدة</option>
                 </select>
@@ -463,6 +463,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.value = '';
             }
         });
+        
+        // إذا كان الصف الأول، اختر أول وحدة متاحة تلقائياً
+        if (isPrimary && unitSelect.options.length > 1) {
+            // ابحث عن "لتر" أو اختر أول وحدة
+            let literOption = null;
+            for (let i = 1; i < unitSelect.options.length - 1; i++) {
+                if (unitSelect.options[i].text.includes('لتر')) {
+                    literOption = unitSelect.options[i];
+                    break;
+                }
+            }
+            if (literOption) {
+                unitSelect.value = literOption.value;
+            } else if (unitSelect.options[1]) {
+                unitSelect.value = unitSelect.options[1].value;
+            }
+        }
         
         unitIndex++;
     }
