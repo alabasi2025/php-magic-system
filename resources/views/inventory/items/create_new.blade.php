@@ -95,7 +95,7 @@
                     </div>
                 </div>
 
-                <!-- الوحدات المتعددة -->
+                <!-- الوحدات المتعددة - جدول -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
@@ -108,13 +108,26 @@
                         </button>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-info">
+                        <div class="alert alert-info mb-3">
                             <i class="fas fa-lightbulb me-2"></i>
-                            <strong>ملاحظة:</strong> يجب تحديد وحدة رئيسية واحدة على الأقل. الوحدة الرئيسية هي الوحدة الأساسية للصرف والمخزون.
+                            <strong>ملاحظة:</strong> حدد الوحدة الرئيسية التي سيتم الصرف والحساب بها. السعة تُحسب بالنسبة للوحدة الرئيسية.
                         </div>
 
-                        <div id="unitsContainer">
-                            <!-- سيتم إضافة الوحدات هنا ديناميكياً -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="unitsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="35%">الوحدة <span class="text-danger">*</span></th>
+                                        <th width="20%">السعة <span class="text-danger">*</span></th>
+                                        <th width="20%">السعر (اختياري)</th>
+                                        <th width="15%" class="text-center">رئيسية؟</th>
+                                        <th width="10%" class="text-center">حذف</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="unitsTableBody">
+                                    <!-- سيتم إضافة الصفوف هنا ديناميكياً -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -243,68 +256,6 @@
     </form>
 </div>
 
-<!-- Template للوحدة -->
-<template id="unitTemplate">
-    <div class="unit-row card mb-3" data-unit-index="0">
-        <div class="card-body">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label">الوحدة <span class="text-danger">*</span></label>
-                    <div class="input-group">
-                        <select class="form-select unit-select" name="units[0][unit_id]" required>
-                            <option value="">اختر الوحدة...</option>
-                            @foreach($units as $unit)
-                                <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                            @endforeach
-                            <option value="new">+ إضافة وحدة جديدة</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label">السعة <span class="text-danger">*</span></label>
-                    <input type="number" 
-                           class="form-control capacity-input" 
-                           name="units[0][capacity]" 
-                           value="1" 
-                           step="0.0001"
-                           min="0.0001"
-                           required>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">السعر (اختياري)</label>
-                    <input type="number" 
-                           class="form-control price-input" 
-                           name="units[0][price]" 
-                           step="0.01"
-                           min="0"
-                           placeholder="0.00">
-                </div>
-
-                <div class="col-md-2">
-                    <div class="form-check">
-                        <input class="form-check-input primary-checkbox" 
-                               type="radio" 
-                               name="primary_unit" 
-                               value="0" 
-                               id="primary_0">
-                        <label class="form-check-label" for="primary_0">
-                            رئيسية
-                        </label>
-                    </div>
-                </div>
-
-                <div class="col-md-1">
-                    <button type="button" class="btn btn-danger btn-sm remove-unit-btn w-100">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</template>
-
 <!-- Modal: إضافة وحدة جديدة -->
 <div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -365,19 +316,16 @@
 
 @push('styles')
 <style>
-    .unit-row {
-        border-left: 4px solid #0d6efd;
-        transition: all 0.3s ease;
+    #unitsTable tbody tr:hover {
+        background-color: #f8f9fa;
     }
     
-    .unit-row:hover {
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
+    #unitsTable tbody tr.primary-row {
+        background-color: #d1f4e0;
     }
     
-    .unit-row.primary-unit {
-        border-left-color: #198754;
-        background-color: #f8fff8;
+    #unitsTable tbody tr.primary-row:hover {
+        background-color: #c0efd4;
     }
     
     .form-check-input:checked {
@@ -389,6 +337,11 @@
         border: 2px dashed #dee2e6;
         padding: 10px;
     }
+    
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
 </style>
 @endpush
 
@@ -396,101 +349,135 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let unitIndex = 0;
-    const unitsContainer = document.getElementById('unitsContainer');
-    const unitTemplate = document.getElementById('unitTemplate');
+    const unitsTableBody = document.getElementById('unitsTableBody');
     const addUnitBtn = document.getElementById('addUnitBtn');
     
-    // إضافة وحدة واحدة افتراضية
-    addUnit();
+    // إضافة صف واحد افتراضي
+    addUnitRow();
     
     // زر إضافة وحدة
     addUnitBtn.addEventListener('click', function() {
-        if (document.querySelectorAll('.unit-row').length < 4) {
-            addUnit();
+        if (document.querySelectorAll('#unitsTableBody tr').length < 6) {
+            addUnitRow();
         } else {
-            alert('الحد الأقصى 4 وحدات');
+            alert('الحد الأقصى 6 وحدات');
         }
     });
     
-    // دالة إضافة وحدة
-    function addUnit() {
-        const clone = unitTemplate.content.cloneNode(true);
-        const unitRow = clone.querySelector('.unit-row');
+    // دالة إضافة صف وحدة
+    function addUnitRow() {
+        const row = document.createElement('tr');
+        row.setAttribute('data-unit-index', unitIndex);
         
-        // تحديث الـ index
-        unitRow.setAttribute('data-unit-index', unitIndex);
-        
-        // تحديث الأسماء والـ IDs
-        unitRow.querySelectorAll('[name]').forEach(input => {
-            input.name = input.name.replace('[0]', `[${unitIndex}]`);
-        });
-        
-        const primaryCheckbox = unitRow.querySelector('.primary-checkbox');
-        primaryCheckbox.value = unitIndex;
-        primaryCheckbox.id = `primary_${unitIndex}`;
-        unitRow.querySelector(`label[for="primary_0"]`).setAttribute('for', `primary_${unitIndex}`);
-        
-        // إذا كانت أول وحدة، اجعلها رئيسية
-        if (unitIndex === 0) {
-            primaryCheckbox.checked = true;
-            unitRow.classList.add('primary-unit');
-            unitRow.querySelector('.capacity-input').value = 1;
-            unitRow.querySelector('.capacity-input').setAttribute('readonly', true);
+        // إذا كان أول صف، اجعله رئيسي
+        const isPrimary = (unitIndex === 0);
+        if (isPrimary) {
+            row.classList.add('primary-row');
         }
         
-        // زر الحذف
-        const removeBtn = unitRow.querySelector('.remove-unit-btn');
+        row.innerHTML = `
+            <td>
+                <select class="form-select unit-select" name="units[${unitIndex}][unit_id]" required>
+                    <option value="">اختر الوحدة...</option>
+                    @foreach($units as $unit)
+                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                    @endforeach
+                    <option value="new" class="text-success fw-bold">+ إضافة وحدة جديدة</option>
+                </select>
+            </td>
+            <td>
+                <input type="number" 
+                       class="form-control capacity-input" 
+                       name="units[${unitIndex}][capacity]" 
+                       value="${isPrimary ? '1' : ''}" 
+                       step="0.0001"
+                       min="0.0001"
+                       ${isPrimary ? 'readonly' : ''}
+                       placeholder="مثال: 20"
+                       required>
+            </td>
+            <td>
+                <input type="number" 
+                       class="form-control price-input" 
+                       name="units[${unitIndex}][price]" 
+                       step="0.01"
+                       min="0"
+                       placeholder="0.00">
+            </td>
+            <td class="text-center">
+                <div class="form-check d-inline-block">
+                    <input class="form-check-input primary-radio" 
+                           type="radio" 
+                           name="primary_unit" 
+                           value="${unitIndex}" 
+                           id="primary_${unitIndex}"
+                           ${isPrimary ? 'checked' : ''}>
+                </div>
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-danger btn-sm remove-unit-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        
+        unitsTableBody.appendChild(row);
+        
+        // معالجة زر الحذف
+        const removeBtn = row.querySelector('.remove-unit-btn');
         removeBtn.addEventListener('click', function() {
-            if (document.querySelectorAll('.unit-row').length > 1) {
-                unitRow.remove();
+            if (document.querySelectorAll('#unitsTableBody tr').length > 1) {
+                row.remove();
                 updatePrimaryUnit();
             } else {
                 alert('يجب وجود وحدة واحدة على الأقل');
             }
         });
         
-        // تغيير الوحدة الرئيسية
-        primaryCheckbox.addEventListener('change', function() {
+        // معالجة تغيير الوحدة الرئيسية
+        const primaryRadio = row.querySelector('.primary-radio');
+        primaryRadio.addEventListener('change', function() {
             if (this.checked) {
-                document.querySelectorAll('.unit-row').forEach(row => {
-                    row.classList.remove('primary-unit');
-                    row.querySelector('.capacity-input').removeAttribute('readonly');
+                // إزالة التنسيق من جميع الصفوف
+                document.querySelectorAll('#unitsTableBody tr').forEach(r => {
+                    r.classList.remove('primary-row');
+                    const capacityInput = r.querySelector('.capacity-input');
+                    capacityInput.removeAttribute('readonly');
                 });
-                unitRow.classList.add('primary-unit');
-                unitRow.querySelector('.capacity-input').value = 1;
-                unitRow.querySelector('.capacity-input').setAttribute('readonly', true);
+                
+                // إضافة التنسيق للصف الحالي
+                row.classList.add('primary-row');
+                const capacityInput = row.querySelector('.capacity-input');
+                capacityInput.value = 1;
+                capacityInput.setAttribute('readonly', true);
             }
         });
         
-        unitsContainer.appendChild(unitRow);
+        // معالجة اختيار "إضافة وحدة جديدة"
+        const unitSelect = row.querySelector('.unit-select');
+        unitSelect.addEventListener('change', function() {
+            if (this.value === 'new') {
+                const modal = new bootstrap.Modal(document.getElementById('addUnitModal'));
+                modal.show();
+                document.getElementById('addUnitModal').dataset.targetRow = unitIndex;
+                this.value = '';
+            }
+        });
+        
         unitIndex++;
     }
     
     // تحديث الوحدة الرئيسية
     function updatePrimaryUnit() {
-        const primaryChecked = document.querySelector('.primary-checkbox:checked');
+        const primaryChecked = document.querySelector('.primary-radio:checked');
         if (!primaryChecked) {
-            const firstCheckbox = document.querySelector('.primary-checkbox');
-            if (firstCheckbox) {
-                firstCheckbox.checked = true;
-                firstCheckbox.dispatchEvent(new Event('change'));
+            const firstRadio = document.querySelector('.primary-radio');
+            if (firstRadio) {
+                firstRadio.checked = true;
+                firstRadio.dispatchEvent(new Event('change'));
             }
         }
     }
-    
-    // معالجة اختيار "إضافة وحدة جديدة"
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('unit-select') && e.target.value === 'new') {
-            const modal = new bootstrap.Modal(document.getElementById('addUnitModal'));
-            modal.show();
-            
-            // حفظ مرجع للـ select الحالي
-            document.getElementById('addUnitModal').dataset.targetSelect = e.target.dataset.unitIndex || '0';
-            
-            // إعادة تعيين القيمة
-            e.target.value = '';
-        }
-    });
     
     // حفظ وحدة جديدة
     document.getElementById('saveNewUnitBtn').addEventListener('click', function() {
@@ -510,21 +497,21 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 // إضافة الوحدة الجديدة لجميع الـ dropdowns
-                const newOption = `<option value="${data.unit.id}">${data.unit.name}</option>`;
                 document.querySelectorAll('.unit-select').forEach(select => {
-                    const newOptElement = document.createElement('option');
-                    newOptElement.value = data.unit.id;
-                    newOptElement.textContent = data.unit.name;
+                    const newOption = document.createElement('option');
+                    newOption.value = data.unit.id;
+                    newOption.textContent = data.unit.name;
                     
                     // إضافة قبل خيار "إضافة جديدة"
                     const newOptionElement = select.querySelector('option[value="new"]');
-                    select.insertBefore(newOptElement, newOptionElement);
+                    select.insertBefore(newOption, newOptionElement);
                 });
                 
-                // تحديد الوحدة الجديدة في الـ select الحالي
-                const targetSelectIndex = document.getElementById('addUnitModal').dataset.targetSelect;
-                const targetSelect = document.querySelector(`[name="units[${targetSelectIndex}][unit_id]"]`);
-                if (targetSelect) {
+                // تحديد الوحدة الجديدة في الصف الحالي
+                const targetRowIndex = document.getElementById('addUnitModal').dataset.targetRow;
+                const targetRow = document.querySelector(`tr[data-unit-index="${targetRowIndex}"]`);
+                if (targetRow) {
+                    const targetSelect = targetRow.querySelector('.unit-select');
                     targetSelect.value = data.unit.id;
                 }
                 
@@ -560,17 +547,32 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // التحقق من النموذج قبل الإرسال
     document.getElementById('itemForm').addEventListener('submit', function(e) {
-        const primaryChecked = document.querySelector('.primary-checkbox:checked');
+        const primaryChecked = document.querySelector('.primary-radio:checked');
         if (!primaryChecked) {
             e.preventDefault();
             alert('يجب تحديد وحدة رئيسية واحدة على الأقل');
             return false;
         }
         
-        const units = document.querySelectorAll('.unit-row');
-        if (units.length === 0) {
+        const rows = document.querySelectorAll('#unitsTableBody tr');
+        if (rows.length === 0) {
             e.preventDefault();
             alert('يجب إضافة وحدة واحدة على الأقل');
+            return false;
+        }
+        
+        // التحقق من اختيار الوحدات
+        let allUnitsSelected = true;
+        rows.forEach(row => {
+            const select = row.querySelector('.unit-select');
+            if (!select.value || select.value === 'new') {
+                allUnitsSelected = false;
+            }
+        });
+        
+        if (!allUnitsSelected) {
+            e.preventDefault();
+            alert('يجب اختيار وحدة لكل صف');
             return false;
         }
     });
