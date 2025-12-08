@@ -246,10 +246,17 @@ Route::prefix('setup')->name('setup.')->group(function () {
                 ]);
             }
             
-            // Get first category
+            // Get or create first category
             $category = \DB::table('categories')->first();
             if (!$category) {
-                throw new \Exception('يجب إضافة تصنيف واحد على الأقل');
+                $categoryId = \DB::table('categories')->insertGetId([
+                    'name' => 'مواد وقود',
+                    'description' => 'مواد وقود ومحروقات',
+                    'is_active' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $category = (object)['id' => $categoryId];
             }
             
             $item = \App\Models\Item::create([
