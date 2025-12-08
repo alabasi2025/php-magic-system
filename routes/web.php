@@ -55,6 +55,28 @@ Route::get('/test-warehouses', function () {
     }
 });
 
+// Simple GET route to run warehouse groups seeder (temporary)
+Route::get('/run-warehouse-groups-seeder', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => 'Database\\Seeders\\WarehouseGroupsSeeder',
+            '--force' => true
+        ]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        return response()->json([
+            'success' => true,
+            'message' => 'Warehouse groups seeder executed successfully',
+            'output' => $output
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error running seeder',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
 // Simple GET route to run warehouse accounts seeder (temporary)
 Route::get('/run-warehouse-accounts-seeder', function () {
     try {
