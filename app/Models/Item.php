@@ -37,16 +37,23 @@ class Item extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'sku',
+        'code',
+        'sku', // Keep for backward compatibility
         'name',
         'description',
+        'category_id',
         'unit_id',
         'min_stock',
         'max_stock',
-        'unit_price',
+        'reorder_level',
+        'cost_price',
+        'selling_price',
+        'unit_price', // Keep for backward compatibility
         'barcode',
-        'image_path',
-        'status',
+        'image',
+        'image_path', // Keep for backward compatibility
+        'is_active',
+        'status', // Keep for backward compatibility
     ];
 
     /**
@@ -110,7 +117,7 @@ class Item extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('status', 'active');
+        return $query->where('is_active', 1);
     }
 
     /**
@@ -118,7 +125,7 @@ class Item extends Model
      */
     public function scopeInactive($query)
     {
-        return $query->where('status', 'inactive');
+        return $query->where('is_active', 0);
     }
 
     /**
@@ -141,7 +148,7 @@ class Item extends Model
      */
     public function isActive(): bool
     {
-        return $this->status === 'active';
+        return $this->is_active == 1;
     }
 
     /**
