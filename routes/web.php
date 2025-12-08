@@ -416,29 +416,136 @@ Route::get('/add-employees-group-now', function() {
     }
 })->middleware('auth');
 
-// Temporary route to run AccountTypeSeeder
-Route::get('/run-account-type-seeder', function() {
+// Temporary route to add account types directly
+Route::get('/add-account-types-now', function() {
     try {
-        \Illuminate\Support\Facades\Artisan::call('db:seed', [
-            '--class' => 'AccountTypeSeeder',
-            '--force' => true
-        ]);
-        $output = \Illuminate\Support\Facades\Artisan::output();
+        $accountTypes = [
+            [
+                'key' => 'customer',
+                'name_ar' => 'عميل',
+                'name_en' => 'Customer',
+                'icon' => 'fas fa-user-tie',
+                'description' => 'حسابات العملاء',
+                'is_active' => true,
+                'is_system' => true,
+                'sort_order' => 1,
+            ],
+            [
+                'key' => 'supplier',
+                'name_ar' => 'مورد',
+                'name_en' => 'Supplier',
+                'icon' => 'fas fa-truck',
+                'description' => 'حسابات الموردين',
+                'is_active' => true,
+                'is_system' => true,
+                'sort_order' => 2,
+            ],
+            [
+                'key' => 'employee',
+                'name_ar' => 'موظف',
+                'name_en' => 'Employee',
+                'icon' => 'fas fa-user',
+                'description' => 'حسابات الموظفين',
+                'is_active' => true,
+                'is_system' => true,
+                'sort_order' => 3,
+            ],
+            [
+                'key' => 'bank',
+                'name_ar' => 'بنك',
+                'name_en' => 'Bank',
+                'icon' => 'fas fa-university',
+                'description' => 'الحسابات البنكية',
+                'is_active' => true,
+                'is_system' => true,
+                'sort_order' => 4,
+            ],
+            [
+                'key' => 'cash',
+                'name_ar' => 'صندوق نقدي',
+                'name_en' => 'Cash',
+                'icon' => 'fas fa-cash-register',
+                'description' => 'الصناديق النقدية',
+                'is_active' => true,
+                'is_system' => true,
+                'sort_order' => 5,
+            ],
+            [
+                'key' => 'asset',
+                'name_ar' => 'أصل',
+                'name_en' => 'Asset',
+                'icon' => 'fas fa-building',
+                'description' => 'الأصول الثابتة',
+                'is_active' => true,
+                'is_system' => true,
+                'sort_order' => 6,
+            ],
+            [
+                'key' => 'expense',
+                'name_ar' => 'مصروف',
+                'name_en' => 'Expense',
+                'icon' => 'fas fa-money-bill-wave',
+                'description' => 'حسابات المصروفات',
+                'is_active' => true,
+                'is_system' => true,
+                'sort_order' => 7,
+            ],
+            [
+                'key' => 'revenue',
+                'name_ar' => 'إيراد',
+                'name_en' => 'Revenue',
+                'icon' => 'fas fa-chart-line',
+                'description' => 'حسابات الإيرادات',
+                'is_active' => true,
+                'is_system' => true,
+                'sort_order' => 8,
+            ],
+            [
+                'key' => 'tax',
+                'name_ar' => 'ضريبة',
+                'name_en' => 'Tax',
+                'icon' => 'fas fa-percentage',
+                'description' => 'حسابات الضرائب',
+                'is_active' => true,
+                'is_system' => true,
+                'sort_order' => 9,
+            ],
+            [
+                'key' => 'partner',
+                'name_ar' => 'شريك',
+                'name_en' => 'Partner',
+                'icon' => 'fas fa-handshake',
+                'description' => 'حسابات الشركاء',
+                'is_active' => true,
+                'is_system' => true,
+                'sort_order' => 10,
+            ],
+        ];
+
+        $added = [];
+        foreach ($accountTypes as $type) {
+            $existing = \App\Models\AccountType::where('key', $type['key'])->first();
+            if (!$existing) {
+                $created = \App\Models\AccountType::create($type);
+                $added[] = $created;
+            }
+        }
         
         $count = \App\Models\AccountType::count();
         
         return response()->json([
             'success' => true,
-            'message' => 'تم تشغيل AccountTypeSeeder بنجاح!',
-            'output' => $output,
-            'account_types_count' => $count,
-            'next_step' => 'افتح صفحة الإعدادات المالية لمشاهدة أنواع الحسابات: /financial-settings'
+            'message' => 'تم إضافة أنواع الحسابات بنجاح!',
+            'added_count' => count($added),
+            'total_count' => $count,
+            'next_step' => 'افتح صفحة الإعدادات المالية: /financial-settings'
         ]);
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,
             'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
+            'line' => $e->getLine(),
+            'file' => $e->getFile()
         ], 500);
     }
 });
