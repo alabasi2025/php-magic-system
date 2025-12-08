@@ -36,6 +36,28 @@ Route::get('/test-warehouses', function () {
     }
 });
 
+// Simple GET route to run warehouse account type seeder (temporary)
+Route::get('/run-warehouse-seeder', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', [
+            '--class' => 'Database\\Seeders\\WarehouseAccountTypeSeeder',
+            '--force' => true
+        ]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        return response()->json([
+            'success' => true,
+            'message' => 'Warehouse account type seeder executed successfully',
+            'output' => $output
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error running seeder',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
 // Simple GET route to run migrations (temporary)
 Route::get('/run-migrations-now', function () {
     try {
