@@ -151,6 +151,74 @@ Route::prefix('setup')->name('setup.')->group(function () {
         }
     });
     
+    // Add Diesel Item
+    Route::get('/add-diesel', function() {
+        try {
+            \DB::beginTransaction();
+            
+            $literUnit = \App\Models\ItemUnit::where('name', 'لتر')->first();
+            
+            if (!$literUnit) {
+                throw new \Exception('وحدة اللتر غير موجودة');
+            }
+            
+            // Check if already exists
+            $existing = \App\Models\Item::where('sku', 'DIESEL-001')->first();
+            if ($existing) {
+                return response()->json([
+                    'success' => true,
+                    'item_id' => $existing->id,
+                    'message' => 'صنف الديزل موجود مسبقاً'
+                ]);
+            }
+            
+            $item = \App\Models\Item::create([
+                'sku' => 'DIESEL-001',
+                'name' => 'الديزل',
+                'description' => 'ديزل للمحركات',
+                'unit_id' => $literUnit->id,
+                'min_stock' => 100,
+                'max_stock' => 10000,
+                'unit_price' => 5.00,
+                'status' => 'active',
+            ]);
+            
+            $units = [
+                ['name' => 'لتر', 'capacity' => 1, 'price' => 5.00, 'is_primary' => true],
+                ['name' => 'دبة', 'capacity' => 20, 'price' => 95.00, 'is_primary' => false],
+                ['name' => 'برميل', 'capacity' => 200, 'price' => 950.00, 'is_primary' => false],
+            ];
+            
+            foreach ($units as $unitData) {
+                $unit = \App\Models\ItemUnit::where('name', $unitData['name'])->first();
+                if ($unit) {
+                    \App\Models\ItemUnitConversion::create([
+                        'item_id' => $item->id,
+                        'item_unit_id' => $unit->id,
+                        'capacity' => $unitData['capacity'],
+                        'price' => $unitData['price'],
+                        'is_primary' => $unitData['is_primary'],
+                    ]);
+                }
+            }
+            
+            \DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'item_id' => $item->id,
+                'message' => 'تم إضافة صنف الديزل بنجاح'
+            ]);
+            
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
+    
     // Clear all caches
     Route::get('/clear-cache', function() {
         try {
