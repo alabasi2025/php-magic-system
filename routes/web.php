@@ -649,3 +649,33 @@ Route::get('/clear-cache-version', function() {
         'number' => config('version.number')
     ]);
 });
+
+// Test update account
+Route::get('/test-update-account-16', function() {
+    $account = \App\Models\ChartAccount::find(16);
+    if (!$account) {
+        return response()->json(['error' => 'Account not found']);
+    }
+    
+    $before = [
+        'account_group_id' => $account->account_group_id,
+        'is_parent' => $account->is_parent
+    ];
+    
+    $account->update([
+        'is_parent' => false,
+        'account_group_id' => 6
+    ]);
+    
+    $after = [
+        'account_group_id' => $account->account_group_id,
+        'is_parent' => $account->is_parent
+    ];
+    
+    return response()->json([
+        'success' => true,
+        'before' => $before,
+        'after' => $after,
+        'account' => $account
+    ]);
+});
