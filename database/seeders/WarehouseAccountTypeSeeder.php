@@ -15,6 +15,7 @@ class WarehouseAccountTypeSeeder extends Seeder
         if (!$exists) {
             DB::table('account_types')->insert([
                 'key' => 'warehouse',
+                'name' => 'مخزون',
                 'name_ar' => 'مخزون',
                 'name_en' => 'Warehouse',
                 'icon' => 'fas fa-warehouse',
