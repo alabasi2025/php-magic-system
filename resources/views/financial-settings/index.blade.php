@@ -305,6 +305,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = id ? `/financial-settings/account-groups/${id}` : '/financial-settings/account-groups';
             const method = id ? 'PUT' : 'POST';
             
+            console.log('📤 Sending request:', {url, method, data});
+            
             try {
                 const response = await fetch(url, {
                     method: method,
@@ -328,6 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 const result = await response.json();
+                console.log('📥 Response received:', result);
                 
                 if (result.success) {
                     alert(result.message);
