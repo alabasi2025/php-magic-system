@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <select class="form-select unit-select" name="units[${unitIndex}][unit_id]" required>
                     <option value="">اختر الوحدة...</option>
                     @foreach($units as $unit)
-                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                        <option value="{{ $unit->id }}" ${isPrimary && '{{ $unit->name }}' === 'لتر' ? 'selected' : ''}>{{ $unit->name }}</option>
                     @endforeach
                     <option value="new" class="text-success fw-bold">+ إضافة وحدة جديدة</option>
                 </select>
