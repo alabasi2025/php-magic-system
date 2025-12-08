@@ -103,6 +103,7 @@
         <form id="addAccountForm" class="p-6 space-y-4">
             @csrf
             <input type="hidden" name="chart_group_id" value="{{ $chartGroup->id }}">
+            <input type="hidden" name="account_id" id="account_id" value="">
 
             <!-- الحساب الأب -->
             <div>
@@ -124,7 +125,7 @@
                     <i class="fas fa-barcode text-indigo-600 ml-1"></i>
                     كود الحساب <span class="text-red-500">*</span>
                 </label>
-                <input type="text" name="code" required 
+                <input type="text" name="code" id="code" required 
                        placeholder="مثال: 001-001"
                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
             </div>
@@ -135,8 +136,19 @@
                     <i class="fas fa-tag text-indigo-600 ml-1"></i>
                     اسم الحساب <span class="text-red-500">*</span>
                 </label>
-                <input type="text" name="name" required 
+                <input type="text" name="name" id="name" required 
                        placeholder="مثال: الرواتب والأجور"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- الاسم بالإنجليزية -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-tag text-indigo-600 ml-1"></i>
+                    اسم الحساب بالإنجليزية (اختياري)
+                </label>
+                <input type="text" name="name_en" id="name_en" 
+                       placeholder="Example: Salaries and Wages"
                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
             </div>
 
@@ -190,7 +202,7 @@
                     <i class="fas fa-link text-indigo-600 ml-1"></i>
                     حساب وسيط لأي فئة؟ <span class="text-red-500">*</span>
                 </label>
-                <select name="intermediate_for" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                <select name="intermediate_for" id="intermediate_for" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                     <option value="">-- اختر الفئة --</option>
                     <option value="cash_boxes">الصناديق</option>
                     <option value="banks">البنوك</option>
@@ -206,15 +218,15 @@
                     <i class="fas fa-align-right text-indigo-600 ml-1"></i>
                     الوصف (اختياري)
                 </label>
-                <textarea name="description" rows="2"
+                <textarea name="description" id="description" rows="2"
                           placeholder="وصف مختصر للحساب..."
                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
             </div>
 
             <!-- الحالة -->
             <div class="flex items-center">
-                <input type="checkbox" name="is_active" value="1" checked
-                       class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                <input type="checkbox" name="is_active" id="is_active" value="1" checked
+                       class="w-full h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                 <label class="mr-3 text-sm font-medium text-gray-700">
                     تفعيل الحساب
                 </label>
@@ -226,7 +238,7 @@
                     <i class="fas fa-times ml-2"></i>
                     إلغاء
                 </button>
-                <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors">
+                <button type="submit" id="saveAccountBtn" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors">
                     <i class="fas fa-save ml-2"></i>
                     حفظ الحساب
                 </button>
