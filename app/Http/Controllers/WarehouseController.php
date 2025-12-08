@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Warehouse;
+use App\Models\WarehouseGroup;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,7 +49,8 @@ class WarehouseController extends Controller
     public function create()
     {
         $managers = User::all();
-        return view('inventory.warehouses.create', compact('managers'));
+        $warehouseGroups = WarehouseGroup::active()->orderBy('name')->get();
+        return view('inventory.warehouses.create', compact('managers', 'warehouseGroups'));
     }
 
     /**
@@ -57,6 +59,7 @@ class WarehouseController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'warehouse_group_id' => 'nullable|exists:warehouse_groups,id',
             'code' => 'required|string|max:50|unique:warehouses,code',
             'name' => 'required|string|max:200',
             'location' => 'nullable|string|max:500',
@@ -105,7 +108,8 @@ class WarehouseController extends Controller
     public function edit(Warehouse $warehouse)
     {
         $managers = User::all();
-        return view('inventory.warehouses.edit', compact('warehouse', 'managers'));
+        $warehouseGroups = WarehouseGroup::active()->orderBy('name')->get();
+        return view('inventory.warehouses.edit', compact('warehouse', 'managers', 'warehouseGroups'));
     }
 
     /**
@@ -114,6 +118,7 @@ class WarehouseController extends Controller
     public function update(Request $request, Warehouse $warehouse)
     {
         $validated = $request->validate([
+            'warehouse_group_id' => 'nullable|exists:warehouse_groups,id',
             'code' => ['required', 'string', 'max:50', Rule::unique('warehouses', 'code')->ignore($warehouse->id)],
             'name' => 'required|string|max:200',
             'location' => 'nullable|string|max:500',

@@ -32,6 +32,7 @@ class Warehouse extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'warehouse_group_id',
         'code',
         'name',
         'location',
@@ -50,6 +51,14 @@ class Warehouse extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    /**
+     * Get the warehouse group this warehouse belongs to.
+     */
+    public function warehouseGroup()
+    {
+        return $this->belongsTo(WarehouseGroup::class, 'warehouse_group_id');
+    }
 
     /**
      * Get the manager of this warehouse.

@@ -91,6 +91,37 @@
 
                     <div class="form-group-enhanced">
                         <label>
+                            <i class="fas fa-layer-group me-2 text-purple"></i>
+                            مجموعة المخازن
+                        </label>
+                        <select class="form-control-enhanced @error('warehouse_group_id') is-invalid @enderror" 
+                                id="warehouse_group_id" 
+                                name="warehouse_group_id">
+                            <option value="">-- اختر مجموعة المخازن --</option>
+                            @foreach($warehouseGroups as $group)
+                                <option value="{{ $group->id }}" 
+                                        {{ old('warehouse_group_id', $warehouse->warehouse_group_id) == $group->id ? 'selected' : '' }}>
+                                    {{ $group->code }} - {{ $group->name }}
+                                    @if($group->account)
+                                        ({{ $group->account->code }})
+                                    @endif
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('warehouse_group_id')
+                            <div class="invalid-feedback d-block">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {{ $message }}
+                            </div>
+                        @enderror
+                        <small class="form-text text-muted mt-2 d-block">
+                            <i class="fas fa-info-circle me-1"></i>
+                            المجموعة تحدد الحساب المحاسبي المرتبط بالمخزن
+                        </small>
+                    </div>
+
+                    <div class="form-group-enhanced">
+                        <label>
                             <i class="fas fa-map-marker-alt me-2 text-danger"></i>
                             الموقع
                         </label>

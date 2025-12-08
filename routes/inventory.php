@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\WarehouseGroupController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\InventoryReportController;
@@ -25,6 +26,9 @@ Route::prefix('inventory')->name('inventory.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [InventoryReportController::class, 'dashboard'])->name('dashboard');
 
+    // Warehouse Groups Management
+    Route::resource('warehouse-groups', WarehouseGroupController::class);
+    
     // Warehouses Management
     Route::resource('warehouses', WarehouseController::class);
     Route::get('/warehouses/{warehouse}/stock-report', [WarehouseController::class, 'stockReport'])->name('warehouses.stock-report');
