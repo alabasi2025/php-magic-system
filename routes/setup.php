@@ -127,6 +127,30 @@ Route::prefix('setup')->name('setup.')->group(function () {
         }
     });
     
+    // Debug: View last error
+    Route::get('/last-error', function() {
+        try {
+            $logFile = storage_path('logs/laravel.log');
+            
+            if (!\File::exists($logFile)) {
+                return response()->json(['error' => 'Log file not found']);
+            }
+            
+            $content = \File::get($logFile);
+            $lines = explode("\n", $content);
+            
+            // Get last 200 lines
+            $lastLines = array_slice($lines, -200);
+            
+            return response('<pre>' . htmlspecialchars(implode("\n", $lastLines)) . '</pre>');
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
+    
     // Clear all caches
     Route::get('/clear-cache', function() {
         try {
