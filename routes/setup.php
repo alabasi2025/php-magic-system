@@ -29,4 +29,29 @@ Route::prefix('setup')->name('setup.')->group(function () {
     // Setup complete inventory system
     Route::get('/inventory/setup', [SetupController::class, 'setupInventorySystem'])
         ->name('inventory.setup');
+    
+    // Test items page
+    Route::get('/test-items', function() {
+        try {
+            $units = \App\Models\ItemUnit::all();
+            $items = \App\Models\Item::all();
+            
+            return response()->json([
+                'success' => true,
+                'units_count' => $units->count(),
+                'items_count' => $items->count(),
+                'sample_units' => $units->take(3)->map(function($u) {
+                    return ['code' => $u->code, 'name' => $u->name];
+                }),
+                'controller_test' => 'Testing ItemController...'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
+        }
+    });
 });
