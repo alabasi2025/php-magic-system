@@ -223,10 +223,17 @@ Route::prefix('setup')->name('setup.')->group(function () {
         try {
             \DB::beginTransaction();
             
+            // Get liter unit from item_units for conversions
             $literUnit = \App\Models\ItemUnit::where('name', 'لتر')->first();
             
             if (!$literUnit) {
                 throw new \Exception('وحدة اللتر غير موجودة');
+            }
+            
+            // Get first organizational unit from units table
+            $orgUnit = \DB::table('units')->first();
+            if (!$orgUnit) {
+                throw new \Exception('يجب وجود وحدة تنظيمية واحدة على الأقل');
             }
             
             // Check if already exists
@@ -250,7 +257,7 @@ Route::prefix('setup')->name('setup.')->group(function () {
                 'name' => 'الديزل',
                 'description' => 'ديزل للمحركات',
                 'category_id' => $category->id,
-                'unit_id' => $literUnit->id,
+                'unit_id' => $orgUnit->id, // Organizational unit (not item_unit)
                 'min_stock' => 100,
                 'max_stock' => 10000,
                 'cost_price' => 5.00,
