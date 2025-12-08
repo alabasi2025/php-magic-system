@@ -464,21 +464,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // إذا كان الصف الأول، اختر أول وحدة متاحة تلقائياً
-        if (isPrimary && unitSelect.options.length > 1) {
-            // ابحث عن "لتر" أو اختر أول وحدة
-            let literOption = null;
-            for (let i = 1; i < unitSelect.options.length - 1; i++) {
-                if (unitSelect.options[i].text.includes('لتر')) {
-                    literOption = unitSelect.options[i];
-                    break;
-                }
-            }
-            if (literOption) {
-                unitSelect.value = literOption.value;
-            } else if (unitSelect.options[1]) {
-                unitSelect.value = unitSelect.options[1].value;
-            }
+        // إذا كان الصف الأول (الرئيسي)، اختر أول وحدة متاحة
+        if (isPrimary && unitSelect.options.length > 2) {
+            // اختر أول وحدة بعد "اختر الوحدة..."
+            unitSelect.selectedIndex = 1;
         }
         
         unitIndex++;
