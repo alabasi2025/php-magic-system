@@ -679,3 +679,30 @@ Route::get('/test-update-account-16', function() {
         'account' => $account
     ]);
 });
+
+
+// Test routes for account groups
+Route::get('/test-add-account-group', function() {
+    $group = \App\Models\AccountGroup::create([
+        'name' => 'مجموعة اختبار ' . time(),
+        'code' => 'TEST' . time(),
+        'description' => 'مجموعة للاختبار',
+        'sort_order' => 999,
+        'is_active' => true
+    ]);
+    return response()->json(['success' => true, 'group' => $group]);
+});
+
+Route::get('/test-update-account-group/{id}', function($id) {
+    $group = \App\Models\AccountGroup::find($id);
+    $before = ['name' => $group->name, 'code' => $group->code];
+    $group->update(['name' => 'مجموعة معدلة', 'code' => 'UPDATED']);
+    $after = ['name' => $group->name, 'code' => $group->code];
+    return response()->json(['success' => true, 'before' => $before, 'after' => $after]);
+});
+
+Route::get('/test-delete-account-group/{id}', function($id) {
+    $group = \App\Models\AccountGroup::find($id);
+    $group->delete();
+    return response()->json(['success' => true, 'message' => 'تم الحذف']);
+});
