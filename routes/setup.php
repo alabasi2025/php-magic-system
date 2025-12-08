@@ -220,14 +220,10 @@ Route::prefix('setup')->name('setup.')->group(function () {
                 ]);
             }
             
-            // Get first category or create one
-            $category = \App\Models\Inventory\Category::first();
+            // Get first category
+            $category = \DB::table('categories')->first();
             if (!$category) {
-                $category = \App\Models\Inventory\Category::create([
-                    'name' => 'مواد وقود',
-                    'description' => 'مواد وقود ومحروقات',
-                    'is_active' => true,
-                ]);
+                throw new \Exception('يجب إضافة تصنيف واحد على الأقل');
             }
             
             $item = \App\Models\Item::create([
