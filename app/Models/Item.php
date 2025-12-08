@@ -72,6 +72,22 @@ class Item extends Model
     }
 
     /**
+     * Get all unit conversions for this item.
+     */
+    public function unitConversions()
+    {
+        return $this->hasMany(ItemUnitConversion::class, 'item_id')->ordered();
+    }
+
+    /**
+     * Get the primary unit conversion.
+     */
+    public function primaryUnitConversion()
+    {
+        return $this->hasOne(ItemUnitConversion::class, 'item_id')->where('is_primary', true);
+    }
+
+    /**
      * Get all stock movements for this item.
      */
     public function stockMovements()

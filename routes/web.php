@@ -145,6 +145,24 @@ Route::get('/run-warehouse-seeder', function () {
     }
 });
 
+// Route to add Dahmiya warehouse
+Route::get('/add-dahmiya-warehouse', function () {
+    try {
+        $seeder = new \Database\Seeders\DahmiyaWarehouseSeeder();
+        $result = $seeder->run();
+        return response()->json([
+            'success' => true,
+            'message' => $result
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error adding warehouse',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
 // Simple GET route to run migrations (temporary)
 Route::get('/run-migrations-now', function () {
     try {

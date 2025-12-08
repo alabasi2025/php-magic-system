@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WarehouseGroupController;
-use App\Http\Controllers\ItemController;
+use App\Http\Controllers\Inventory\ItemController;
+use App\Http\Controllers\Inventory\ItemUnitController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\InventoryReportController;
 
@@ -33,8 +34,14 @@ Route::prefix('inventory')->name('inventory.')->group(function () {
     Route::resource('warehouses', WarehouseController::class);
     Route::get('/warehouses/{warehouse}/stock-report', [WarehouseController::class, 'stockReport'])->name('warehouses.stock-report');
 
+    // Item Units Management
+    Route::resource('item-units', ItemUnitController::class);
+    Route::post('/item-units/store-ajax', [ItemUnitController::class, 'storeAjax'])->name('item-units.store-ajax');
+    Route::get('/item-units/get-active', [ItemUnitController::class, 'getActive'])->name('item-units.get-active');
+    
     // Items Management
     Route::resource('items', ItemController::class);
+    Route::get('/items/{item}/unit-conversions', [ItemController::class, 'getUnitConversions'])->name('items.unit-conversions');
     Route::get('/items-below-min-stock', [ItemController::class, 'belowMinStock'])->name('items.below-min-stock');
 
     // Stock Movements
