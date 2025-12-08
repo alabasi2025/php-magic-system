@@ -465,9 +465,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // إذا كان الصف الأول (الرئيسي)، اختر أول وحدة متاحة
-        if (isPrimary && unitSelect.options.length > 2) {
-            // اختر أول وحدة بعد "اختر الوحدة..."
-            unitSelect.selectedIndex = 1;
+        if (isPrimary) {
+            // انتظر قليلاً ثم حدد أول وحدة
+            setTimeout(function() {
+                if (unitSelect.options.length > 2) {
+                    unitSelect.selectedIndex = 1;
+                    // Trigger change event
+                    unitSelect.dispatchEvent(new Event('change'));
+                }
+            }, 100);
         }
         
         unitIndex++;
