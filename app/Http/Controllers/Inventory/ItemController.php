@@ -109,14 +109,9 @@ class ItemController extends Controller
                 $itemData['image_path'] = $request->file('image')->store('items', 'public');
             }
 
-            // Add code field only if it exists in the table
-            if (Schema::hasColumn('items', 'code')) {
-                $itemData['code'] = $validated['sku'];
-            }
-            
             \Log::info('Item Data Before Create', $itemData);
             $item = Item::create($itemData);
-            \Log::info('Item created successfully', ['item_id' => $item->id, 'sku' => $item->sku, 'code' => $item->code]);
+            \Log::info('Item created successfully', ['item_id' => $item->id, 'sku' => $item->sku]);
 
             DB::commit();
 

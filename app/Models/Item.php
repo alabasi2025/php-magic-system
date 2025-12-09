@@ -37,8 +37,7 @@ class Item extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'code',
-        'sku', // Keep for backward compatibility
+        'sku',
         'name',
         'description',
         'category_id',
