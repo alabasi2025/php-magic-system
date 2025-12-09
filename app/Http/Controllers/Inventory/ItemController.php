@@ -70,12 +70,7 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        // Debug: Check received data
-        \Log::info('Item Store Request', [
-            'all_data' => $request->all(),
-            'units' => $request->input('units'),
-            'primary_unit' => $request->input('primary_unit')
-        ]);
+        \Log::info('Item Store Request', $request->all());
         
         // Validation
         $validated = $request->validate([
@@ -114,6 +109,7 @@ class ItemController extends Controller
             }
 
             $item = Item::create($itemData);
+            \Log::info('Item created successfully', ['item_id' => $item->id, 'sku' => $item->sku]);
 
             DB::commit();
 
@@ -123,6 +119,10 @@ class ItemController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Item Store Error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             
             return redirect()
                 ->back()
