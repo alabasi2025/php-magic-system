@@ -91,6 +91,7 @@ class ItemController extends Controller
 
             // Create item with simplified data
             $itemData = [
+                'code' => $validated['sku'], // استخدام SKU كـ code
                 'sku' => $validated['sku'],
                 'name' => $validated['name'],
                 'description' => $validated['description'] ?? null,
