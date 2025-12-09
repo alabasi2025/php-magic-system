@@ -61,8 +61,8 @@ class ItemController extends Controller
     public function create()
     {
         $units = ItemUnit::where('status', 'active')->orderBy('name')->get();
-        return view('inventory.items.create_new', compact('units'));
-        return view('inventory.items.create_new', compact('units'));
+        $totalItems = Item::count();
+        return view('inventory.items.create', compact('units', 'totalItems'));
     }
 
     /**
