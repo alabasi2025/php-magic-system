@@ -1,0 +1,97 @@
+/* Premium 4K Ultra HD Styles for PHP Magic System */
+
+/* 4K Resolution Optimization (3840×2160) */
+@media (min-width: 3840px) {
+    html {
+        font-size: 20px;
+    }
+    
+    .container-fluid {
+        max-width: 3600px;
+        margin: 0 auto;
+        padding: 0 100px;
+    }
+    
+    .card {
+        margin-bottom: 4rem;
+    }
+    
+    .card-body {
+        padding: 4rem;
+    }
+    
+    h1 { font-size: 6rem; }
+    h2 { font-size: 5rem; }
+    h3 { font-size: 4rem; }
+    h4 { font-size: 3rem; }
+    h5 { font-size: 2.5rem; }
+    
+    .btn-lg {
+        font-size: 2rem;
+        padding: 1.5rem 3rem;
+    }
+    
+    .form-control-lg, .form-select-lg {
+        font-size: 1.8rem;
+        padding: 1.5rem 2rem;
+    }
+}
+
+/* 2K/QHD Resolution Optimization (2560×1440) */
+@media (min-width: 2560px) and (max-width: 3839px) {
+    html {
+        font-size: 18px;
+    }
+    
+    .container-fluid {
+        max-width: 2400px;
+        margin: 0 auto;
+        padding: 0 60px;
+    }
+    
+    h1 { font-size: 4.5rem; }
+    h2 { font-size: 3.8rem; }
+    h3 { font-size: 3rem; }
+    h4 { font-size: 2.5rem; }
+    h5 { font-size: 2rem; }
+}
+
+/* Premium Animations */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.shimmer-effect {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    background-size: 1000px 100%;
+    animation: shimmer 3s infinite;
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* High-DPI Image Support */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* Performance Optimizations */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+}
