@@ -109,8 +109,9 @@ class ItemController extends Controller
                 $itemData['image_path'] = $request->file('image')->store('items', 'public');
             }
 
+            \Log::info('Item Data Before Create', $itemData);
             $item = Item::create($itemData);
-            \Log::info('Item created successfully', ['item_id' => $item->id, 'sku' => $item->sku]);
+            \Log::info('Item created successfully', ['item_id' => $item->id, 'sku' => $item->sku, 'code' => $item->code]);
 
             DB::commit();
 
