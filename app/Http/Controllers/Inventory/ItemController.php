@@ -87,31 +87,25 @@ class ItemController extends Controller
             'barcode' => 'nullable|string|max:100|unique:items,barcode',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:active,inactive',
-            'units' => 'required|array|min:1',
-            'units.*.unit_id' => 'required|exists:item_units,id',
-            'units.*.capacity' => 'required|numeric|min:0.0001',
-            'units.*.price' => 'nullable|numeric|min:0',
-            'primary_unit' => 'required|integer',
+            'unit_id' => 'required|exists:item_units,id',
+            'unit_price' => 'required|numeric|min:0',
         ]);
 
         try {
             DB::beginTransaction();
 
-            // Get primary unit info
-            $primaryUnitIndex = $validated['primary_unit'];
-            $primaryUnitId = $validated['units'][$primaryUnitIndex]['unit_id'];
-
-            // Create item
+            // Create item with simplified data
             $itemData = [
                 'sku' => $validated['sku'],
                 'name' => $validated['name'],
                 'description' => $validated['description'] ?? null,
-                'unit_id' => $primaryUnitId, // الوحدة الرئيسية
+                'unit_id' => $validated['unit_id'],
                 'min_stock' => $validated['min_stock'],
                 'max_stock' => $validated['max_stock'],
-                'unit_price' => $validated['units'][$primaryUnitIndex]['price'] ?? 0,
+                'unit_price' => $validated['unit_price'],
                 'barcode' => $validated['barcode'] ?? null,
                 'status' => $validated['status'],
+                'is_active' => ($validated['status'] === 'active') ? 1 : 0,
             ];
 
             // Handle image upload
@@ -121,24 +115,11 @@ class ItemController extends Controller
 
             $item = Item::create($itemData);
 
-            // Create unit conversions
-            $sortOrder = 0;
-            foreach ($validated['units'] as $index => $unitData) {
-                ItemUnitConversion::create([
-                    'item_id' => $item->id,
-                    'unit_id' => $unitData['unit_id'],
-                    'capacity' => $unitData['capacity'],
-                    'is_primary' => ($index == $primaryUnitIndex),
-                    'price' => $unitData['price'] ?? null,
-                    'sort_order' => $sortOrder++,
-                ]);
-            }
-
             DB::commit();
 
             return redirect()
                 ->route('inventory.items.index')
-                ->with('success', 'تم إنشاء الصنف بنجاح مع ' . count($validated['units']) . ' وحدات');
+                ->with('success', 'تم إنشاء الصنف بنجاح');
 
         } catch (\Exception $e) {
             DB::rollBack();
