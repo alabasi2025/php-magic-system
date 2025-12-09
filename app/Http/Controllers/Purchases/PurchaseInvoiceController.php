@@ -44,12 +44,12 @@ class PurchaseInvoiceController extends Controller
     public function create()
     {
         // جلب الموردين النشطين
-        $suppliers = Supplier::where('status', 'active')
+        $suppliers = Supplier::where('is_active', 1)
             ->orderBy('name', 'asc')
             ->get();
 
         // جلب الأصناف النشطة
-        $items = Item::where('status', 'active')
+        $items = Item::where('is_active', 1)
             ->orderBy('name', 'asc')
             ->get();
 
@@ -190,12 +190,12 @@ class PurchaseInvoiceController extends Controller
         }
 
         // جلب الموردين النشطين
-        $suppliers = Supplier::where('status', 'active')
+        $suppliers = Supplier::where('is_active', 1)
             ->orderBy('name', 'asc')
             ->get();
 
         // جلب الأصناف النشطة
-        $items = Item::where('status', 'active')
+        $items = Item::where('is_active', 1)
             ->orderBy('name', 'asc')
             ->get();
 
