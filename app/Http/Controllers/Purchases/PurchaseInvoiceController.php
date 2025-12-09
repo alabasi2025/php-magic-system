@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Purchases;
 use App\Http\Controllers\Controller;
 use App\Models\PurchaseInvoice;
 use App\Models\Supplier;
-use App\Models\Product;
+use App\Models\Item;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -44,12 +44,12 @@ class PurchaseInvoiceController extends Controller
     public function create()
     {
         // جلب الموردين النشطين
-        $suppliers = Supplier::where('is_active', true)
+        $suppliers = Supplier::where('status', 'active')
             ->orderBy('name', 'asc')
             ->get();
 
-        // جلب المنتجات النشطة
-        $products = Product::where('is_active', true)
+        // جلب الأصناف النشطة
+        $items = Item::where('status', 'active')
             ->orderBy('name', 'asc')
             ->get();
 
@@ -59,7 +59,7 @@ class PurchaseInvoiceController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('purchases.invoices.create', compact('suppliers', 'products', 'purchaseOrders'));
+        return view('purchases.invoices.create', compact('suppliers', 'items', 'purchaseOrders'));
     }
 
     /**
@@ -190,16 +190,16 @@ class PurchaseInvoiceController extends Controller
         }
 
         // جلب الموردين النشطين
-        $suppliers = Supplier::where('is_active', true)
+        $suppliers = Supplier::where('status', 'active')
             ->orderBy('name', 'asc')
             ->get();
 
-        // جلب المنتجات النشطة
-        $products = Product::where('is_active', true)
+        // جلب الأصناف النشطة
+        $items = Item::where('status', 'active')
             ->orderBy('name', 'asc')
             ->get();
 
-        return view('purchases.invoices.edit', compact('invoice', 'suppliers', 'products'));
+        return view('purchases.invoices.edit', compact('invoice', 'suppliers', 'items'));
     }
 
     /**
