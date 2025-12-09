@@ -1,0 +1,379 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Item;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Throwable;
+
+/**
+ * InventoryApiService
+ * 
+ * RESTful API service for Inventory system (Item Model)
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class InventoryApiService
+{
+    /**
+     * Get the validation rules for store and update operations.
+     *
+     * @param int|null $id
+     * @return array
+     */
+    protected function rules(?int $id = null): array
+    {
+        return [
+            'code' => ['required', 'string', 'max:255', 'unique:items,code,' . $id],
+            'sku' => ['nullable', 'string', 'max:255', 'unique:items,sku,' . $id],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'], // Assuming a 'categories' table
+            'unit_id' => ['required', 'integer', 'exists:item_units,id'], // Assuming an 'item_units' table
+            'min_stock' => ['nullable', 'numeric', 'min:0'],
+            'max_stock' => ['nullable', 'numeric', 'min:0'],
+            'reorder_level' => ['nullable', 'numeric', 'min:0'],
+            'cost_price' => ['required', 'numeric', 'min:0'],
+            'selling_price' => ['required', 'numeric', 'min:0'],
+            'barcode' => ['nullable', 'string', 'max:255'],
+            'is_active' => ['boolean'],
+        ];
+    }
+
+    /**
+     * Get all records with pagination and filtering.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $query = Item::query();
+
+            // Simple search filter
+            if ($search = $request->get('search')) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('sku', 'like', "%{$search}%")
+                      ->orWhere('code', 'like', "%{$search}%");
+            }
+
+            // Apply active scope if requested
+            if ($request->boolean('active')) {
+                $query->active();
+            }
+
+            $items = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Items retrieved successfully.',
+                'data' => $items->items(),
+                'meta' => [
+                    'total' => $items->total(),
+                    'current_page' => $items->currentPage(),
+                    'last_page' => $items->lastPage(),
+                    'per_page' => $items->perPage(),
+                ],
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve items.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get single record by ID.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $item = Item::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Item retrieved successfully.',
+                'data' => $item,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item not found.',
+            ], 404);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve item.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Create new record.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $validated = Validator::make($request->all(), $this->rules())->validate();
+
+            DB::beginTransaction();
+            
+            $item = Item::create($validated);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Item created successfully.',
+                'data' => $item,
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create item.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update existing record.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $item = Item::findOrFail($id);
+            $validated = Validator::make($request->all(), $this->rules($id))->validate();
+
+            DB::beginTransaction();
+            
+            $item->update($validated);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Item updated successfully.',
+                'data' => $item,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item not found.',
+            ], 404);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update item.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete record.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $item = Item::findOrFail($id);
+
+            DB::beginTransaction();
+            
+            $item->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Item deleted successfully.',
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item not found.',
+            ], 404);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete item.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Bulk operations (e.g., delete, update status).
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'operation' => ['required', 'string', 'in:delete,activate,deactivate'],
+            'ids' => ['required', 'array'],
+            'ids.*' => ['integer', 'exists:items,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for bulk operation.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $validated = $validator->validated();
+        $operation = $validated['operation'];
+        $ids = $validated['ids'];
+        $affected = 0;
+
+        try {
+            DB::beginTransaction();
+
+            $query = Item::whereIn('id', $ids);
+
+            switch ($operation) {
+                case 'delete':
+                    $affected = $query->delete();
+                    break;
+                case 'activate':
+                    $affected = $query->update(['is_active' => true]);
+                    break;
+                case 'deactivate':
+                    $affected = $query->update(['is_active' => false]);
+                    break;
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Bulk operation '{$operation}' completed successfully.",
+                'affected' => $affected,
+            ]);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to perform bulk operation.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Export data (simulated).
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        // In a real application, this would dispatch a job to generate a file
+        // and return a download link or a job ID.
+        try {
+            // Simulate file generation
+            $fileName = 'inventory_export_' . time() . '.csv';
+            $filePath = '/exports/' . $fileName;
+
+            // Logic to fetch data and write to file would go here
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Export process initiated successfully.',
+                'download_url' => $filePath,
+                'note' => 'This is a simulated export. In production, a job would be dispatched.',
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate export.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Import data (simulated).
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => ['required', 'file', 'mimes:csv,xlsx', 'max:10240'], // Max 10MB
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for import file.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // In a real application, the file would be stored and a job would be dispatched
+        // to process the import asynchronously.
+        try {
+            // $file = $request->file('file');
+            // $path = $file->store('imports');
+
+            // Dispatch ImportJob::dispatch($path, $request->user()->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Import file uploaded and processing initiated.',
+                'imported' => rand(10, 50), // Simulated
+                'failed' => rand(0, 5), // Simulated
+                'note' => 'This is a simulated import. In production, a job would be dispatched to process the file.',
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process import.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+}

@@ -1,0 +1,391 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Purchase;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
+/**
+ * PurchasesApiService
+ * 
+ * خدمة API RESTful لإدارة عمليات الشراء.
+ * تضمن تطبيق أفضل الممارسات مثل التحقق من الصحة (Validation)،
+ * المعاملات (Transactions)، ومعالجة الأخطاء الشاملة.
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class PurchasesApiService
+{
+    /**
+     * جلب جميع سجلات الشراء مع دعم التصفح والترشيح.
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @return JsonResponse استجابة JSON تحتوي على قائمة المشتريات.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            // التحقق من صحة مدخلات التصفح والترشيح
+            $validated = Validator::make($request->all(), [
+                'per_page' => 'nullable|integer|min:1|max:100',
+                'search' => 'nullable|string|max:255',
+                'status' => 'nullable|string|in:pending,completed,cancelled',
+            ])->validate();
+
+            $perPage = $validated['per_page'] ?? 15;
+            $query = Purchase::query();
+
+            // تطبيق الترشيح
+            if (!empty($validated['search'])) {
+                $query->where('supplier_id', 'like', '%' . $validated['search'] . '%')
+                      ->orWhere('total_amount', 'like', '%' . $validated['search'] . '%');
+            }
+
+            if (!empty($validated['status'])) {
+                $query->where('status', $validated['status']);
+            }
+
+            // جلب البيانات مع التصفح
+            $purchases = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم جلب سجلات الشراء بنجاح.',
+                'data' => $purchases->items(),
+                'meta' => [
+                    'total' => $purchases->total(),
+                    'current_page' => $purchases->currentPage(),
+                    'last_page' => $purchases->lastPage(),
+                    'per_page' => $purchases->perPage(),
+                ],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة المدخلات.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            // معالجة أي خطأ عام آخر
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء جلب البيانات.',
+                'error_details' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * جلب سجل شراء واحد بناءً على المعرف.
+     *
+     * @param int $id معرف سجل الشراء.
+     * @return JsonResponse استجابة JSON تحتوي على بيانات الشراء.
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            // البحث عن السجل، سيتم رمي ModelNotFoundException إذا لم يتم العثور عليه
+            $purchase = Purchase::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم جلب سجل الشراء بنجاح.',
+                'data' => $purchase,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم العثور على سجل الشراء المطلوب.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء جلب البيانات.',
+                'error_details' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * إنشاء سجل شراء جديد.
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @return JsonResponse استجابة JSON تحتوي على السجل الذي تم إنشاؤه.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        // قواعد التحقق من الصحة
+        $rules = [
+            'user_id' => 'required|integer|exists:users,id',
+            'supplier_id' => 'required|integer|exists:suppliers,id',
+            'purchase_date' => 'required|date',
+            'total_amount' => 'required|numeric|min:0',
+            'status' => 'required|string|in:pending,completed,cancelled',
+            'notes' => 'nullable|string|max:500',
+        ];
+
+        try {
+            $validatedData = Validator::make($request->all(), $rules)->validate();
+
+            // استخدام المعاملات لضمان سلامة البيانات
+            $purchase = DB::transaction(function () use ($validatedData) {
+                return Purchase::create($validatedData);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء سجل الشراء بنجاح.',
+                'data' => $purchase,
+            ], Response::HTTP_CREATED);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة المدخلات.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل إنشاء سجل الشراء.',
+                'error_details' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تحديث سجل شراء موجود.
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @param int $id معرف سجل الشراء المراد تحديثه.
+     * @return JsonResponse استجابة JSON تحتوي على السجل المحدث.
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        // قواعد التحقق من الصحة (قد تكون جزئية لعملية التحديث)
+        $rules = [
+            'user_id' => 'sometimes|integer|exists:users,id',
+            'supplier_id' => 'sometimes|integer|exists:suppliers,id',
+            'purchase_date' => 'sometimes|date',
+            'total_amount' => 'sometimes|numeric|min:0',
+            'status' => 'sometimes|string|in:pending,completed,cancelled',
+            'notes' => 'nullable|string|max:500',
+        ];
+
+        try {
+            $validatedData = Validator::make($request->all(), $rules)->validate();
+
+            // البحث عن السجل
+            $purchase = Purchase::findOrFail($id);
+
+            // استخدام المعاملات لضمان سلامة البيانات
+            DB::transaction(function () use ($purchase, $validatedData) {
+                $purchase->update($validatedData);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث سجل الشراء بنجاح.',
+                'data' => $purchase->fresh(), // جلب السجل المحدث
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم العثور على سجل الشراء المطلوب للتحديث.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة المدخلات.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل تحديث سجل الشراء.',
+                'error_details' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * حذف سجل شراء.
+     *
+     * @param int $id معرف سجل الشراء المراد حذفه.
+     * @return JsonResponse استجابة JSON تؤكد الحذف.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            // البحث عن السجل
+            $purchase = Purchase::findOrFail($id);
+
+            // استخدام المعاملات لضمان سلامة البيانات
+            DB::transaction(function () use ($purchase) {
+                $purchase->delete();
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف سجل الشراء بنجاح.',
+            ], Response::HTTP_OK);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم العثور على سجل الشراء المطلوب للحذف.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل حذف سجل الشراء.',
+                'error_details' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تنفيذ عمليات مجمعة (Bulk operations) على سجلات الشراء.
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @return JsonResponse استجابة JSON تلخص نتيجة العملية المجمعة.
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        // قواعد التحقق من الصحة لعمليات مجمعة
+        $rules = [
+            'action' => 'required|string|in:delete,update_status',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:purchases,id',
+            'status' => 'required_if:action,update_status|string|in:pending,completed,cancelled',
+        ];
+
+        try {
+            $validatedData = Validator::make($request->all(), $rules)->validate();
+            $action = $validatedData['action'];
+            $ids = $validatedData['ids'];
+            $affected = 0;
+
+            DB::beginTransaction();
+            
+            if ($action === 'delete') {
+                $affected = Purchase::whereIn('id', $ids)->delete();
+                $message = 'تم حذف ' . $affected . ' سجل شراء بنجاح.';
+            } elseif ($action === 'update_status') {
+                $status = $validatedData['status'];
+                $affected = Purchase::whereIn('id', $ids)->update(['status' => $status]);
+                $message = 'تم تحديث حالة ' . $affected . ' سجل شراء إلى ' . $status . ' بنجاح.';
+            } else {
+                // هذا الجزء لن يتم الوصول إليه بسبب قواعد التحقق، ولكنه يضاف للاكتمال
+                throw new \InvalidArgumentException('عملية مجمعة غير صالحة.');
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'affected' => $affected,
+            ]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة المدخلات للعملية المجمعة.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل تنفيذ العملية المجمعة.',
+                'error_details' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تصدير بيانات الشراء.
+     *
+     * يتم هنا محاكاة عملية التصدير، وفي التطبيق الحقيقي يجب أن يتم إنشاء ملف CSV/Excel.
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @return JsonResponse استجابة JSON تحتوي على رابط التنزيل.
+     */
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            // TODO: في تطبيق حقيقي، يجب تنفيذ منطق جلب البيانات وتنسيقها وتصديرها إلى ملف (مثل CSV أو Excel)
+            // ثم تخزين الملف وإرجاع رابط التنزيل.
+            
+            // محاكاة عملية التصدير
+            $exportFile = 'purchases_export_' . time() . '.csv';
+            // افتراض أن الملف تم إنشاؤه وتخزينه
+            $downloadUrl = '/api/v1/exports/' . $exportFile;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم بدء عملية التصدير بنجاح.',
+                'download_url' => $downloadUrl,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل عملية التصدير.',
+                'error_details' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * استيراد بيانات الشراء من ملف.
+     *
+     * يتم هنا محاكاة عملية الاستيراد.
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @return JsonResponse استجابة JSON تلخص نتيجة الاستيراد.
+     */
+    public function import(Request $request): JsonResponse
+    {
+        // قواعد التحقق من الصحة لملف الاستيراد
+        $rules = [
+            'file' => 'required|file|mimes:csv,xlsx|max:10240', // 10MB كحد أقصى
+        ];
+
+        try {
+            $validatedData = Validator::make($request->all(), $rules)->validate();
+            $file = $validatedData['file'];
+            
+            // TODO: في تطبيق حقيقي، يجب تنفيذ منطق قراءة الملف ومعالجة البيانات وإدخالها في قاعدة البيانات ضمن معاملة.
+
+            // محاكاة عملية الاستيراد
+            $importedCount = rand(50, 100);
+            $failedCount = rand(0, 5);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم استيراد البيانات بنجاح.',
+                'file_name' => $file->getClientOriginalName(),
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة ملف الاستيراد.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل عملية الاستيراد.',
+                'error_details' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}

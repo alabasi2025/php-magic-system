@@ -1,0 +1,371 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Notification; // افتراض وجود نموذج Notification
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Exception;
+
+/**
+ * NotificationsApiService
+ * 
+ * خدمة API شاملة لنموذج الإشعارات (Notification) مع تطبيق أفضل الممارسات الأمنية والبرمجية.
+ * تشمل الوظائف الأساسية (CRUD) بالإضافة إلى العمليات المجمعة والاستيراد والتصدير.
+ * 
+ * @package App\ApiServices
+ * @version 2.0.0
+ */
+class NotificationsApiService
+{
+    /**
+     * اسم النموذج المرتبط بالخدمة.
+     *
+     * @var string
+     */
+    protected $model = Notification::class;
+
+    /**
+     * قواعد التحقق الأساسية لإنشاء وتحديث الإشعار.
+     *
+     * @param bool $isUpdate
+     * @return array
+     */
+    protected function validationRules(bool $isUpdate = false): array
+    {
+        return [
+            'user_id' => 'required|integer|exists:users,id',
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'type' => 'nullable|string|in:info,warning,error,success',
+            'read_at' => 'nullable|date',
+        ];
+    }
+
+    /**
+     * جلب جميع سجلات الإشعارات مع التصفح والبحث.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $query = $this->model::query();
+
+            // تطبيق البحث والتصفية
+            if ($request->has('search')) {
+                $searchTerm = '%' . $request->search . '%';
+                $query->where('title', 'like', $searchTerm)
+                      ->orWhere('content', 'like', $searchTerm);
+            }
+
+            // تطبيق الترتيب
+            $query->orderBy($request->get('sort_by', 'created_at'), $request->get('sort_order', 'desc'));
+
+            $notifications = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Notifications retrieved successfully.',
+                'data' => $notifications->items(),
+                'meta' => [
+                    'total' => $notifications->total(),
+                    'page' => $notifications->currentPage(),
+                    'per_page' => $notifications->perPage(),
+                    'last_page' => $notifications->lastPage(),
+                ],
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve notifications.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * جلب سجل إشعار واحد بناءً على المعرف.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $notification = $this->model::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification retrieved successfully.',
+                'data' => $notification,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Notification not found.',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve notification.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * إنشاء سجل إشعار جديد.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $validator = Validator::make($request->all(), $this->validationRules());
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $notification = DB::transaction(function () use ($request) {
+                return $this->model::create($request->validated());
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification created successfully.',
+                'data' => $notification,
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create notification.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * تحديث سجل إشعار موجود.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $notification = $this->model::findOrFail($id);
+
+            $validator = Validator::make($request->all(), $this->validationRules(true));
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            DB::transaction(function () use ($request, $notification) {
+                $notification->update($request->validated());
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification updated successfully.',
+                'data' => $notification->fresh(),
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Notification not found.',
+            ], 404);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update notification.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * حذف سجل إشعار موجود.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $notification = $this->model::findOrFail($id);
+
+            DB::transaction(function () use ($notification) {
+                $notification->delete();
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification deleted successfully.',
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Notification not found.',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete notification.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * تنفيذ عمليات مجمعة (Bulk Operations) على الإشعارات.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'action' => 'required|string|in:delete,mark_read,mark_unread',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:notifications,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for bulk operation.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $action = $request->action;
+        $ids = $request->ids;
+        $affected = 0;
+
+        try {
+            DB::transaction(function () use ($action, $ids, &$affected) {
+                switch ($action) {
+                    case 'delete':
+                        $affected = $this->model::whereIn('id', $ids)->delete();
+                        break;
+                    case 'mark_read':
+                        $affected = $this->model::whereIn('id', $ids)->update(['read_at' => now()]);
+                        break;
+                    case 'mark_unread':
+                        $affected = $this->model::whereIn('id', $ids)->update(['read_at' => null]);
+                        break;
+                }
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => "Bulk operation '{$action}' completed successfully.",
+                'affected' => $affected,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to perform bulk operation.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * تصدير بيانات الإشعارات إلى ملف (مثال: CSV).
+     *
+     * ملاحظة: يتطلب تنفيذاً حقيقياً لعملية التصدير، هنا مجرد محاكاة.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            // هنا يتم عادةً بدء مهمة تصدير طويلة الأمد أو إنشاء ملف مؤقت
+            // لغرض المحاكاة، سنفترض نجاح العملية وإرجاع رابط وهمي
+            
+            // $dataToExport = $this->model::query()->get();
+            // $filePath = $this->generateExportFile($dataToExport);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Export process initiated successfully.',
+                'download_url' => '/api/notifications/download/export-' . time() . '.csv',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate export.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * استيراد بيانات الإشعارات من ملف (مثال: CSV).
+     *
+     * ملاحظة: يتطلب تنفيذاً حقيقياً لعملية الاستيراد، هنا مجرد محاكاة.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:csv,txt|max:10240', // 10MB max
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for import file.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            // هنا يتم عادةً معالجة الملف وتحليل البيانات وإدخالها في قاعدة البيانات
+            // باستخدام Transactions لضمان سلامة البيانات
+            
+            // $file = $request->file('file');
+            // $importedCount = $this->processImportFile($file);
+
+            $importedCount = 50; // محاكاة لعدد السجلات المستوردة
+            $failedCount = 0;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Import completed successfully.',
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to complete import.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+}

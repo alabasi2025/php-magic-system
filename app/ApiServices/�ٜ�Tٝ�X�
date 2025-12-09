@@ -1,0 +1,458 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Exception;
+
+/**
+ * UsersApiService
+ * 
+ * RESTful API service for Users system. Implements all CRUD, bulk, export, and import operations.
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class UsersApiService
+{
+    /**
+     * قواعد التحقق الأساسية لإنشاء المستخدم
+     *
+     * @var array
+     */
+    protected $storeRules = [
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email',
+        'password' => 'required|string|min:8|confirmed',
+    ];
+
+    /**
+     * قواعد التحقق الأساسية لتحديث المستخدم
+     *
+     * @var array
+     */
+    protected function updateRules(int $id): array
+    {
+        return [
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
+            'password' => 'sometimes|string|min:8|confirmed',
+        ];
+    }
+
+    /**
+     * جلب جميع سجلات المستخدمين مع التصفح (Pagination)
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $query = User::query();
+
+            // تطبيق فلاتر بسيطة (مثال: البحث بالاسم أو البريد الإلكتروني)
+            if ($request->has('search')) {
+                $searchTerm = '%' . $request->get('search') . '%';
+                $query->where('name', 'like', $searchTerm)
+                      ->orWhere('email', 'like', $searchTerm);
+            }
+
+            $users = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => $users->items(),
+                'meta' => [
+                    'total' => $users->total(),
+                    'page' => $users->currentPage(),
+                    'per_page' => $users->perPage(),
+                    'last_page' => $users->lastPage(),
+                ],
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في جلب قائمة المستخدمين.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * جلب سجل مستخدم واحد بناءً على المعرف (ID)
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $user = User::find($id);
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'المستخدم غير موجود.',
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $user,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في جلب بيانات المستخدم.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * إنشاء سجل مستخدم جديد
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            // 1. التحقق من صحة البيانات
+            $validatedData = Validator::make($request->all(), $this->storeRules)->validate();
+
+            // 2. إنشاء المستخدم
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => bcrypt($validatedData['password']), // تأمين كلمة المرور
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء المستخدم بنجاح.',
+                'data' => $user,
+            ], 201);
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة البيانات.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في إنشاء المستخدم.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * تحديث سجل مستخدم موجود
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $user = User::find($id);
+
+            if (!$user) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'المستخدم غير موجود.',
+                ], 404);
+            }
+
+            // 1. التحقق من صحة البيانات
+            $validatedData = Validator::make($request->all(), $this->updateRules($id))->validate();
+
+            // 2. تحديث المستخدم
+            $updateData = $validatedData;
+            if (isset($updateData['password'])) {
+                $updateData['password'] = bcrypt($updateData['password']);
+            }
+            
+            $user->update($updateData);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث المستخدم بنجاح.',
+                'data' => $user,
+            ]);
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة البيانات.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في تحديث المستخدم.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * حذف سجل مستخدم
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $user = User::find($id);
+
+            if (!$user) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'المستخدم غير موجود.',
+                ], 404);
+            }
+
+            $user->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف المستخدم بنجاح.',
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في حذف المستخدم.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * عمليات مجمعة (Bulk Operations)
+     *
+     * تدعم الحذف والتحديث المجمع.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'action' => 'required|in:delete,update',
+                'ids' => 'required|array',
+                'ids.*' => 'integer|exists:users,id',
+                'data' => 'required_if:action,update|array',
+            ])->validate();
+
+            $action = $validatedData['action'];
+            $ids = $validatedData['ids'];
+            $affected = 0;
+
+            if ($action === 'delete') {
+                $affected = User::whereIn('id', $ids)->delete();
+                $message = "تم حذف {$affected} مستخدم بنجاح.";
+            } elseif ($action === 'update') {
+                $updateData = $validatedData['data'];
+                
+                // يجب تطبيق قواعد تحقق إضافية على بيانات التحديث المجمعة هنا
+                // مثال: التحقق من أن الحقول المحدثة مسموح بها
+                
+                if (isset($updateData['password'])) {
+                    $updateData['password'] = bcrypt($updateData['password']);
+                }
+
+                $affected = User::whereIn('id', $ids)->update($updateData);
+                $message = "تم تحديث {$affected} مستخدم بنجاح.";
+            } else {
+                // لن يتم الوصول إلى هذا الجزء بسبب التحقق من الصحة
+                $message = 'إجراء غير صالح.';
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'affected' => $affected,
+            ]);
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة البيانات للعملية المجمعة.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في تنفيذ العملية المجمعة.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * تصدير بيانات المستخدمين
+     *
+     * يقوم بإنشاء ملف CSV مؤقت وإرجاع مسار التحميل.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            // في تطبيق حقيقي، سيتم استخدام مكتبة مثل Laravel Excel
+            // أو إنشاء ملف CSV مباشرة. هنا، نكتفي بمنطق محاكاة.
+            
+            $users = User::all(['id', 'name', 'email']);
+            $fileName = 'users_export_' . time() . '.csv';
+            $filePath = storage_path('app/exports/' . $fileName);
+
+            // محاكاة إنشاء الملف
+            if (!is_dir(dirname($filePath))) {
+                mkdir(dirname($filePath), 0777, true);
+            }
+            $file = fopen($filePath, 'w');
+            fputcsv($file, ['ID', 'Name', 'Email']);
+            foreach ($users as $user) {
+                fputcsv($file, [$user->id, $user->name, $user->email]);
+            }
+            fclose($file);
+
+            // في بيئة حقيقية، يجب أن يكون المسار قابلاً للوصول عبر HTTP
+            $downloadUrl = '/api/v1/users/download-export/' . $fileName;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم بدء عملية التصدير بنجاح.',
+                'download_url' => $downloadUrl,
+                'file_name' => $fileName,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في عملية التصدير.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * استيراد بيانات المستخدمين
+     *
+     * يتطلب ملفاً مرفوعاً (عادةً CSV أو Excel)
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'file' => 'required|file|mimes:csv,txt|max:10240', // 10MB max, CSV/TXT only
+            ])->validate();
+
+            $file = $request->file('file');
+            $path = $file->getRealPath();
+            $data = array_map('str_getcsv', file($path));
+            $header = array_shift($data); // إزالة الصف الأول (العناوين)
+
+            $importedCount = 0;
+            $failedCount = 0;
+            $errors = [];
+
+            // محاكاة عملية الاستيراد
+            foreach ($data as $row) {
+                if (count($row) < 3) {
+                    $failedCount++;
+                    $errors[] = ['row' => $row, 'error' => 'عدد الأعمدة غير كافٍ.'];
+                    continue;
+                }
+                
+                $userData = [
+                    'name' => $row[0],
+                    'email' => $row[1],
+                    'password' => $row[2] ?? 'password', // افتراض كلمة مرور مؤقتة
+                ];
+
+                // يجب تطبيق تحقق إضافي على كل صف هنا
+                $rowValidator = Validator::make($userData, $this->storeRules);
+
+                if ($rowValidator->fails()) {
+                    $failedCount++;
+                    $errors[] = ['row' => $userData, 'errors' => $rowValidator->errors()];
+                    continue;
+                }
+
+                // محاكاة إنشاء المستخدم
+                User::create([
+                    'name' => $userData['name'],
+                    'email' => $userData['email'],
+                    'password' => bcrypt($userData['password']),
+                ]);
+                $importedCount++;
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تمت عملية الاستيراد بنجاح.',
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+                'errors' => $errors,
+            ]);
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة ملف الاستيراد.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في عملية الاستيراد.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+}

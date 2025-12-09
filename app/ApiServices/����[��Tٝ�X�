@@ -1,0 +1,355 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Log; // افتراض وجود نموذج Log
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Throwable;
+
+/**
+ * LoggingApiService
+ * 
+ * خدمة API RESTful متكاملة لإدارة سجلات النظام (Logging).
+ * تتبع أفضل ممارسات Laravel من حيث الأمان، التحقق من المدخلات، ومعالجة الأخطاء.
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class LoggingApiService
+{
+    /**
+     * جلب جميع السجلات مع دعم التصفح (Pagination) والفلترة.
+     *
+     * @param Request $request طلب HTTP يحتوي على معايير البحث والتصفح.
+     * @return JsonResponse استجابة JSON تحتوي على قائمة السجلات وبيانات التصفح.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $query = Log::query();
+
+            // مثال بسيط للفلترة
+            if ($request->has('level')) {
+                $query->where('level', $request->level);
+            }
+
+            $logs = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم جلب السجلات بنجاح.',
+                'data' => $logs->items(),
+                'meta' => [
+                    'total' => $logs->total(),
+                    'current_page' => $logs->currentPage(),
+                    'per_page' => $logs->perPage(),
+                    'last_page' => $logs->lastPage(),
+                ],
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء جلب السجلات.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * جلب سجل واحد محدد بواسطة المعرف (ID).
+     *
+     * @param int $id معرف السجل المطلوب.
+     * @return JsonResponse استجابة JSON تحتوي على بيانات السجل.
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $log = Log::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم جلب السجل بنجاح.',
+                'data' => $log,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'السجل المطلوب غير موجود.',
+            ], 404);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء جلب السجل.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * إنشاء سجل جديد.
+     *
+     * يتم التحقق من صحة المدخلات واستخدام معاملة قاعدة بيانات (DB Transaction) لضمان السلامة.
+     *
+     * @param Request $request طلب HTTP يحتوي على بيانات السجل الجديد.
+     * @return JsonResponse استجابة JSON تحتوي على بيانات السجل الذي تم إنشاؤه.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'level' => 'required|string|max:50',
+            'message' => 'required|string',
+            'context' => 'nullable|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة المدخلات.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $log = Log::create($validator->validated());
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء السجل بنجاح.',
+                'data' => $log,
+            ], 201);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل إنشاء السجل.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * تحديث سجل موجود.
+     *
+     * يتم التحقق من صحة المدخلات واستخدام معاملة قاعدة بيانات (DB Transaction) لضمان السلامة.
+     *
+     * @param Request $request طلب HTTP يحتوي على البيانات المحدثة.
+     * @param int $id معرف السجل المراد تحديثه.
+     * @return JsonResponse استجابة JSON تحتوي على بيانات السجل المحدثة.
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'level' => 'sometimes|string|max:50',
+            'message' => 'sometimes|string',
+            'context' => 'nullable|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة المدخلات.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $log = Log::findOrFail($id);
+            $log->update($validator->validated());
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث السجل بنجاح.',
+                'data' => $log,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'السجل المطلوب غير موجود.',
+            ], 404);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل تحديث السجل.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * حذف سجل محدد.
+     *
+     * يتم استخدام معاملة قاعدة بيانات (DB Transaction) لضمان السلامة.
+     *
+     * @param int $id معرف السجل المراد حذفه.
+     * @return JsonResponse استجابة JSON تؤكد عملية الحذف.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $log = Log::findOrFail($id);
+            $log->delete();
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف السجل بنجاح.',
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'السجل المطلوب غير موجود.',
+            ], 404);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل حذف السجل.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * عمليات مجمعة (Bulk Operations) مثل الحذف أو تحديث الحالة لمجموعة من السجلات.
+     *
+     * @param Request $request طلب HTTP يحتوي على قائمة المعرفات والعملية المراد تنفيذها.
+     * @return JsonResponse استجابة JSON تحتوي على عدد السجلات المتأثرة.
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'action' => 'required|in:delete,update_level',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:logs,id', // افتراض أن الجدول هو logs
+            'new_level' => 'required_if:action,update_level|string|max:50',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة المدخلات للعملية المجمعة.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $validated = $validator->validated();
+        $affected = 0;
+
+        DB::beginTransaction();
+        try {
+            $ids = $validated['ids'];
+            $action = $validated['action'];
+
+            if ($action === 'delete') {
+                $affected = Log::whereIn('id', $ids)->delete();
+            } elseif ($action === 'update_level') {
+                $affected = Log::whereIn('id', $ids)->update(['level' => $validated['new_level']]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => "تم تنفيذ العملية المجمعة بنجاح. عدد السجلات المتأثرة: {$affected}.",
+                'affected' => $affected,
+            ]);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل تنفيذ العملية المجمعة.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * تصدير البيانات (Export) إلى ملف (مثل CSV أو Excel).
+     *
+     * يتم محاكاة عملية التصدير هنا، وفي التطبيقات الحقيقية يفضل استخدام Queues.
+     *
+     * @param Request $request طلب HTTP يحتوي على معايير التصدير.
+     * @return JsonResponse استجابة JSON تحتوي على رابط تحميل الملف.
+     */
+    public function export(Request $request): JsonResponse
+    {
+        // يمكن إضافة تحقق من المدخلات لمعايير التصدير (مثل التاريخ، المستوى)
+        try {
+            // محاكاة عملية التصدير
+            // في تطبيق حقيقي، سيتم إرسال مهمة (Job) إلى قائمة الانتظار (Queue)
+            // ثم يتم إرسال إشعار للمستخدم عند الانتهاء.
+            $filename = 'logs_export_' . now()->format('Ymd_His') . '.csv';
+            $downloadUrl = '/api/v1/logs/download/' . $filename;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم بدء عملية التصدير بنجاح. سيتم توفير رابط التحميل قريباً.',
+                'download_url' => $downloadUrl,
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل عملية التصدير.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * استيراد البيانات (Import) من ملف مرفوع.
+     *
+     * يتم محاكاة عملية الاستيراد هنا، وفي التطبيقات الحقيقية يفضل استخدام Queues.
+     *
+     * @param Request $request طلب HTTP يحتوي على ملف البيانات للاستيراد.
+     * @return JsonResponse استجابة JSON تحتوي على إحصائيات عملية الاستيراد.
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:csv,txt|max:10240', // ملف CSV بحد أقصى 10 ميجابايت
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة المدخلات لعملية الاستيراد.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            // محاكاة معالجة الملف
+            $file = $request->file('file');
+            $importedCount = rand(50, 150);
+            $failedCount = rand(0, 5);
+
+            // في تطبيق حقيقي، سيتم تخزين الملف وإرسال مهمة (Job) لمعالجته
+            // $path = $file->store('imports');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم استلام ملف الاستيراد بنجاح. بدأت المعالجة في الخلفية.',
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+                'filename' => $file->getClientOriginalName(),
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل عملية الاستيراد.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+}

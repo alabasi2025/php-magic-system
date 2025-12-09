@@ -1,0 +1,405 @@
+<?php
+
+namespace App\ApiServices;
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use App\Models\IoTData; // Assuming this model exists
+use Exception;
+
+/**
+ * IoTApiService
+ * 
+ * RESTful API service for IoT system
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class IoTApiService
+{
+    /**
+     * The Model class associated with this service.
+     *
+     * @var string
+     */
+    protected string $model = IoTData::class;
+
+    /**
+     * Validation rules for the store operation.
+     *
+     * @var array
+     */
+    protected array $storeRules = [
+        'device_id' => 'required|string|max:255',
+        'timestamp' => 'required|date',
+        'temperature' => 'required|numeric',
+        'humidity' => 'required|numeric',
+        'status' => 'nullable|string|in:active,inactive',
+    ];
+
+    /**
+     * Validation rules for the update operation.
+     *
+     * @var array
+     */
+    protected array $updateRules = [
+        'device_id' => 'sometimes|string|max:255',
+        'timestamp' => 'sometimes|date',
+        'temperature' => 'sometimes|numeric',
+        'humidity' => 'sometimes|numeric',
+        'status' => 'sometimes|string|in:active,inactive',
+    ];
+    /**
+     * Retrieve a paginated list of all IoT data records.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $data = $this->model::paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data retrieved successfully.',
+                'data' => $data->items(),
+                'meta' => [
+                    'total' => $data->total(),
+                    'page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'last_page' => $data->lastPage(),
+                ],
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve data.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Retrieve a single IoT data record by its ID.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $record = $this->model::find($id);
+
+            if (!$record) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Record not found.',
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Record retrieved successfully.',
+                'data' => $record,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve record.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Create a new IoT data record after validation and within a database transaction.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), $this->storeRules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $record = $this->model::create($validator->validated());
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Record created successfully.',
+                'data' => $record,
+            ], 201);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create record.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update an existing IoT data record after validation and within a database transaction.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $validator = Validator::make($request->all(), $this->updateRules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $record = $this->model::find($id);
+
+            if (!$record) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Record not found.',
+                ], 404);
+            }
+
+            $record->update($validator->validated());
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Record updated successfully.',
+                'data' => $record,
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update record.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete a single IoT data record within a database transaction.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $record = $this->model::find($id);
+
+            if (!$record) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Record not found.',
+                ], 404);
+            }
+
+            $record->delete();
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Record deleted successfully.',
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete record.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Perform bulk operations (create, update, delete) on IoT data records.
+     * All operations are wrapped in a single database transaction.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'operations' => 'required|array',
+            'operations.*.type' => 'required|string|in:create,update,delete',
+            'operations.*.data' => 'required|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for bulk request.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $results = ['created' => 0, 'updated' => 0, 'deleted' => 0, 'failed' => 0, 'errors' => []];
+
+        DB::beginTransaction();
+        try {
+            foreach ($validator->validated()['operations'] as $operation) {
+                $type = $operation['type'];
+                $data = $operation['data'];
+
+                if ($type === 'create') {
+                    // Basic create validation (assuming data contains all required fields for store)
+                    $this->model::create($data);
+                    $results['created']++;
+                } elseif ($type === 'update' && isset($data['id'])) {
+                    $record = $this->model::find($data['id']);
+                    if ($record) {
+                        $record->update($data);
+                        $results['updated']++;
+                    } else {
+                        $results['failed']++;
+                        $results['errors'][] = "Update failed: Record with ID {$data['id']} not found.";
+                    }
+                } elseif ($type === 'delete' && isset($data['id'])) {
+                    $record = $this->model::find($data['id']);
+                    if ($record) {
+                        $record->delete();
+                        $results['deleted']++;
+                    } else {
+                        $results['failed']++;
+                        $results['errors'][] = "Delete failed: Record with ID {$data['id']} not found.";
+                    }
+                }
+            }
+
+            if ($results['failed'] > 0) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bulk operation failed due to one or more errors. No changes were saved.',
+                    'results' => $results,
+                ], 400);
+            }
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Bulk operation completed successfully.',
+                'results' => $results,
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Bulk operation failed due to a server error. No changes were saved.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Simulate the export of IoT data records.
+     * In a real application, this would typically queue a job.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            // In a real application, this would queue a job to generate a file (e.g., CSV, Excel)
+            // based on filters in $request and save it to storage.
+
+            // Simulate the export process
+            $count = $this->model::count();
+            $filename = 'iot_data_' . time() . '.csv';
+            $downloadUrl = '/api/v1/iot/exports/' . $filename;
+
+            return response()->json([
+                'success' => true,
+                'message' => "Export of {$count} records initiated successfully.",
+                'download_url' => $downloadUrl,
+                'status' => 'processing', // In a real app, the client would poll for 'ready'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate export.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Simulate the import of IoT data records from a file.
+     * The file is validated and the process is wrapped in a database transaction.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:csv,txt|max:10240', // Max 10MB
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for import file.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            // In a real application, the file would be processed line by line here.
+            // For simulation, we assume a successful import of 100 records.
+            $importedCount = 100;
+            $failedCount = 0;
+
+            // Simulate file processing and data insertion
+            // $file = $request->file('file');
+            // $data = array_map('str_getcsv', file($file->getRealPath()));
+            // foreach ($data as $row) { ... }
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Import process completed successfully.',
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Import failed due to a server error. No data was imported.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+}

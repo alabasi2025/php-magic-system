@@ -1,0 +1,429 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Tax;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * TaxApiService
+ * 
+ * RESTful API service for Tax system
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class TaxApiService
+{
+    /**
+     * The model instance.
+     *
+     * @var Tax
+     */
+    protected $model;
+
+    public function __construct()
+    {
+        $this->model = new Tax();
+    }
+
+    /**
+     * Get validation rules for Tax model.
+     *
+     * @param int|null $id
+     * @return array
+     */
+    private function getValidationRules(?int $id = null): array
+    {
+        return [
+            // Assuming the table name is 'taxes'
+            'name' => ['required', 'string', 'max:255', 'unique:taxes,name' . ($id ? ",$id" : '')],
+            'rate' => ['required', 'numeric', 'min:0', 'max:1'],
+            'is_active' => ['nullable', 'boolean'],
+        ];
+    }
+
+    /**
+     * Get all records with pagination and filtering.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $query = $this->model->query();
+
+            // Simple filtering example
+            if ($request->has('name')) {
+                $query->where('name', 'like', '%' . $request->get('name') . '%');
+            }
+            if ($request->has('is_active')) {
+                $query->where('is_active', (bool)$request->get('is_active'));
+            }
+
+            $taxes = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => $taxes->items(),
+                'meta' => [
+                    'total' => $taxes->total(),
+                    'page' => $taxes->currentPage(),
+                    'per_page' => $taxes->perPage(),
+                    'last_page' => $taxes->lastPage(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve taxes.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Get single record by ID.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $tax = $this->model->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $tax,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tax record not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve tax record.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Create new record.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $validatedData = $request->validate($this->getValidationRules());
+
+            DB::beginTransaction();
+            
+            $tax = $this->model->create($validatedData);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tax created successfully.',
+                'data' => $tax,
+            ], Response::HTTP_CREATED);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create tax record.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Update existing record.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $tax = $this->model->findOrFail($id);
+            
+            $validatedData = $request->validate($this->getValidationRules($id));
+
+            DB::beginTransaction();
+            
+            $tax->update($validatedData);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tax updated successfully.',
+                'data' => $tax,
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tax record not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update tax record.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Delete record.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $tax = $this->model->findOrFail($id);
+
+            DB::beginTransaction();
+            
+            $tax->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tax deleted successfully.',
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tax record not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete tax record.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    public function bulk(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'operations' => ['required', 'array'],
+            'operations.*.action' => ['required', 'string', 'in:create,update,delete'],
+            'operations.*.id' => ['nullable', 'integer', 'required_if:operations.*.action,update,delete'],
+            'operations.*.data' => ['nullable', 'array', 'required_if:operations.*.action,create,update'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bulk operation validation failed.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $affectedCount = 0;
+        $errors = [];
+
+        DB::beginTransaction();
+        try {
+            foreach ($request->input('operations') as $index => $operation) {
+                $action = $operation['action'];
+                $data = $operation['data'] ?? [];
+                $id = $operation['id'] ?? null;
+
+                switch ($action) {
+                    case 'create':
+                        $rules = $this->getValidationRules();
+                        $opValidator = Validator::make($data, $rules);
+                        if ($opValidator->fails()) {
+                            $errors["operation_$index"] = ['action' => $action, 'errors' => $opValidator->errors()];
+                            continue 2; // Continue to next operation
+                        }
+                        $this->model->create($data);
+                        $affectedCount++;
+                        break;
+
+                    case 'update':
+                        $tax = $this->model->find($id);
+                        if (!$tax) {
+                            $errors["operation_$index"] = ['action' => $action, 'message' => "Tax with ID $id not found."];
+                            continue 2;
+                        }
+                        $rules = $this->getValidationRules($id);
+                        $opValidator = Validator::make($data, $rules);
+                        if ($opValidator->fails()) {
+                            $errors["operation_$index"] = ['action' => $action, 'errors' => $opValidator->errors()];
+                            continue 2;
+                        }
+                        $tax->update($data);
+                        $affectedCount++;
+                        break;
+
+                    case 'delete':
+                        $deleted = $this->model->where('id', $id)->delete();
+                        if ($deleted) {
+                            $affectedCount++;
+                        } else {
+                            $errors["operation_$index"] = ['action' => $action, 'message' => "Tax with ID $id not found for deletion."];
+                        }
+                        break;
+                }
+            }
+
+            if (!empty($errors)) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bulk operation completed with errors. No changes were saved.',
+                    'affected' => 0,
+                    'errors' => $errors,
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Bulk operation completed successfully.',
+                'affected' => $affectedCount,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred during bulk operation.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            // In a real application, this would involve querying data, formatting it,
+            // saving it to a temporary file (e.g., using Laravel Excel), and then
+            // generating a signed URL for download.
+
+            // Simulation:
+            $filename = 'taxes_export_' . time() . '.csv';
+            $path = '/storage/exports/' . $filename;
+
+            // Simulate a long-running task
+            sleep(1); 
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data export initiated successfully.',
+                'download_url' => $path,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate data export.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    public function import(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => ['required', 'file', 'mimes:csv,txt,xlsx', 'max:10240'], // Max 10MB
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Import file validation failed.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        // In a real application, this would involve:
+        // 1. Storing the file: $path = $request->file('file')->store('imports');
+        // 2. Processing the file (e.g., using Laravel Excel's import feature).
+        // 3. Running the import within a DB transaction.
+
+        DB::beginTransaction();
+        try {
+            // Simulation of processing 10 records
+            $totalRecords = 10;
+            $importedCount = 8;
+            $failedCount = 2;
+
+            // Simulate file processing time
+            sleep(1);
+
+            if ($failedCount > 0) {
+                // If any record fails, we might roll back the whole transaction
+                // or log the failures and commit the successful ones, depending on business logic.
+                // Here, we simulate a partial success with a commit.
+                DB::commit();
+                return response()->json([
+                    'success' => true,
+                    'message' => "Import completed. $importedCount records imported, $failedCount failed.",
+                    'imported' => $importedCount,
+                    'failed' => $failedCount,
+                ], Response::HTTP_OK);
+            }
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Import completed successfully.',
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred during import process.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}

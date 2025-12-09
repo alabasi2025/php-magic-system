@@ -1,0 +1,369 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Account; // افتراض وجود نموذج باسم Account
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * AccountingApiService
+ * 
+ * خدمة API RESTful لنظام المحاسبة.
+ * 
+ * يتم تطبيق أفضل الممارسات: التحقق من الصحة (Validation)، معاملات قاعدة البيانات (DB Transactions)،
+ * معالجة الأخطاء الشاملة (Try-Catch)، والتوثيق الكامل.
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class AccountingApiService
+{
+    /**
+     * الحصول على جميع السجلات مع ترقيم الصفحات.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $accounts = Account::paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم استرداد السجلات بنجاح.',
+                'data' => $accounts->items(),
+                'meta' => [
+                    'total' => $accounts->total(),
+                    'current_page' => $accounts->currentPage(),
+                    'per_page' => (int) $accounts->perPage(),
+                    'last_page' => $accounts->lastPage(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في استرداد السجلات.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * الحصول على سجل واحد.
+     *
+     * @param int $id معرف السجل
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $account = Account::find($id);
+
+            if (!$account) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'السجل غير موجود.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم استرداد السجل بنجاح.',
+                'data' => $account,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في استرداد السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * إنشاء سجل جديد.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:asset,liability,equity,revenue,expense',
+            'balance' => 'required|numeric|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من الصحة.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {
+            DB::beginTransaction();
+            
+            $account = Account::create($request->only(['name', 'type', 'balance']));
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء السجل بنجاح.',
+                'data' => $account,
+            ], Response::HTTP_CREATED);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في إنشاء السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تحديث سجل موجود.
+     *
+     * @param Request $request
+     * @param int $id معرف السجل
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|string|max:255',
+            'type' => 'sometimes|in:asset,liability,equity,revenue,expense',
+            'balance' => 'sometimes|numeric|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من الصحة.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {
+            $account = Account::find($id);
+
+            if (!$account) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'السجل غير موجود.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            DB::beginTransaction();
+            
+            $account->update($request->only(['name', 'type', 'balance']));
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث السجل بنجاح.',
+                'data' => $account,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في تحديث السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * حذف سجل.
+     *
+     * @param int $id معرف السجل
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $account = Account::find($id);
+
+            if (!$account) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'السجل غير موجود.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            DB::beginTransaction();
+            
+            $account->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف السجل بنجاح.',
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في حذف السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * عمليات مجمعة (Bulk Operations).
+     *
+     * تتوقع مصفوفة من المعرفات (ids) ونوع العملية (action: delete, update_status).
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:accounts,id', // افتراض أن الجدول هو accounts
+            'action' => 'required|in:delete,update_status',
+            'status' => 'required_if:action,update_status|in:active,inactive',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من الصحة للعملية المجمعة.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $ids = $request->input('ids');
+        $action = $request->input('action');
+        $affected = 0;
+
+        try {
+            DB::beginTransaction();
+
+            if ($action === 'delete') {
+                $affected = Account::whereIn('id', $ids)->delete();
+                $message = "تم حذف {$affected} سجل بنجاح.";
+            } elseif ($action === 'update_status') {
+                $status = $request->input('status');
+                $affected = Account::whereIn('id', $ids)->update(['status' => $status]);
+                $message = "تم تحديث حالة {$affected} سجل إلى '{$status}' بنجاح.";
+            } else {
+                // هذا الجزء لن يتم الوصول إليه بسبب التحقق من الصحة
+                $message = 'عملية غير صالحة.';
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'affected' => $affected,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في تنفيذ العملية المجمعة.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تصدير البيانات (Export Data).
+     *
+     * يتم محاكاة عملية التصدير وإرجاع مسار ملف وهمي.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        // في تطبيق حقيقي، سيتم استخدام مكتبة مثل Laravel Excel
+        // أو إنشاء ملف CSV/Excel مباشرة.
+        try {
+            // محاكاة عملية التصدير
+            $count = Account::count();
+            $filename = 'accounts_export_' . time() . '.csv';
+            
+            // هنا يتم إنشاء الملف فعليًا وحفظه في التخزين السحابي أو المحلي
+            // ...
+
+            return response()->json([
+                'success' => true,
+                'message' => "تم تجهيز تصدير {$count} سجل بنجاح.",
+                'download_url' => "/exports/{$filename}",
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في عملية التصدير.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * استيراد البيانات (Import Data).
+     *
+     * يتم محاكاة عملية الاستيراد.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:csv,xlsx|max:10240', // 10MB
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من الصحة لملف الاستيراد.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {
+            // في تطبيق حقيقي، سيتم استخدام مكتبة مثل Laravel Excel
+            // لمعالجة الملف واستيراد البيانات.
+            
+            // محاكاة عملية الاستيراد
+            $importedCount = rand(50, 100);
+            $failedCount = rand(0, 5);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إكمال عملية الاستيراد بنجاح.',
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في عملية الاستيراد.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}

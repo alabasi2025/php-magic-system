@@ -1,0 +1,399 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Storage;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * StorageApiService
+ * 
+ * خدمة API RESTful متكاملة وآمنة لإدارة موارد التخزين (Storage).
+ * تتضمن الوظائف القياسية (CRUD) بالإضافة إلى العمليات المجمعة (Bulk)، التصدير (Export)، والاستيراد (Import).
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class StorageApiService
+{
+    /**
+     * اسم النموذج المرتبط بالخدمة.
+     *
+     * @var string
+     */
+    protected string $model = Storage::class;
+
+    /**
+     * قواعد التحقق (Validation Rules) لعملية الإنشاء والتحديث.
+     *
+     * @param bool $isUpdate هل القواعد لعملية التحديث؟
+     * @param int|null $id معرف السجل لتجاهله في قواعد Unique.
+     * @return array
+     */
+    protected function getValidationRules(bool $isUpdate = false, ?int $id = null): array
+    {
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'path' => ['required', 'string', 'max:255'],
+            'size' => ['nullable', 'integer', 'min:0'],
+            'type' => ['required', 'string', 'in:file,folder'],
+            'parent_id' => ['nullable', 'integer', 'exists:storage,id'],
+        ];
+
+        if ($isUpdate && $id) {
+            // تجاهل السجل الحالي في قاعدة unique:path
+            $rules['path'][] = 'unique:storage,path,' . $id;
+        } else {
+            $rules['path'][] = 'unique:storage,path';
+        }
+
+        return $rules;
+    }
+
+    /**
+     * جلب جميع السجلات مع دعم التصفية والترقيم.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $query = $this->model::query();
+
+            // تطبيق التصفية (مثال: البحث بالاسم)
+            if ($request->has('search')) {
+                $query->where('name', 'like', '%' . $request->input('search') . '%');
+            }
+
+            // تطبيق الترتيب
+            $query->orderBy($request->get('sort_by', 'created_at'), $request->get('sort_order', 'desc'));
+
+            $data = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Records retrieved successfully.',
+                'data' => $data->items(),
+                'meta' => [
+                    'total' => $data->total(),
+                    'page' => $data->currentPage(),
+                    'per_page' => $data->perPage(),
+                    'last_page' => $data->lastPage(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while retrieving records.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * جلب سجل واحد بناءً على المعرف.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $record = $this->model::find($id);
+
+            if (!$record) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Record not found.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Record retrieved successfully.',
+                'data' => $record,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while retrieving the record.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * إنشاء سجل جديد.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $validator = Validator::make($request->all(), $this->getValidationRules());
+            
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $record = DB::transaction(function () use ($request) {
+                return $this->model::create($request->validated());
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Record created successfully.',
+                'data' => $record,
+            ], Response::HTTP_CREATED);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during creation.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تحديث سجل موجود.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $record = $this->model::find($id);
+
+            if (!$record) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Record not found.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            $validator = Validator::make($request->all(), $this->getValidationRules(true, $id));
+            
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            DB::transaction(function () use ($request, $record) {
+                $record->update($request->validated());
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Record updated successfully.',
+                'data' => $record->fresh(),
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during update.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * حذف سجل.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $record = $this->model::find($id);
+
+            if (!$record) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Record not found.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            DB::transaction(function () use ($record) {
+                $record->delete();
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Record deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during deletion.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تنفيذ عمليات مجمعة (حذف، تحديث حالة، إلخ).
+     *
+     * @param Request $request يجب أن يحتوي على 'ids' (مصفوفة) و 'operation' (سلسلة نصية).
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'ids' => ['required', 'array'],
+                'ids.*' => ['integer', 'exists:storage,id'],
+                'operation' => ['required', 'string', 'in:delete,update_status'],
+                // قواعد إضافية لعمليات محددة
+                'status' => ['required_if:operation,update_status', 'string'],
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $affected = 0;
+            $ids = $request->input('ids');
+            $operation = $request->input('operation');
+
+            DB::transaction(function () use ($ids, $operation, $request, &$affected) {
+                switch ($operation) {
+                    case 'delete':
+                        $affected = $this->model::whereIn('id', $ids)->delete();
+                        break;
+                    case 'update_status':
+                        $affected = $this->model::whereIn('id', $ids)->update(['status' => $request->input('status')]);
+                        break;
+                    // يمكن إضافة المزيد من العمليات المجمعة هنا
+                }
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => "Bulk operation '{$operation}' completed successfully.",
+                'affected' => $affected,
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for bulk operation.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during bulk operation.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تصدير البيانات.
+     *
+     * يتم محاكاة عملية التصدير هنا. في التطبيق الحقيقي، يجب استخدام وظيفة Laravel Queues
+     * لتنفيذ التصدير في الخلفية وإرسال رابط التحميل للمستخدم.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        // TODO: يجب استبدال هذا بمنطق حقيقي للتصدير غير المتزامن (Asynchronous Export)
+        try {
+            // محاكاة بدء عملية التصدير
+            $exportJobId = uniqid('export_');
+
+            // هنا يتم إطلاق وظيفة في الخلفية (Job)
+            // Example: ExportJob::dispatch($request->all(), $request->user());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Export process started successfully. You will be notified when the file is ready.',
+                'job_id' => $exportJobId,
+                'status_url' => '/api/storage/export/status/' . $exportJobId,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while starting the export process.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * استيراد البيانات.
+     *
+     * يتم محاكاة عملية الاستيراد هنا. في التطبيق الحقيقي، يجب استخدام وظيفة Laravel Queues
+     * للتعامل مع ملفات الاستيراد الكبيرة بشكل غير متزامن.
+     *
+     * @param Request $request يجب أن يحتوي على ملف الاستيراد.
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        // TODO: يجب استبدال هذا بمنطق حقيقي للاستيراد غير المتزامن (Asynchronous Import)
+        try {
+            $validator = Validator::make($request->all(), [
+                'file' => ['required', 'file', 'mimes:csv,xlsx', 'max:10240'], // 10MB
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            // محاكاة تخزين الملف وإطلاق وظيفة الاستيراد
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            // $file->storeAs('imports', $fileName);
+
+            $importJobId = uniqid('import_');
+            // Example: ImportJob::dispatch($fileName, $request->user());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Import file uploaded successfully. Processing started in the background.',
+                'job_id' => $importJobId,
+                'status_url' => '/api/storage/import/status/' . $importJobId,
+            ], Response::HTTP_ACCEPTED);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for import file.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during the import process.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}

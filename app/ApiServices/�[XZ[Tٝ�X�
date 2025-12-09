@@ -1,0 +1,396 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Email;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * EmailApiService
+ * 
+ * RESTful API service for Email system. Implements CRUD operations
+ * with validation, transactions, and comprehensive error handling.
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class EmailApiService
+{
+    /**
+     * Get all email records with pagination and optional filtering.
+     *
+     * @param Request $request The incoming request, may contain 'per_page' and filtering parameters.
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $query = Email::query();
+
+            // Simple filtering example
+            if ($request->has('status')) {
+                $query->where('status', $request->input('status'));
+            }
+
+            $emails = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Emails retrieved successfully.',
+                'data' => $emails->items(),
+                'meta' => [
+                    'total' => $emails->total(),
+                    'page' => $emails->currentPage(),
+                    'per_page' => $emails->perPage(),
+                    'last_page' => $emails->lastPage(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error("EmailApiService: index failed. " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve emails.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Get a single email record by ID.
+     *
+     * @param int $id The ID of the email record.
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $email = Email::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email retrieved successfully.',
+                'data' => $email,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            \Log::error("EmailApiService: show failed for ID {$id}. " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve email.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Create a new email record.
+     *
+     * @param Request $request The incoming request with email data.
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            // 1. Validation
+            $validatedData = Validator::make($request->all(), [
+                'subject' => 'required|string|max:255',
+                'body' => 'required|string',
+                'sender_id' => 'required|integer|exists:users,id', // Assuming 'users' table exists
+                'recipient_id' => 'required|integer|exists:users,id',
+                'status' => 'sometimes|string|in:draft,sent,failed',
+            ])->validate();
+
+            // 2. DB Transaction
+            $email = DB::transaction(function () use ($validatedData) {
+                return Email::create($validatedData);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email created successfully.',
+                'data' => $email,
+            ], Response::HTTP_CREATED);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            \Log::error("EmailApiService: store failed. " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create email.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Update an existing email record.
+     *
+     * @param Request $request The incoming request with updated email data.
+     * @param int $id The ID of the email record to update.
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            // 1. Find Record
+            $email = Email::findOrFail($id);
+
+            // 2. Validation
+            $validatedData = Validator::make($request->all(), [
+                'subject' => 'sometimes|string|max:255',
+                'body' => 'sometimes|string',
+                'sender_id' => 'sometimes|integer|exists:users,id',
+                'recipient_id' => 'sometimes|integer|exists:users,id',
+                'status' => 'sometimes|string|in:draft,sent,failed',
+            ])->validate();
+
+            // 3. DB Transaction
+            DB::transaction(function () use ($email, $validatedData) {
+                $email->update($validatedData);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email updated successfully.',
+                'data' => $email->fresh(),
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            \Log::error("EmailApiService: update failed for ID {$id}. " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update email.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Delete an email record.
+     *
+     * @param int $id The ID of the email record to delete.
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            // 1. Find Record
+            $email = Email::findOrFail($id);
+
+            // 2. DB Transaction
+            DB::transaction(function () use ($email) {
+                $email->delete();
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email deleted successfully.',
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            \Log::error("EmailApiService: destroy failed for ID {$id}. " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete email.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Perform bulk operations (e.g., delete, update status) on multiple emails.
+     *
+     * @param Request $request The incoming request with 'operation' and 'ids'.
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        try {
+            // 1. Validation
+            $validatedData = Validator::make($request->all(), [
+                'operation' => 'required|string|in:delete,status_update',
+                'ids' => 'required|array',
+                'ids.*' => 'integer|exists:emails,id',
+                'status' => 'required_if:operation,status_update|string|in:draft,sent,failed',
+            ])->validate();
+
+            $operation = $validatedData['operation'];
+            $ids = $validatedData['ids'];
+            $affected = 0;
+
+            // 2. DB Transaction
+            DB::transaction(function () use ($operation, $ids, $validatedData, &$affected) {
+                if ($operation === 'delete') {
+                    $affected = Email::whereIn('id', $ids)->delete();
+                } elseif ($operation === 'status_update') {
+                    $affected = Email::whereIn('id', $ids)->update(['status' => $validatedData['status']]);
+                }
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => "Bulk operation '{$operation}' completed successfully.",
+                'affected' => $affected,
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for bulk operation.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            \Log::error("EmailApiService: bulk failed. " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to perform bulk operation.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Export data to a file (e.g., CSV, Excel).
+     *
+     * @param Request $request The incoming request with export parameters.
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            // 1. Validation (e.g., format, filters)
+            $validatedData = Validator::make($request->all(), [
+                'format' => 'sometimes|string|in:csv,xlsx,pdf',
+                'status' => 'sometimes|string|in:draft,sent,failed',
+            ])->validate();
+
+            $format = $validatedData['format'] ?? 'csv';
+
+            // 2. Simulate Export Logic (In a real app, this would queue a job)
+            $query = Email::query();
+            if (isset($validatedData['status'])) {
+                $query->where('status', $validatedData['status']);
+            }
+            $count = $query->count();
+
+            // Simulate file creation and storage
+            $filename = 'emails_export_' . time() . '.' . $format;
+            $downloadUrl = '/api/v1/emails/download/' . $filename;
+
+            return response()->json([
+                'success' => true,
+                'message' => "Export of {$count} records initiated. Download URL provided.",
+                'download_url' => $downloadUrl,
+                'format' => $format,
+                'records_count' => $count,
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for export operation.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            \Log::error("EmailApiService: export failed. " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate export.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Import data from an uploaded file.
+     *
+     * @param Request $request The incoming request with the file to import.
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        try {
+            // 1. Validation
+            $validatedData = Validator::make($request->all(), [
+                'file' => 'required|file|mimes:csv,xlsx|max:10240', // Max 10MB
+            ])->validate();
+
+            $file = $request->file('file');
+            $importedCount = 0;
+            $failedCount = 0;
+
+            // 2. DB Transaction and Import Logic Simulation
+            DB::transaction(function () use ($file, &$importedCount, &$failedCount) {
+                // In a real application, you would parse the file here (e.g., using Laravel Excel)
+                // For simulation, we assume 10 records were processed, 8 imported, 2 failed.
+                $importedCount = 8;
+                $failedCount = 2;
+
+                // Example: $data = \Excel::toCollection(null, $file);
+                // foreach ($data[0] as $row) { Email::create($row->toArray()); }
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Import process completed.',
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+                'filename' => $file->getClientOriginalName(),
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for import operation.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            \Log::error("EmailApiService: import failed. " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to complete import process.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}

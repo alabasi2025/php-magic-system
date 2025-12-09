@@ -1,0 +1,305 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Payment;
+use App\Http\Requests\Api\PaymentRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
+use Exception;
+
+/**
+ * PaymentApiService
+ * 
+ * RESTful API service for Payment system.
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class PaymentApiService
+{
+    /**
+     * Get all payment records with pagination and filtering.
+     *
+     * @param Request $request The incoming request with optional filters and pagination parameters.
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $query = Payment::query();
+
+            // Simple filtering example
+            if ($request->has('status')) {
+                $query->where('status', $request->get('status'));
+            }
+            if ($request->has('user_id')) {
+                $query->where('user_id', $request->get('user_id'));
+            }
+
+            $payments = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => $payments->items(),
+                'meta' => [
+                    'total' => $payments->total(),
+                    'page' => $payments->currentPage(),
+                    'per_page' => $payments->perPage(),
+                    'last_page' => $payments->lastPage(),
+                ],
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve payments.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a single payment record by ID.
+     *
+     * @param int $id The ID of the payment record.
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $payment = Payment::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $payment,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment record not found.',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve payment record.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Create a new payment record.
+     *
+     * @param PaymentRequest $request The validated request data.
+     * @return JsonResponse
+     */
+    public function store(PaymentRequest $request): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $payment = Payment::create($request->validated());
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment created successfully.',
+                'data' => $payment,
+            ], 201);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create payment.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update an existing payment record.
+     *
+     * @param PaymentRequest $request The validated request data.
+     * @param int $id The ID of the payment record to update.
+     * @return JsonResponse
+     */
+    public function update(PaymentRequest $request, int $id): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $payment = Payment::findOrFail($id);
+            $payment->update($request->validated());
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment updated successfully.',
+                'data' => $payment,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment record not found.',
+            ], 404);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update payment.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete a payment record.
+     *
+     * @param int $id The ID of the payment record to delete.
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $payment = Payment::findOrFail($id);
+            $payment->delete();
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment deleted successfully.',
+            ]);
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment record not found.',
+            ], 404);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete payment.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Perform bulk operations (e.g., bulk delete, bulk update status).
+     *
+     * @param Request $request The request containing the operation type and list of IDs.
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'operation' => 'required|string|in:delete,update_status',
+                'ids' => 'required|array',
+                'ids.*' => 'integer|exists:payments,id',
+                'status' => 'required_if:operation,update_status|string|in:pending,completed,failed',
+            ]);
+
+            $operation = $request->input('operation');
+            $ids = $request->input('ids');
+            $affected = 0;
+
+            DB::beginTransaction();
+            if ($operation === 'delete') {
+                $affected = Payment::whereIn('id', $ids)->delete();
+            } elseif ($operation === 'update_status') {
+                $status = $request->input('status');
+                $affected = Payment::whereIn('id', $ids)->update(['status' => $status]);
+            }
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Bulk operation '{$operation}' completed successfully.",
+                'affected' => $affected,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for bulk operation.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to perform bulk operation.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Export payment data to a downloadable file (e.g., CSV).
+     *
+     * NOTE: In a real application, this would typically dispatch a job and return a status.
+     * For this implementation, we return a placeholder success response.
+     *
+     * @param Request $request The request with optional filters for export.
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        // In a real-world scenario, this would trigger a background job
+        // to generate the file and update a download link.
+        // For this task, we simulate the success of the job dispatch.
+        return response()->json([
+            'success' => true,
+            'message' => 'Export job successfully dispatched. You will be notified when the file is ready.',
+            'job_id' => uniqid('export_'),
+            'download_url' => null, // Will be populated by the background job
+        ]);
+    }
+
+    /**
+     * Import payment data from an uploaded file.
+     *
+     * NOTE: In a real application, this would typically dispatch a job to process the file.
+     * For this implementation, we return a placeholder success response.
+     *
+     * @param Request $request The request containing the file to import.
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'file' => 'required|file|mimes:csv,xlsx|max:10240', // Max 10MB
+            ]);
+
+            // In a real-world scenario, this would trigger a background job
+            // to process the uploaded file.
+            $fileName = $request->file('file')->getClientOriginalName();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Import job for file '{$fileName}' successfully dispatched.",
+                'job_id' => uniqid('import_'),
+                'imported' => 0, // Will be populated by the background job
+                'failed' => 0,   // Will be populated by the background job
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for import file.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process import request.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+}

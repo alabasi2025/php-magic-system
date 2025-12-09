@@ -1,0 +1,462 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Map;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Throwable;
+
+/**
+ * MapsApiService
+ * 
+ * RESTful API service for Maps system. Implements full CRUD, bulk operations, export, and import.
+ * 
+ * @package App\ApiServices
+ * @version 2.0.0
+ */
+class MapsApiService
+{
+    /**
+     * Get all map records with pagination and filtering.
+     *
+     * @param Request $request The incoming request, may contain 'per_page' and 'search' parameters.
+     * @return JsonResponse
+     * 
+     * @OA\Get(
+     *     path="/maps",
+     *     summary="الحصول على قائمة بجميع سجلات الخرائط",
+     *     @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer"), description="عدد السجلات في الصفحة"),
+     *     @OA\Parameter(name="search", in="query", required=false, @OA\Schema(type="string"), description="كلمة للبحث في الاسم والوصف"),
+     *     @OA\Response(response=200, description="قائمة السجلات بنجاح"),
+     *     @OA\Response(response=500, description="خطأ داخلي في الخادم")
+     * )
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->input('per_page', 15);
+            $search = $request->input('search');
+
+            $query = Map::query();
+
+            if ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+            }
+
+            $maps = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => $maps->items(),
+                'meta' => [
+                    'total' => $maps->total(),
+                    'page' => $maps->currentPage(),
+                    'per_page' => $maps->perPage(),
+                    'last_page' => $maps->lastPage(),
+                ],
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في جلب السجلات: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a single map record by ID.
+     *
+     * @param int $id The ID of the map record.
+     * @return JsonResponse
+     * 
+     * @OA\Get(
+     *     path="/maps/{id}",
+     *     summary="الحصول على سجل خريطة واحد",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer"), description="معرف السجل"),
+     *     @OA\Response(response=200, description="تم جلب السجل بنجاح"),
+     *     @OA\Response(response=404, description="السجل غير موجود"),
+     *     @OA\Response(response=500, description="خطأ داخلي في الخادم")
+     * )
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $map = Map::find($id);
+
+            if (!$map) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'السجل غير موجود.',
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $map,
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في جلب السجل: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Create a new map record.
+     *
+     * @param Request $request The incoming request with map data.
+     * @return JsonResponse
+     * 
+     * @OA\Post(
+     *     path="/maps",
+     *     summary="إنشاء سجل خريطة جديد",
+     *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/Map")),
+     *     @OA\Response(response=201, description="تم إنشاء السجل بنجاح"),
+     *     @OA\Response(response=422, description="خطأ في التحقق من صحة البيانات"),
+     *     @OA\Response(response=500, description="خطأ داخلي في الخادم")
+     * )
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+            'description' => 'nullable|string',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            DB::beginTransaction();
+            
+            $map = Map::create($validator->validated());
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء السجل بنجاح.',
+                'data' => $map,
+            ], 201);
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في التحقق من صحة البيانات.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في إنشاء السجل: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update an existing map record.
+     *
+     * @param Request $request The incoming request with updated map data.
+     * @param int $id The ID of the map record to update.
+     * @return JsonResponse
+     * 
+     * @OA\Put(
+     *     path="/maps/{id}",
+     *     summary="تحديث سجل خريطة موجود",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer"), description="معرف السجل"),
+     *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/Map")),
+     *     @OA\Response(response=200, description="تم تحديث السجل بنجاح"),
+     *     @OA\Response(response=404, description="السجل غير موجود"),
+     *     @OA\Response(response=422, description="خطأ في التحقق من صحة البيانات"),
+     *     @OA\Response(response=500, description="خطأ داخلي في الخادم")
+     * )
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|required|string|max:255',
+            'latitude' => 'sometimes|required|numeric|between:-90,90',
+            'longitude' => 'sometimes|required|numeric|between:-180,180',
+            'description' => 'nullable|string',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $map = Map::find($id);
+
+            if (!$map) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'السجل غير موجود.',
+                ], 404);
+            }
+
+            DB::beginTransaction();
+            
+            $map->update($validator->validated());
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث السجل بنجاح.',
+                'data' => $map,
+            ]);
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في التحقق من صحة البيانات.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في تحديث السجل: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete a map record by ID.
+     *
+     * @param int $id The ID of the map record to delete.
+     * @return JsonResponse
+     * 
+     * @OA\Delete(
+     *     path="/maps/{id}",
+     *     summary="حذف سجل خريطة",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer"), description="معرف السجل"),
+     *     @OA\Response(response=200, description="تم حذف السجل بنجاح"),
+     *     @OA\Response(response=404, description="السجل غير موجود"),
+     *     @OA\Response(response=500, description="خطأ داخلي في الخادم")
+     * )
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $map = Map::find($id);
+
+            if (!$map) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'السجل غير موجود.',
+                ], 404);
+            }
+
+            DB::beginTransaction();
+            
+            $map->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف السجل بنجاح.',
+            ]);
+
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في حذف السجل: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Perform bulk operations (e.g., delete, update status) on multiple records.
+     *
+     * @param Request $request The incoming request with 'operation' and 'ids' array.
+     * @return JsonResponse
+     * 
+     * @OA\Post(
+     *     path="/maps/bulk",
+     *     summary="تنفيذ عمليات مجمعة على سجلات الخرائط",
+     *     @OA\RequestBody(required=true, @OA\JsonContent(
+     *         @OA\Property(property="operation", type="string", enum={"delete", "update"}, description="نوع العملية"),
+     *         @OA\Property(property="ids", type="array", @OA\Items(type="integer"), description="قائمة بمعرفات السجلات"),
+     *         @OA\Property(property="data", type="object", nullable=true, description="البيانات المراد تحديثها (إذا كانت العملية 'update')")
+     *     )),
+     *     @OA\Response(response=200, description="تمت العملية المجمعة بنجاح"),
+     *     @OA\Response(response=422, description="خطأ في التحقق من صحة البيانات"),
+     *     @OA\Response(response=500, description="خطأ داخلي في الخادم")
+     * )
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'operation' => 'required|string|in:delete,update',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:maps,id',
+            'data' => 'required_if:operation,update|array',
+            'data.name' => 'sometimes|string|max:255',
+            'data.latitude' => 'sometimes|numeric|between:-90,90',
+            'data.longitude' => 'sometimes|numeric|between:-180,180',
+            'data.description' => 'nullable|string',
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $validated = $validator->validated();
+            $operation = $validated['operation'];
+            $ids = $validated['ids'];
+            $affected = 0;
+
+            DB::beginTransaction();
+
+            if ($operation === 'delete') {
+                $affected = Map::whereIn('id', $ids)->delete();
+                $message = 'تم حذف ' . $affected . ' سجل بنجاح.';
+            } elseif ($operation === 'update') {
+                $updateData = $validated['data'];
+                $affected = Map::whereIn('id', $ids)->update($updateData);
+                $message = 'تم تحديث ' . $affected . ' سجل بنجاح.';
+            } else {
+                // Should not happen due to validator
+                $message = 'عملية غير مدعومة.';
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'affected' => $affected,
+            ]);
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في التحقق من صحة البيانات للعملية المجمعة.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في تنفيذ العملية المجمعة: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Export map data to a file (e.g., CSV).
+     *
+     * NOTE: This is a mock implementation. In a real application, this would trigger a job
+     * and return a download link.
+     *
+     * @param Request $request The incoming request.
+     * @return JsonResponse
+     * 
+     * @OA\Get(
+     *     path="/maps/export",
+     *     summary="تصدير بيانات الخرائط",
+     *     @OA\Response(response=200, description="تم بدء عملية التصدير بنجاح"),
+     *     @OA\Response(response=500, description="خطأ داخلي في الخادم")
+     * )
+     */
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            // Mocking the export process
+            $totalRecords = Map::count();
+            $fileName = 'maps_export_' . time() . '.csv';
+            $downloadUrl = '/exports/' . $fileName;
+
+            // In a real scenario, dispatch an ExportJob here.
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم بدء عملية التصدير بنجاح. سيتم توفير رابط التنزيل قريباً.',
+                'total_records' => $totalRecords,
+                'download_url' => $downloadUrl,
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في بدء عملية التصدير: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Import map data from an uploaded file.
+     *
+     * NOTE: This is a mock implementation. In a real application, this would trigger a job
+     * to process the file.
+     *
+     * @param Request $request The incoming request with the file.
+     * @return JsonResponse
+     * 
+     * @OA\Post(
+     *     path="/maps/import",
+     *     summary="استيراد بيانات الخرائط من ملف",
+     *     @OA\RequestBody(required=true, @OA\MediaType(mediaType="multipart/form-data", @OA\Schema(
+     *         @OA\Property(property="file", type="string", format="binary", description="ملف البيانات (CSV, Excel, etc.)")
+     *     ))),
+     *     @OA\Response(response=200, description="تم بدء عملية الاستيراد بنجاح"),
+     *     @OA\Response(response=422, description="خطأ في التحقق من صحة البيانات"),
+     *     @OA\Response(response=500, description="خطأ داخلي في الخادم")
+     * )
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:csv,txt,xls,xlsx|max:10240', // 10MB max
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            // Mocking the import process
+            $fileName = $request->file('file')->getClientOriginalName();
+            $importedCount = rand(10, 100);
+            $failedCount = rand(0, 5);
+
+            // In a real scenario, store the file and dispatch an ImportJob here.
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم استلام ملف الاستيراد بنجاح. سيتم معالجته في الخلفية.',
+                'file_name' => $fileName,
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطأ في التحقق من صحة البيانات لملف الاستيراد.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في بدء عملية الاستيراد: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+}

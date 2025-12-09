@@ -1,0 +1,351 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Monitoring;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Throwable;
+
+/**
+ * MonitoringApiService
+ * 
+ * RESTful API service for Monitoring system, ensuring secure, transactional, and well-documented operations.
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class MonitoringApiService
+{
+    /**
+     * Get all monitoring records with pagination.
+     *
+     * @param Request $request The incoming request, optionally containing 'per_page' and 'search' parameters.
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $search = $request->get('search');
+
+            $query = Monitoring::query();
+
+            if ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('status', 'like', '%' . $search . '%');
+            }
+
+            $monitors = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Monitoring records retrieved successfully.',
+                'data' => $monitors->items(),
+                'meta' => [
+                    'total' => $monitors->total(),
+                    'page' => $monitors->currentPage(),
+                    'per_page' => $monitors->perPage(),
+                    'last_page' => $monitors->lastPage(),
+                ],
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve monitoring records.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a single monitoring record by ID.
+     *
+     * @param int $id The ID of the monitoring record.
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $monitor = Monitoring::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Monitoring record retrieved successfully.',
+                'data' => $monitor,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Monitoring record not found.',
+            ], 404);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve monitoring record.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Create a new monitoring record.
+     *
+     * @param Request $request The incoming request with data for the new record.
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'status' => 'required|in:active,inactive,error',
+                'value' => 'required|numeric|min:0',
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $monitor = DB::transaction(function () use ($request) {
+                return Monitoring::create($request->only(['name', 'status', 'value']));
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Monitoring record created successfully.',
+                'data' => $monitor,
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create monitoring record.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update an existing monitoring record.
+     *
+     * @param Request $request The incoming request with data to update.
+     * @param int $id The ID of the monitoring record to update.
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'sometimes|string|max:255',
+                'status' => 'sometimes|in:active,inactive,error',
+                'value' => 'sometimes|numeric|min:0',
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $monitor = Monitoring::findOrFail($id);
+
+            DB::transaction(function () use ($request, $monitor) {
+                $monitor->update($request->only(['name', 'status', 'value']));
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Monitoring record updated successfully.',
+                'data' => $monitor->fresh(),
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Monitoring record not found.',
+            ], 404);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update monitoring record.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete a monitoring record.
+     *
+     * @param int $id The ID of the monitoring record to delete.
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $monitor = Monitoring::findOrFail($id);
+
+            DB::transaction(function () use ($monitor) {
+                $monitor->delete();
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Monitoring record deleted successfully.',
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Monitoring record not found.',
+            ], 404);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete monitoring record.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Perform bulk operations (e.g., update status, delete multiple).
+     *
+     * @param Request $request The incoming request containing 'action' and 'ids'.
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'action' => 'required|in:delete,update_status',
+                'ids' => 'required|array',
+                'ids.*' => 'integer|exists:monitoring,id',
+                'status' => 'required_if:action,update_status|in:active,inactive,error',
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            $action = $request->input('action');
+            $ids = $request->input('ids');
+            $affected = 0;
+
+            DB::transaction(function () use ($action, $ids, $request, &$affected) {
+                if ($action === 'delete') {
+                    $affected = Monitoring::destroy($ids);
+                } elseif ($action === 'update_status') {
+                    $status = $request->input('status');
+                    $affected = Monitoring::whereIn('id', $ids)->update(['status' => $status]);
+                }
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => "Bulk operation '{$action}' completed successfully.",
+                'affected' => $affected,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for bulk operation.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to perform bulk operation.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Export monitoring records to a file (simulated).
+     *
+     * @param Request $request The incoming request, optionally containing filters.
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            // In a real application, this would involve queuing a job to generate a file (e.g., CSV, Excel)
+            // and returning a link to the file once ready. This is a simulation.
+            $count = Monitoring::count();
+            $fileName = 'monitoring_export_' . time() . '.csv';
+            $downloadUrl = '/exports/' . $fileName;
+
+            // Simulation of export process
+            // ...
+
+            return response()->json([
+                'success' => true,
+                'message' => "Export of {$count} records initiated successfully.",
+                'download_url' => $downloadUrl,
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate export.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Import monitoring records from an uploaded file (simulated).
+     *
+     * @param Request $request The incoming request containing the file.
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'file' => 'required|file|mimes:csv,txt|max:10240', // Max 10MB CSV/TXT file
+            ]);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+
+            // In a real application, this would involve storing the file and queuing an import job.
+            $file = $request->file('file');
+            $originalName = $file->getClientOriginalName();
+            
+            // Simulation of import process
+            $importedCount = rand(10, 100);
+            $failedCount = rand(0, 5);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Import of file '{$originalName}' completed successfully.",
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for import operation.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to perform import operation.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+}

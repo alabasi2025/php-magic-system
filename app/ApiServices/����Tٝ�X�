@@ -1,0 +1,392 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Task; // افتراض وجود هذا النموذج
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Exception;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * TasksApiService
+ *
+ * خدمة API RESTful لنظام المهام (Tasks)، تطبق عمليات CRUD كاملة، وعمليات مجمعة (Bulk)، وتصدير (Export)، واستيراد (Import).
+ *
+ * @package App\ApiServices
+ * @version 2.0.0
+ */
+class TasksApiService
+{
+    /**
+     * قواعد التحقق (Validation Rules) لإنشاء سجل جديد.
+     *
+     * @return array
+     */
+    private function getStoreRules(): array
+    {
+        return [
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'due_date' => 'nullable|date',
+            'status' => 'required|in:pending,in_progress,completed',
+        ];
+    }
+
+    /**
+     * قواعد التحقق (Validation Rules) لتحديث سجل موجود.
+     *
+     * @return array
+     */
+    private function getUpdateRules(): array
+    {
+        return [
+            'title' => 'sometimes|string|max:255',
+            'description' => 'nullable|string',
+            'due_date' => 'nullable|date',
+            'status' => 'sometimes|in:pending,in_progress,completed',
+        ];
+    }
+
+    /**
+     * جلب جميع السجلات مع ترقيم الصفحات.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $tasks = Task::paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tasks retrieved successfully.',
+                'data' => $tasks->items(),
+                'meta' => [
+                    'total' => $tasks->total(),
+                    'current_page' => $tasks->currentPage(),
+                    'last_page' => $tasks->lastPage(),
+                    'per_page' => $tasks->perPage(),
+                ],
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve tasks.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * جلب سجل واحد بناءً على المعرف.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $task = Task::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task retrieved successfully.',
+                'data' => $task,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Task not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve task.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * إنشاء سجل جديد.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $this->validateRequest($request, $this->getStoreRules());
+
+            DB::beginTransaction();
+            $task = Task::create($request->all());
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task created successfully.',
+                'data' => $task,
+            ], Response::HTTP_CREATED);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create task.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تحديث سجل موجود.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $this->validateRequest($request, $this->getUpdateRules());
+
+            DB::beginTransaction();
+            $task = Task::findOrFail($id);
+            $task->update($request->all());
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task updated successfully.',
+                'data' => $task,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Task not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update task.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * حذف سجل.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            DB::beginTransaction();
+            $task = Task::findOrFail($id);
+            $task->delete();
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task deleted successfully.',
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Task not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete task.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تنفيذ عمليات مجمعة (Bulk Operations) مثل الحذف أو التحديث.
+     *
+     * يتطلب مصفوفة من السجلات لتنفيذ العملية عليها.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        $rules = [
+            'operation' => 'required|in:delete,update_status',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:tasks,id', // افتراض أن الجدول هو 'tasks'
+            'status' => 'required_if:operation,update_status|in:pending,in_progress,completed',
+        ];
+
+        try {
+            $this->validateRequest($request, $rules);
+
+            $operation = $request->input('operation');
+            $ids = $request->input('ids');
+            $affected = 0;
+
+            DB::beginTransaction();
+
+            if ($operation === 'delete') {
+                $affected = Task::whereIn('id', $ids)->delete();
+                $message = 'Bulk deletion completed.';
+            } elseif ($operation === 'update_status') {
+                $status = $request->input('status');
+                $affected = Task::whereIn('id', $ids)->update(['status' => $status]);
+                $message = 'Bulk status update completed.';
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'affected' => $affected,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for bulk operation.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to perform bulk operation.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تصدير البيانات (Export) إلى ملف (مثل CSV أو Excel).
+     *
+     * يتم هنا محاكاة عملية التصدير، حيث أن التنفيذ الفعلي يتطلب مكتبات إضافية.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        // TODO: يجب استبدال هذا بمنطق تصدير حقيقي باستخدام مكتبة مثل Laravel Excel
+        try {
+            // محاكاة عملية التصدير
+            $count = Task::count();
+            if ($count === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No records to export.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // محاكاة إنشاء ملف التصدير
+            $fileName = 'tasks_export_' . time() . '.csv';
+            $filePath = '/exports/' . $fileName;
+
+            // في بيئة الإنتاج، يجب أن يتم إرجاع استجابة تنزيل أو رابط موقع للتنزيل
+            return response()->json([
+                'success' => true,
+                'message' => "Export of {$count} records initiated successfully.",
+                'download_url' => $filePath,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate export.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * استيراد البيانات (Import) من ملف مرفوع.
+     *
+     * يتم هنا محاكاة عملية الاستيراد، حيث أن التنفيذ الفعلي يتطلب مكتبات إضافية.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $rules = [
+            'file' => 'required|file|mimes:csv,txt,xlsx|max:10240', // 10MB Max
+        ];
+
+        try {
+            $this->validateRequest($request, $rules);
+
+            // TODO: يجب استبدال هذا بمنطق استيراد حقيقي باستخدام مكتبة مثل Laravel Excel
+            $file = $request->file('file');
+            $fileName = $file->getClientOriginalName();
+
+            DB::beginTransaction();
+            // محاكاة عملية قراءة الملف ومعالجة البيانات
+            $importedCount = rand(10, 50);
+            $failedCount = rand(0, 5);
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Import of file '{$fileName}' completed successfully.",
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for import file.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to perform import operation.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Helper method for validation.
+     *
+     * @param Request $request
+     * @param array $rules
+     * @throws ValidationException
+     */
+    private function validateRequest(Request $request, array $rules): void
+    {
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+    }
+}

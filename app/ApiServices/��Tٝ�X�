@@ -1,0 +1,383 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Employee; // افتراض وجود نموذج Employee
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * HrApiService
+ * 
+ * خدمة API RESTful لإدارة سجلات الموظفين (الموارد البشرية).
+ * تطبق أفضل الممارسات في Laravel مثل التحقق من الصحة (Validation)،
+ * المعاملات (DB Transactions)، ومعالجة الأخطاء الشاملة.
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class HrApiService
+{
+    /**
+     * الحصول على جميع سجلات الموظفين مع التصفح (Pagination) والبحث.
+     *
+     * @param Request $request طلب HTTP يحتوي على معايير البحث والتصفح.
+     * @return JsonResponse استجابة JSON تحتوي على قائمة الموظفين وبيانات التصفح.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $search = $request->get('search');
+
+            $employees = Employee::query()
+                ->when($search, function ($query, $search) {
+                    $query->where('name', 'like', "%{$search}%")
+                          ->orWhere('email', 'like', "%{$search}%")
+                          ->orWhere('position', 'like', "%{$search}%");
+                })
+                ->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم استرداد سجلات الموظفين بنجاح.',
+                'data' => $employees->items(),
+                'meta' => [
+                    'total' => $employees->total(),
+                    'current_page' => $employees->currentPage(),
+                    'per_page' => $employees->perPage(),
+                    'last_page' => $employees->lastPage(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error("HrApiService - Index Error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء استرداد السجلات.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * الحصول على سجل موظف واحد بناءً على المعرف (ID).
+     *
+     * @param int $id معرف الموظف.
+     * @return JsonResponse استجابة JSON تحتوي على بيانات الموظف أو رسالة خطأ.
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $employee = Employee::find($id);
+
+            if (!$employee) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لم يتم العثور على الموظف.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم استرداد سجل الموظف بنجاح.',
+                'data' => $employee,
+            ]);
+        } catch (\Exception $e) {
+            Log::error("HrApiService - Show Error for ID {$id}: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء استرداد السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * إنشاء سجل موظف جديد.
+     *
+     * يتم تطبيق التحقق من الصحة واستخدام معاملات قاعدة البيانات.
+     *
+     * @param Request $request طلب HTTP يحتوي على بيانات الموظف.
+     * @return JsonResponse استجابة JSON تحتوي على بيانات الموظف الذي تم إنشاؤه.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:employees,email',
+            'position' => 'required|string|max:255',
+            'salary' => 'required|numeric|min:0',
+        ];
+
+        try {
+            $validatedData = Validator::make($request->all(), $rules)->validate();
+
+            DB::beginTransaction();
+
+            $employee = Employee::create($validatedData);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء الموظف بنجاح.',
+                'data' => $employee,
+            ], Response::HTTP_CREATED);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة البيانات.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("HrApiService - Store Error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء إنشاء السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تحديث سجل موظف موجود.
+     *
+     * يتم تطبيق التحقق من الصحة واستخدام معاملات قاعدة البيانات.
+     *
+     * @param Request $request طلب HTTP يحتوي على البيانات المحدثة.
+     * @param int $id معرف الموظف المراد تحديثه.
+     * @return JsonResponse استجابة JSON تحتوي على بيانات الموظف المحدثة.
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $rules = [
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:employees,email,' . $id,
+            'position' => 'sometimes|string|max:255',
+            'salary' => 'sometimes|numeric|min:0',
+        ];
+
+        try {
+            $validatedData = Validator::make($request->all(), $rules)->validate();
+
+            $employee = Employee::find($id);
+            if (!$employee) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لم يتم العثور على الموظف المراد تحديثه.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            DB::beginTransaction();
+
+            $employee->update($validatedData);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث الموظف بنجاح.',
+                'data' => $employee,
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة البيانات.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("HrApiService - Update Error for ID {$id}: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء تحديث السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * حذف سجل موظف.
+     *
+     * يتم استخدام معاملات قاعدة البيانات لضمان سلامة العملية.
+     *
+     * @param int $id معرف الموظف المراد حذفه.
+     * @return JsonResponse استجابة JSON برسالة نجاح.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $employee = Employee::find($id);
+            if (!$employee) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لم يتم العثور على الموظف المراد حذفه.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            DB::beginTransaction();
+
+            $employee->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف الموظف بنجاح.',
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("HrApiService - Delete Error for ID {$id}: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء حذف السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * عمليات مجمعة (Bulk Operations) مثل الحذف أو التحديث لمجموعة من السجلات.
+     *
+     * يتطلب مصفوفة من المعرفات (IDs) ونوع العملية.
+     *
+     * @param Request $request طلب HTTP يحتوي على 'ids' و 'operation'.
+     * @return JsonResponse استجابة JSON توضح نتيجة العملية المجمعة.
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        $rules = [
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:employees,id',
+            'operation' => 'required|string|in:delete,update_position', // مثال للعمليات
+            'position' => 'required_if:operation,update_position|string|max:255',
+        ];
+
+        try {
+            $validatedData = Validator::make($request->all(), $rules)->validate();
+            $ids = $validatedData['ids'];
+            $operation = $validatedData['operation'];
+            $affected = 0;
+
+            DB::beginTransaction();
+
+            if ($operation === 'delete') {
+                $affected = Employee::whereIn('id', $ids)->delete();
+                $message = "تم حذف {$affected} سجل بنجاح.";
+            } elseif ($operation === 'update_position') {
+                $position = $validatedData['position'];
+                $affected = Employee::whereIn('id', $ids)->update(['position' => $position]);
+                $message = "تم تحديث منصب {$affected} سجل بنجاح إلى '{$position}'.";
+            } else {
+                // يجب أن لا نصل إلى هنا بسبب قاعدة 'in'
+                throw new \Exception('عملية مجمعة غير مدعومة.');
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'affected' => $affected,
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة البيانات للعملية المجمعة.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("HrApiService - Bulk Error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء تنفيذ العملية المجمعة.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تصدير البيانات.
+     *
+     * يتم محاكاة إرسال مهمة تصدير (Export Job) للتعامل مع مجموعات البيانات الكبيرة بشكل غير متزامن.
+     *
+     * @param Request $request طلب HTTP يحتوي على معايير التصدير (مثل الفلاتر).
+     * @return JsonResponse استجابة JSON تحتوي على رسالة تأكيد.
+     */
+    public function export(Request $request): JsonResponse
+    {
+        // في تطبيق حقيقي، سيتم هنا إرسال مهمة (Job) إلى قائمة الانتظار (Queue)
+        // مثال: ExportEmployeesJob::dispatch($request->all(), $request->user()->id);
+
+        // محاكاة بسيطة لعملية التصدير
+        $filters = json_encode($request->all());
+        Log::info("Export Job Dispatched with filters: {$filters}");
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم إرسال مهمة التصدير بنجاح. سيتم إعلامك عند اكتمال الملف.',
+            'job_id' => uniqid('export_'),
+            'download_url' => null, // سيتم توفيره لاحقاً
+        ]);
+    }
+
+    /**
+     * استيراد البيانات.
+     *
+     * يتم التحقق من ملف الاستيراد ومحاكاة إرسال مهمة استيراد (Import Job) للتعامل مع البيانات بشكل غير متزامن.
+     *
+     * @param Request $request طلب HTTP يحتوي على ملف الاستيراد.
+     * @return JsonResponse استجابة JSON تحتوي على رسالة تأكيد.
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $rules = [
+            'file' => 'required|file|mimes:csv,xlsx|max:10240', // 10MB
+        ];
+
+        try {
+            $validatedData = Validator::make($request->all(), $rules)->validate();
+            $file = $validatedData['file'];
+
+            // في تطبيق حقيقي، سيتم تخزين الملف وإرسال مهمة
+            // $path = $file->store('imports');
+            // ImportEmployeesJob::dispatch($path, $request->user()->id);
+
+            // محاكاة بسيطة لعملية الاستيراد
+            $fileName = $file->getClientOriginalName();
+            Log::info("Import Job Dispatched for file: {$fileName}");
+
+            return response()->json([
+                'success' => true,
+                'message' => "تم استلام ملف '{$fileName}' بنجاح. بدأت عملية الاستيراد في الخلفية.",
+                'imported' => 0,
+                'failed' => 0,
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة البيانات لملف الاستيراد.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (\Exception $e) {
+            Log::error("HrApiService - Import Error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء معالجة ملف الاستيراد.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}

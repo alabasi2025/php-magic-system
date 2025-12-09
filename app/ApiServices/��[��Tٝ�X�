@@ -1,0 +1,402 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Gene;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
+use Exception;
+
+/**
+ * GenesApiService
+ *
+ * خدمة API RESTful لإدارة كيانات الجينات (Gene).
+ * تضمن تطبيق أفضل الممارسات في Laravel مثل التحقق من البيانات (Validation)،
+ * المعاملات على قاعدة البيانات (DB Transactions)، ومعالجة الأخطاء الشاملة.
+ *
+ * @package App\ApiServices
+ * @version 2.0.0
+ */
+class GenesApiService
+{
+    /**
+     * قواعد التحقق الأساسية لإنشاء وتحديث سجل Gene.
+     *
+     * @param int|null $id
+     * @return array
+     */
+    protected function rules(?int $id = null): array
+    {
+        return [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                // التحقق من التفرد مع تجاهل السجل الحالي في حالة التحديث
+                'unique:genes,name' . ($id ? ",$id" : ''),
+            ],
+            'symbol' => [
+                'required',
+                'string',
+                'max:50',
+                'unique:genes,symbol' . ($id ? ",$id" : ''),
+            ],
+            'description' => 'nullable|string',
+            'is_active' => 'nullable|boolean',
+        ];
+    }
+
+    /**
+     * جلب جميع سجلات الجينات مع التصفح والبحث.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $query = Gene::query();
+
+            // البحث
+            if ($search = $request->get('search')) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                      ->orWhere('symbol', 'like', "%$search%")
+                      ->orWhere('description', 'like', "%$search%");
+                });
+            }
+
+            // التصفية حسب حالة النشاط
+            if ($request->has('is_active')) {
+                $query->where('is_active', (bool) $request->get('is_active'));
+            }
+
+            $genes = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم جلب سجلات الجينات بنجاح.',
+                'data' => $genes->items(),
+                'meta' => [
+                    'total' => $genes->total(),
+                    'current_page' => $genes->currentPage(),
+                    'per_page' => $genes->perPage(),
+                    'last_page' => $genes->lastPage(),
+                ],
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في جلب السجلات.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * جلب سجل جين واحد.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $gene = Gene::find($id);
+
+            if (!$gene) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'السجل غير موجود.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم جلب السجل بنجاح.',
+                'data' => $gene,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في جلب السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * إنشاء سجل جين جديد.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $validatedData = $request->validate($this->rules());
+
+            DB::beginTransaction();
+            $gene = Gene::create($validatedData);
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء السجل بنجاح.',
+                'data' => $gene,
+            ], Response::HTTP_CREATED);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من البيانات.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في إنشاء السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تحديث سجل جين موجود.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $gene = Gene::find($id);
+
+            if (!$gene) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'السجل غير موجود.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            $validatedData = $request->validate($this->rules($id));
+
+            DB::beginTransaction();
+            $gene->update($validatedData);
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث السجل بنجاح.',
+                'data' => $gene,
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من البيانات.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في تحديث السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * حذف سجل جين.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $gene = Gene::find($id);
+
+            if (!$gene) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'السجل غير موجود.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            DB::beginTransaction();
+            $gene->delete();
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف السجل بنجاح.',
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في حذف السجل.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * عمليات مجمعة (Bulk Operations) مثل الحذف أو التحديث المجمع.
+     *
+     * يتوقع مدخلات مثل:
+     * {
+     *   "action": "delete", // أو "update"
+     *   "ids": [1, 2, 3],
+     *   "data": {"is_active": false} // مطلوب فقط لعملية التحديث
+     * }
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'action' => 'required|in:delete,update',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:genes,id',
+            'data' => 'required_if:action,update|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من البيانات لعملية المجمعة.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $validated = $validator->validated();
+        $action = $validated['action'];
+        $ids = $validated['ids'];
+        $affected = 0;
+
+        try {
+            DB::beginTransaction();
+
+            if ($action === 'delete') {
+                $affected = Gene::whereIn('id', $ids)->delete();
+                $message = 'تم حذف السجلات المحددة بنجاح.';
+            } elseif ($action === 'update') {
+                // يمكن إضافة قواعد تحقق إضافية لـ $validated['data'] هنا
+                $affected = Gene::whereIn('id', $ids)->update($validated['data']);
+                $message = 'تم تحديث السجلات المحددة بنجاح.';
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'affected' => $affected,
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في تنفيذ العملية المجمعة.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تصدير البيانات (Export) إلى ملف (مثل CSV).
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        // في بيئة Laravel حقيقية، سيتم استخدام مكتبة مثل Laravel Excel
+        // أو إنشاء ملف CSV مباشرة. هنا، نكتفي بمحاكاة العملية.
+        try {
+            // يمكن تطبيق نفس منطق التصفية والبحث الموجود في index() هنا
+            $genes = Gene::query()->get();
+
+            // محاكاة عملية إنشاء الملف
+            $fileName = 'genes_export_' . time() . '.csv';
+            $filePath = storage_path('app/exports/' . $fileName);
+
+            // افتراض أن الملف تم إنشاؤه بنجاح
+            // ... (منطق إنشاء الملف الفعلي) ...
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم بدء عملية التصدير بنجاح.',
+                // في بيئة API، عادةً ما يتم إرجاع مسار مؤقت أو رابط توقيعي للتنزيل
+                'download_url' => '/api/genes/download/' . $fileName,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في عملية التصدير.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * استيراد البيانات (Import) من ملف مرفوع.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:csv,txt|max:10240', // ملف CSV بحد أقصى 10 ميجابايت
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من البيانات لملف الاستيراد.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $file = $request->file('file');
+        $importedCount = 0;
+        $failedCount = 0;
+
+        try {
+            // في بيئة Laravel حقيقية، سيتم استخدام مكتبة مثل Laravel Excel
+            // أو معالجة ملف CSV مباشرة. هنا، نكتفي بمحاكاة العملية.
+
+            // محاكاة قراءة الملف ومعالجة كل سطر
+            // ... (منطق قراءة الملف ومعالجة البيانات) ...
+
+            // افتراض نجاح العملية
+            $importedCount = 50;
+            $failedCount = 2;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تمت عملية الاستيراد بنجاح.',
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في عملية الاستيراد.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}

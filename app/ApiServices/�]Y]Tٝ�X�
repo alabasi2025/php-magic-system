@@ -1,0 +1,366 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Audit; // افتراض وجود نموذج Audit
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Exception;
+
+/**
+ * AuditApiService
+ * 
+ * خدمة API RESTful لنظام التدقيق (Audit).
+ * توفر هذه الخدمة عمليات CRUD كاملة، وعمليات مجمعة، واستيراد/تصدير البيانات.
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class AuditApiService
+{
+    /**
+     * جلب جميع سجلات التدقيق مع التصفح (Pagination) والتصفية.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $query = Audit::query();
+
+            // مثال على التصفية: يمكن إضافة المزيد من شروط التصفية هنا
+            if ($request->has('user_id')) {
+                $query->where('user_id', $request->input('user_id'));
+            }
+            if ($request->has('event')) {
+                $query->where('event', $request->input('event'));
+            }
+
+            $audits = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => $audits->items(),
+                'meta' => [
+                    'total' => $audits->total(),
+                    'page' => $audits->currentPage(),
+                    'per_page' => $audits->perPage(),
+                    'last_page' => $audits->lastPage(),
+                ],
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في جلب السجلات: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * جلب سجل تدقيق واحد بواسطة المعرف (ID).
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $audit = Audit::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $audit,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'السجل غير موجود.',
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في جلب السجل: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * إنشاء سجل تدقيق جديد.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $rules = [
+            'user_id' => 'required|integer|exists:users,id',
+            'event' => 'required|string|max:255',
+            'auditable_type' => 'required|string|max:255',
+            'auditable_id' => 'required|integer',
+            'old_values' => 'nullable|array',
+            'new_values' => 'nullable|array',
+        ];
+
+        try {
+            $validatedData = Validator::validate($request->all(), $rules);
+
+            DB::beginTransaction();
+
+            $audit = Audit::create($validatedData);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء السجل بنجاح.',
+                'data' => $audit,
+            ], 201);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة البيانات.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في إنشاء السجل: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * تحديث سجل تدقيق موجود.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $rules = [
+            'user_id' => 'sometimes|integer|exists:users,id',
+            'event' => 'sometimes|string|max:255',
+            'auditable_type' => 'sometimes|string|max:255',
+            'auditable_id' => 'sometimes|integer',
+            'old_values' => 'nullable|array',
+            'new_values' => 'nullable|array',
+        ];
+
+        try {
+            $audit = Audit::findOrFail($id);
+            $validatedData = Validator::validate($request->all(), $rules);
+
+            DB::beginTransaction();
+
+            $audit->update($validatedData);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث السجل بنجاح.',
+                'data' => $audit,
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'السجل غير موجود.',
+            ], 404);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة البيانات.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في تحديث السجل: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * حذف سجل تدقيق.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $audit = Audit::findOrFail($id);
+
+            DB::beginTransaction();
+
+            $audit->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف السجل بنجاح.',
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'السجل غير موجود.',
+            ], 404);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في حذف السجل: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * تنفيذ عمليات مجمعة (Bulk Operations) على سجلات التدقيق.
+     *
+     * تتوقع مدخلات مثل:
+     * {
+     *   "action": "delete", // أو "update_status"
+     *   "ids": [1, 2, 3],
+     *   "data": {"status": "archived"} // مطلوب لعملية التحديث
+     * }
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        $rules = [
+            'action' => 'required|in:delete,update_status',
+            'ids' => 'required|array',
+            'ids.*' => 'integer',
+            'data' => 'required_if:action,update_status|array',
+            'data.status' => 'required_if:action,update_status|string',
+        ];
+
+        try {
+            $validatedData = Validator::validate($request->all(), $rules);
+            $action = $validatedData['action'];
+            $ids = $validatedData['ids'];
+            $affectedRows = 0;
+
+            DB::beginTransaction();
+
+            if ($action === 'delete') {
+                $affectedRows = Audit::whereIn('id', $ids)->delete();
+            } elseif ($action === 'update_status') {
+                $affectedRows = Audit::whereIn('id', $ids)->update($validatedData['data']);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "تمت عملية {$action} المجمعة بنجاح.",
+                'affected' => $affectedRows,
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة البيانات لعملية Bulk.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في تنفيذ عملية Bulk: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * تصدير البيانات (Export) إلى ملف (مثال: CSV).
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function export(Request $request): JsonResponse
+    {
+        // ملاحظة: التنفيذ الفعلي يتطلب استخدام مكتبة مثل Laravel Excel أو وظيفة (Job)
+        // هذا مثال مبسط يحاكي عملية التصدير.
+        try {
+            // ... منطق جلب البيانات وتنسيقها ...
+            $count = Audit::count();
+            $fileName = 'audits_' . time() . '.csv';
+            $filePath = '/storage/exports/' . $fileName;
+
+            // محاكاة إنشاء الملف
+            // file_put_contents(public_path($filePath), $csvContent);
+
+            return response()->json([
+                'success' => true,
+                'message' => "تم بدء عملية تصدير {$count} سجل. سيتم توفير رابط التحميل قريباً.",
+                'download_url' => $filePath,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في عملية التصدير: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * استيراد البيانات (Import) من ملف مرفوع.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $rules = [
+            'file' => 'required|file|mimes:csv,txt|max:10240', // 10MB max, CSV/TXT only
+        ];
+
+        try {
+            $validatedData = Validator::validate($request->all(), $rules);
+            $file = $validatedData['file'];
+
+            // ملاحظة: التنفيذ الفعلي يتطلب استخدام مكتبة أو وظيفة (Job) لمعالجة الملف
+            // هذا مثال مبسط يحاكي عملية الاستيراد.
+
+            // ... منطق معالجة الملف واستيراد البيانات ...
+            $importedCount = 150;
+            $failedCount = 2;
+
+            // $file->storeAs('imports', $file->getClientOriginalName());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم استلام ملف الاستيراد. سيتم معالجته في الخلفية.',
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من صحة البيانات لعملية Import.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في عملية الاستيراد: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+}

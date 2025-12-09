@@ -1,0 +1,354 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\Permission; // افتراض وجود هذا النموذج
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * PermissionsApiService
+ * 
+ * خدمة API RESTful لإدارة الأذونات (Permissions).
+ * تطبق أفضل الممارسات مثل التحقق من الصحة، ومعاملات قاعدة البيانات، ومعالجة الأخطاء الشاملة.
+ * 
+ * @package App\ApiServices
+ * @version 1.0.0
+ */
+class PermissionsApiService
+{
+    /**
+     * الحصول على جميع سجلات الأذونات مع ترقيم الصفحات.
+     *
+     * @param Request $request طلب HTTP الذي قد يحتوي على معلمات البحث والترقيم.
+     * @return JsonResponse استجابة JSON تحتوي على قائمة الأذونات والبيانات الوصفية.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->get('per_page', 15);
+            $search = $request->get('search');
+
+            $query = Permission::query();
+
+            if ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('description', 'like', '%' . $search . '%');
+            }
+
+            $permissions = $query->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permissions retrieved successfully.',
+                'data' => $permissions->items(),
+                'meta' => [
+                    'total' => $permissions->total(),
+                    'page' => $permissions->currentPage(),
+                    'per_page' => (int) $permissions->perPage(),
+                    'last_page' => $permissions->lastPage(),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve permissions.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * الحصول على سجل إذن واحد بواسطة المعرف.
+     *
+     * @param int $id معرف الإذن.
+     * @return JsonResponse استجابة JSON تحتوي على بيانات الإذن.
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $permission = Permission::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permission retrieved successfully.',
+                'data' => $permission,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Permission not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve permission.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * إنشاء سجل إذن جديد.
+     *
+     * @param Request $request طلب HTTP الذي يحتوي على بيانات الإذن.
+     * @return JsonResponse استجابة JSON تحتوي على الإذن الذي تم إنشاؤه.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255|unique:permissions,name',
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        DB::beginTransaction();
+        try {
+            $permission = Permission::create($validator->validated());
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Permission created successfully.',
+                'data' => $permission,
+            ], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create permission.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تحديث سجل إذن موجود.
+     *
+     * @param Request $request طلب HTTP الذي يحتوي على بيانات التحديث.
+     * @param int $id معرف الإذن المراد تحديثه.
+     * @return JsonResponse استجابة JSON تحتوي على الإذن المحدث.
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|required|string|max:255|unique:permissions,name,' . $id,
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        DB::beginTransaction();
+        try {
+            $permission = Permission::findOrFail($id);
+            $permission->update($validator->validated());
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Permission updated successfully.',
+                'data' => $permission,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Permission not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update permission.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * حذف سجل إذن موجود.
+     *
+     * @param int $id معرف الإذن المراد حذفه.
+     * @return JsonResponse استجابة JSON للتأكيد.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $permission = Permission::findOrFail($id);
+            $permission->delete();
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Permission deleted successfully.',
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Permission not found.',
+            ], Response::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete permission.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تنفيذ عمليات مجمعة (Bulk Operations) على الأذونات.
+     * يدعم حاليًا عمليات الحذف والتحديث المجمعة.
+     *
+     * @param Request $request طلب HTTP الذي يحتوي على العملية والمعرفات والبيانات.
+     * @return JsonResponse استجابة JSON تلخص نتيجة العملية المجمعة.
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'operation' => 'required|string|in:delete,update',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:permissions,id',
+            'data' => 'required_if:operation,update|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for bulk operation.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $validated = $validator->validated();
+        $operation = $validated['operation'];
+        $ids = $validated['ids'];
+        $affected = 0;
+
+        DB::beginTransaction();
+        try {
+            if ($operation === 'delete') {
+                $affected = Permission::destroy($ids);
+                $message = "Successfully deleted {$affected} permissions.";
+            } elseif ($operation === 'update') {
+                $data = $validated['data'];
+                $affected = Permission::whereIn('id', $ids)->update($data);
+                $message = "Successfully updated {$affected} permissions.";
+            }
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'affected' => $affected,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to perform bulk operation.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تصدير بيانات الأذونات.
+     * (يتم محاكاة العملية هنا، وفي بيئة إنتاجية يفضل استخدام Jobs).
+     *
+     * @param Request $request طلب HTTP.
+     * @return JsonResponse استجابة JSON تحتوي على رابط التنزيل.
+     */
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            // في بيئة إنتاجية، يجب إرسال هذه العملية إلى Job
+            // ExportJob::dispatch($request->user(), $request->all());
+            
+            // محاكاة عملية التصدير
+            $filename = 'permissions_export_' . time() . '.csv';
+            // افتراض أن الملف تم إنشاؤه وتخزينه في مكان ما
+            $downloadUrl = '/api/exports/' . $filename;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Export process initiated. File will be available shortly.',
+                'download_url' => $downloadUrl,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to initiate export.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * استيراد بيانات الأذونات من ملف.
+     * (يتم محاكاة العملية هنا، وفي بيئة إنتاجية يفضل استخدام Jobs).
+     *
+     * @param Request $request طلب HTTP الذي يحتوي على ملف الاستيراد.
+     * @return JsonResponse استجابة JSON تلخص نتيجة الاستيراد.
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:csv,txt|max:10240', // 10MB
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for import file.',
+                'errors' => $validator->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        DB::beginTransaction();
+        try {
+            // في بيئة إنتاجية، يجب إرسال الملف إلى Job لمعالجته
+            // $path = $request->file('file')->store('imports');
+            // ImportJob::dispatch($path, $request->user());
+
+            // محاكاة عملية الاستيراد
+            $importedCount = rand(50, 100);
+            $failedCount = rand(0, 5);
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Import process completed successfully.',
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to complete import process.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}

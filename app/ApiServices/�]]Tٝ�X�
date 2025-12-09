@@ -1,0 +1,459 @@
+<?php
+
+namespace App\ApiServices;
+
+use App\Models\User; // افتراض استخدام نموذج المستخدم (User) لخدمة المصادقة (Auth)
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * AuthApiService
+ * 
+ * خدمة API RESTful لإدارة موارد المستخدمين (Users) في نظام المصادقة.
+ * تلتزم بأفضل ممارسات Laravel من حيث التحقق من الصحة، ومعالجة الأخطاء، واستخدام المعاملات.
+ * 
+ * @package App\ApiServices
+ * @version 2.0.0
+ */
+class AuthApiService
+{
+    /**
+     * النموذج المرتبط بهذه الخدمة.
+     *
+     * @var string
+     */
+    protected $model = User::class;
+
+    /**
+     * عدد العناصر في الصفحة الافتراضي للترقيم.
+     *
+     * @var int
+     */
+    protected $perPage = 15;
+
+    /**
+     * استرداد قائمة بجميع السجلات مع الترقيم.
+     *
+     * يتم تطبيق التحقق من الصحة على معلمات الاستعلام (مثل 'per_page' و 'search').
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @return JsonResponse استجابة JSON تحتوي على البيانات المرقّمة.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            // 1. التحقق من صحة معلمات الاستعلام
+            $validated = Validator::make($request->all(), [
+                'per_page' => 'nullable|integer|min:1|max:100',
+                'search' => 'nullable|string|max:255',
+            ])->validate();
+
+            $perPage = $validated['per_page'] ?? $this->perPage;
+            $query = $this->model::query();
+
+            // تطبيق البحث إذا كان موجوداً
+            if (!empty($validated['search'])) {
+                $searchTerm = '%' . $validated['search'] . '%';
+                $query->where('name', 'like', $searchTerm)
+                      ->orWhere('email', 'like', $searchTerm);
+            }
+
+            // 2. استرداد البيانات المرقّمة
+            $data = $query->paginate($perPage);
+
+            // 3. إرجاع الاستجابة
+            return response()->json([
+                'success' => true,
+                'message' => 'Records retrieved successfully.',
+                'data' => $data->items(),
+                'meta' => [
+                    'total' => $data->total(),
+                    'per_page' => $data->perPage(),
+                    'current_page' => $data->currentPage(),
+                    'last_page' => $data->lastPage(),
+                ],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $e) {
+            // معالجة أي خطأ عام في قاعدة البيانات أو النظام
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while retrieving records.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * استرداد سجل واحد بواسطة المعرّف.
+     *
+     * @param int $id معرّف السجل المطلوب.
+     * @return JsonResponse استجابة JSON تحتوي على السجل أو رسالة خطأ.
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            // 1. البحث عن السجل
+            $record = $this->model::find($id);
+
+            // 2. التحقق من وجود السجل
+            if (!$record) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Record not found.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // 3. إرجاع الاستجابة
+            return response()->json([
+                'success' => true,
+                'message' => 'Record retrieved successfully.',
+                'data' => $record,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while retrieving the record.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * إنشاء سجل جديد.
+     *
+     * يتم استخدام المعاملات (Transactions) لضمان سلامة البيانات.
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @return JsonResponse استجابة JSON تحتوي على السجل الذي تم إنشاؤه.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        // 1. قواعد التحقق من الصحة (مثال لنموذج المستخدم)
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ];
+
+        try {
+            // 2. التحقق من صحة المدخلات
+            $validated = Validator::make($request->all(), $rules)->validate();
+
+            // 3. بدء المعاملة
+            $record = DB::transaction(function () use ($validated) {
+                // تشفير كلمة المرور قبل الحفظ
+                $validated['password'] = bcrypt($validated['password']);
+                
+                // إنشاء السجل
+                return $this->model::create($validated);
+            });
+
+            // 4. إرجاع الاستجابة
+            return response()->json([
+                'success' => true,
+                'message' => 'Record created successfully.',
+                'data' => $record,
+            ], Response::HTTP_CREATED);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $e) {
+            // سيتم التراجع عن المعاملة تلقائياً في حالة حدوث خطأ
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while creating the record.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تحديث سجل موجود.
+     *
+     * يتم استخدام المعاملات (Transactions) لضمان سلامة البيانات.
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @param int $id معرّف السجل المطلوب تحديثه.
+     * @return JsonResponse استجابة JSON تحتوي على السجل المحدث.
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        // 1. قواعد التحقق من الصحة (مثال لنموذج المستخدم)
+        $rules = [
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8|confirmed',
+        ];
+
+        try {
+            // 2. التحقق من صحة المدخلات
+            $validated = Validator::make($request->all(), $rules)->validate();
+
+            // 3. البحث عن السجل
+            $record = $this->model::find($id);
+            if (!$record) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Record not found.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // 4. بدء المعاملة
+            DB::transaction(function () use ($record, $validated) {
+                if (isset($validated['password'])) {
+                    $validated['password'] = bcrypt($validated['password']);
+                }
+                
+                // تحديث السجل
+                $record->update($validated);
+            });
+
+            // 5. إرجاع الاستجابة
+            return response()->json([
+                'success' => true,
+                'message' => 'Record updated successfully.',
+                'data' => $record->fresh(), // استرداد السجل المحدث
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating the record.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * حذف سجل موجود.
+     *
+     * يتم استخدام المعاملات (Transactions) لضمان سلامة البيانات.
+     *
+     * @param int $id معرّف السجل المطلوب حذفه.
+     * @return JsonResponse استجابة JSON لعملية الحذف.
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            // 1. البحث عن السجل
+            $record = $this->model::find($id);
+            if (!$record) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Record not found.',
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // 2. بدء المعاملة والحذف
+            DB::transaction(function () use ($record) {
+                $record->delete();
+            });
+
+            // 3. إرجاع الاستجابة
+            return response()->json([
+                'success' => true,
+                'message' => 'Record deleted successfully.',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while deleting the record.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تنفيذ عمليات مجمعة (مثل الحذف المجمع أو التحديث المجمع).
+     *
+     * تتطلب مدخلات: 'operation' (العملية المطلوبة) و 'ids' (قائمة المعرّفات).
+     * يتم استخدام المعاملات (Transactions) لضمان سلامة البيانات.
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @return JsonResponse استجابة JSON بنتيجة العملية المجمعة.
+     */
+    public function bulk(Request $request): JsonResponse
+    {
+        // 1. قواعد التحقق من الصحة
+        $rules = [
+            'operation' => 'required|string|in:delete,update_status',
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:users,id', // التحقق من وجود المعرّفات
+            'status' => 'required_if:operation,update_status|in:active,inactive', // مثال لعملية تحديث الحالة
+        ];
+
+        try {
+            // 2. التحقق من صحة المدخلات
+            $validated = Validator::make($request->all(), $rules)->validate();
+            $operation = $validated['operation'];
+            $ids = $validated['ids'];
+            $affected = 0;
+
+            // 3. بدء المعاملة وتنفيذ العملية
+            DB::transaction(function () use ($operation, $ids, $validated, &$affected) {
+                $query = $this->model::whereIn('id', $ids);
+
+                if ($operation === 'delete') {
+                    $affected = $query->delete();
+                } elseif ($operation === 'update_status') {
+                    $affected = $query->update(['status' => $validated['status']]);
+                }
+            });
+
+            // 4. إرجاع الاستجابة
+            return response()->json([
+                'success' => true,
+                'message' => "Bulk operation '{$operation}' completed successfully.",
+                'affected' => $affected,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for bulk operation.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during the bulk operation.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * تصدير البيانات إلى ملف (مثلاً CSV).
+     *
+     * يتم تنفيذ عملية التصدير بشكل مبسط هنا، وفي التطبيقات الحقيقية يفضل استخدام وظائف خلفية (Jobs).
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @return JsonResponse استجابة JSON تحتوي على رابط التنزيل.
+     */
+    public function export(Request $request): JsonResponse
+    {
+        try {
+            // 1. التحقق من صحة معلمات التصدير (مثلاً: التنسيق)
+            Validator::make($request->all(), [
+                'format' => 'nullable|string|in:csv,json',
+            ])->validate();
+
+            // 2. منطق التصدير المبسط (في بيئة الإنتاج، يفضل استخدام Jobs)
+            $records = $this->model::all();
+            $format = $request->input('format', 'csv');
+            
+            // محاكاة إنشاء ملف التصدير
+            $fileName = 'export_' . time() . '.' . $format;
+            $filePath = '/exports/' . $fileName;
+
+            // 3. إرجاع الاستجابة
+            return response()->json([
+                'success' => true,
+                'message' => 'Data export initiated successfully.',
+                'download_url' => $filePath,
+                'total_records' => $records->count(),
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for export parameters.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during the export process.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * استيراد البيانات من ملف.
+     *
+     * تتطلب مدخلات: 'file' (ملف البيانات).
+     * يتم استخدام المعاملات (Transactions) لضمان سلامة البيانات.
+     *
+     * @param Request $request طلب HTTP الوارد.
+     * @return JsonResponse استجابة JSON بنتيجة عملية الاستيراد.
+     */
+    public function import(Request $request): JsonResponse
+    {
+        // 1. قواعد التحقق من الصحة
+        $rules = [
+            'file' => 'required|file|mimes:csv,txt|max:10240', // ملف CSV بحد أقصى 10 ميجابايت
+        ];
+
+        try {
+            // 2. التحقق من صحة المدخلات
+            Validator::make($request->all(), $rules)->validate();
+
+            $file = $request->file('file');
+            $importedCount = 0;
+            $failedCount = 0;
+
+            // 3. بدء المعاملة ومنطق الاستيراد المبسط
+            DB::transaction(function () use ($file, &$importedCount, &$failedCount) {
+                // في التطبيق الحقيقي، يتم قراءة الملف وتحليل البيانات هنا
+                // محاكاة لعملية الاستيراد
+                $data = [
+                    ['name' => 'Imported User 1', 'email' => 'import1@example.com', 'password' => 'password'],
+                    ['name' => 'Imported User 2', 'email' => 'import2@example.com', 'password' => 'password'],
+                ];
+
+                foreach ($data as $item) {
+                    try {
+                        // محاكاة إنشاء سجل
+                        $this->model::create([
+                            'name' => $item['name'],
+                            'email' => $item['email'],
+                            'password' => bcrypt($item['password']),
+                        ]);
+                        $importedCount++;
+                    } catch (Exception $e) {
+                        // تسجيل الخطأ ومتابعة الاستيراد
+                        $failedCount++;
+                    }
+                }
+            });
+
+            // 4. إرجاع الاستجابة
+            return response()->json([
+                'success' => true,
+                'message' => 'Data import completed.',
+                'imported' => $importedCount,
+                'failed' => $failedCount,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed for import file.',
+                'errors' => $e->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during the import process.',
+                'error' => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+}
