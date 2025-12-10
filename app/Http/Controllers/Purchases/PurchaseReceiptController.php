@@ -30,7 +30,8 @@ class PurchaseReceiptController extends Controller
      */
     public function create()
     {
-        $warehouses = Warehouse::where('status', 'active')->get();
+        // جلب جميع المخازن (بدون فلترة بالحالة)
+        $warehouses = Warehouse::orderBy('name')->get();
         $suppliers = Supplier::where('is_active', true)->get();
         
         return view('purchases.receipts.create', compact('warehouses', 'suppliers'));
@@ -43,13 +44,10 @@ class PurchaseReceiptController extends Controller
     {
         $warehouseId = $request->warehouse_id;
         
-        // جلب الفواتير المعتمدة التي لم يتم استلامها بالكامل
+        // جلب الفواتير القابلة للاستلام (معتمدة أو معلقة)
         $invoices = PurchaseInvoice::with(['supplier', 'items.item'])
             ->where('warehouse_id', $warehouseId)
-            ->where('status', 'approved')
-            ->whereDoesntHave('receipts', function($query) {
-                $query->where('status', 'approved');
-            })
+            ->whereIn('status', ['approved', 'pending'])
             ->get();
         
         return response()->json($invoices);
