@@ -370,6 +370,31 @@
 
             <!-- Body -->
             <div class="luxury-body">
+                {{-- رسائل النجاح --}}
+                @if (session('success'))
+                    <div class="alert alert-success alert-luxury alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-check-circle me-2"></i>
+                            نجح العملية!
+                        </h5>
+                        <p class="mb-0">{{ session('success') }}</p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                {{-- رسائل الخطأ العامة --}}
+                @if (session('error'))
+                    <div class="alert alert-danger alert-luxury alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-times-circle me-2"></i>
+                            حدث خطأ!
+                        </h5>
+                        <p class="mb-0">{{ session('error') }}</p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                {{-- أخطاء التحقق من الصحة --}}
                 @if ($errors->any())
                     <div class="alert alert-danger alert-luxury alert-dismissible fade show" role="alert">
                         <h5 class="alert-heading">
