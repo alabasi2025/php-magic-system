@@ -48,7 +48,7 @@
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                     إجمالي الوحدات
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $units->total() }}</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalUnits }}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-building fa-2x text-gray-300"></i>
@@ -67,7 +67,7 @@
                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                     الوحدات النشطة
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $units->where('is_active', true)->count() }}</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activeUnits }}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-check-circle fa-2x text-gray-300"></i>
@@ -86,7 +86,7 @@
                                 <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                     الوحدات غير النشطة
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $units->where('is_active', false)->count() }}</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $inactiveUnits }}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-pause-circle fa-2x text-gray-300"></i>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Unit;
+use App\Models\Holding;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -12,7 +13,16 @@ class OrganizationUnitController extends Controller
     {
         try {
             $units = Unit::orderBy('created_at', 'desc')->paginate(15);
-            return view('organization.units.index', compact('units'));
+            
+            // Calculate statistics
+            $totalUnits = Unit::count();
+            $activeUnits = Unit::where('is_active', true)->count();
+            $inactiveUnits = Unit::where('is_active', false)->count();
+            
+            // Get holdings for filter
+            $holdings = Holding::orderBy('name')->get();
+            
+            return view('organization.units.index', compact('units', 'totalUnits', 'activeUnits', 'inactiveUnits', 'holdings'));
         } catch (\Exception $e) {
             Log::error("OrganizationUnitController@index: " . $e->getMessage());
             return back()->with('error', 'حدث خطأ أثناء جلب البيانات: ' . $e->getMessage());
