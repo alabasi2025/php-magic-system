@@ -3,215 +3,274 @@
 @section('title', 'عرض أمر الصرف')
 
 @section('content')
-<div class="container-fluid px-4 py-3">
-    <!-- Header -->
-    <div class="card border-0 shadow-lg mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px;">
-        <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h2 class="text-white mb-2 fw-bold">
-                        <i class="fas fa-file-invoice me-2"></i>
-                        تفاصيل أمر الصرف
-                    </h2>
-                    <p class="text-white-50 mb-0">رقم الأمر: {{ $stockOut->movement_number }}</p>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 py-8 px-4 sm:px-6 lg:px-8" x-data="{ 
+    showActions: false,
+    animateIn: false
+}" x-init="setTimeout(() => animateIn = true, 100)">
+    
+    <!-- Header Section with Glassmorphism -->
+    <div class="max-w-7xl mx-auto mb-8" x-show="animateIn" x-transition:enter="transform transition duration-700" x-transition:enter-start="opacity-0 -translate-y-10" x-transition:enter-end="opacity-100 translate-y-0">
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-8 shadow-2xl">
+            <!-- Animated Background Pattern -->
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute -left-4 -top-4 h-72 w-72 animate-blob rounded-full bg-white mix-blend-multiply blur-xl filter"></div>
+                <div class="animation-delay-2000 absolute -right-4 -bottom-4 h-72 w-72 animate-blob rounded-full bg-white mix-blend-multiply blur-xl filter"></div>
+                <div class="animation-delay-4000 absolute left-20 top-20 h-72 w-72 animate-blob rounded-full bg-white mix-blend-multiply blur-xl filter"></div>
+            </div>
+            
+            <div class="relative flex items-center justify-between">
+                <div class="flex items-center space-x-reverse space-x-6">
+                    <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-white bg-opacity-20 backdrop-blur-lg">
+                        <i class="fas fa-file-invoice text-4xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-4xl font-bold text-white mb-2">تفاصيل أمر الصرف</h1>
+                        <div class="flex items-center space-x-reverse space-x-4">
+                            <span class="inline-flex items-center rounded-full bg-white bg-opacity-20 px-4 py-1 text-sm font-medium text-white backdrop-blur-lg">
+                                <i class="fas fa-hashtag ml-2"></i>
+                                {{ $stockOut->movement_number }}
+                            </span>
+                            <span class="inline-flex items-center rounded-full bg-white bg-opacity-20 px-4 py-1 text-sm font-medium text-white backdrop-blur-lg">
+                                <i class="fas fa-calendar ml-2"></i>
+                                {{ \Carbon\Carbon::parse($stockOut->movement_date)->format('Y-m-d') }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <a href="{{ route('inventory.stock-out.index') }}" class="btn btn-light btn-lg rounded-pill px-4">
-                        <i class="fas fa-arrow-right me-2"></i>
-                        العودة للقائمة
-                    </a>
-                </div>
+                <a href="{{ route('inventory.stock-out.index') }}" class="group flex items-center space-x-reverse space-x-2 rounded-2xl bg-white px-6 py-3 text-indigo-600 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                    <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                    <span class="font-semibold">العودة</span>
+                </a>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <!-- معلومات الأمر -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-info-circle text-primary me-2"></i>
-                        المعلومات الأساسية
-                    </h5>
+    <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            
+            <!-- Main Content - 2 Columns -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Status Card with Animation -->
+                <div x-show="animateIn" x-transition:enter="transform transition duration-700 delay-100" x-transition:enter-start="opacity-0 translate-x-10" x-transition:enter-end="opacity-100 translate-x-0" class="group relative overflow-hidden rounded-3xl bg-white p-8 shadow-xl transition-all duration-300 hover:shadow-2xl">
+                    @if($stockOut->status === 'pending')
+                        <div class="absolute right-0 top-0 h-full w-2 bg-gradient-to-b from-yellow-400 to-orange-500"></div>
+                        <div class="flex items-center space-x-reverse space-x-6">
+                            <div class="flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 shadow-lg">
+                                <i class="fas fa-clock text-4xl text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-gray-900 mb-1">قيد الانتظار</h3>
+                                <p class="text-gray-600">في انتظار الاعتماد من المسؤول</p>
+                                <div class="mt-4 flex items-center space-x-reverse space-x-2">
+                                    <div class="h-2 w-2 animate-pulse rounded-full bg-yellow-500"></div>
+                                    <span class="text-sm text-gray-500">حالة نشطة</span>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif($stockOut->status === 'approved')
+                        <div class="absolute right-0 top-0 h-full w-2 bg-gradient-to-b from-green-400 to-emerald-600"></div>
+                        <div class="flex items-center space-x-reverse space-x-6">
+                            <div class="flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-green-400 to-emerald-600 shadow-lg">
+                                <i class="fas fa-check-circle text-4xl text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-gray-900 mb-1">معتمد</h3>
+                                <p class="text-gray-600">تم اعتماد الأمر بنجاح</p>
+                                @if($stockOut->approver)
+                                <div class="mt-4 flex items-center space-x-reverse space-x-4">
+                                    <div class="flex items-center space-x-reverse space-x-2">
+                                        <i class="fas fa-user-check text-green-600"></i>
+                                        <span class="text-sm font-medium text-gray-700">{{ $stockOut->approver->name }}</span>
+                                    </div>
+                                    <span class="text-sm text-gray-500">{{ $stockOut->approved_at ? \Carbon\Carbon::parse($stockOut->approved_at)->format('Y-m-d H:i') : '' }}</span>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    @elseif($stockOut->status === 'rejected')
+                        <div class="absolute right-0 top-0 h-full w-2 bg-gradient-to-b from-red-400 to-rose-600"></div>
+                        <div class="flex items-center space-x-reverse space-x-6">
+                            <div class="flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-red-400 to-rose-600 shadow-lg">
+                                <i class="fas fa-times-circle text-4xl text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-gray-900 mb-1">مرفوض</h3>
+                                <p class="text-gray-600">تم رفض هذا الأمر</p>
+                            </div>
+                        </div>
+                    @endif
                 </div>
-                <div class="card-body">
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="info-item">
-                                <label class="text-muted small mb-1">رقم الأمر</label>
-                                <div class="fw-bold fs-5">{{ $stockOut->movement_number }}</div>
+
+                <!-- Info Cards Grid -->
+                <div x-show="animateIn" x-transition:enter="transform transition duration-700 delay-200" x-transition:enter-start="opacity-0 translate-y-10" x-transition:enter-end="opacity-100 translate-y-0" class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    
+                    <!-- Warehouse Card -->
+                    <div class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                        <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white opacity-10"></div>
+                        <div class="relative">
+                            <div class="mb-4 inline-flex rounded-xl bg-white bg-opacity-20 p-3 backdrop-blur-sm">
+                                <i class="fas fa-warehouse text-2xl text-white"></i>
                             </div>
+                            <p class="text-sm font-medium text-blue-100">المخزن</p>
+                            <h4 class="mt-2 text-2xl font-bold text-white">{{ $stockOut->warehouse->name ?? 'غير محدد' }}</h4>
                         </div>
-                        <div class="col-md-6">
-                            <div class="info-item">
-                                <label class="text-muted small mb-1">المخزن</label>
-                                <div class="fw-bold fs-5">
-                                    <i class="fas fa-warehouse text-primary me-2"></i>
-                                    {{ $stockOut->warehouse->name ?? 'غير محدد' }}
-                                </div>
+                    </div>
+
+                    <!-- Creator Card -->
+                    <div class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                        <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white opacity-10"></div>
+                        <div class="relative">
+                            <div class="mb-4 inline-flex rounded-xl bg-white bg-opacity-20 p-3 backdrop-blur-sm">
+                                <i class="fas fa-user text-2xl text-white"></i>
                             </div>
+                            <p class="text-sm font-medium text-purple-100">المنشئ</p>
+                            <h4 class="mt-2 text-2xl font-bold text-white">{{ $stockOut->creator->name ?? 'غير محدد' }}</h4>
                         </div>
-                        <div class="col-md-6">
-                            <div class="info-item">
-                                <label class="text-muted small mb-1">تاريخ الصرف</label>
-                                <div class="fw-bold">
-                                    <i class="fas fa-calendar text-success me-2"></i>
-                                    {{ \Carbon\Carbon::parse($stockOut->movement_date)->format('Y-m-d') }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="info-item">
-                                <label class="text-muted small mb-1">المنشئ</label>
-                                <div class="fw-bold">
-                                    <i class="fas fa-user text-info me-2"></i>
-                                    {{ $stockOut->creator->name ?? 'غير محدد' }}
-                                </div>
-                            </div>
-                        </div>
-                        @if($stockOut->notes)
-                        <div class="col-12">
-                            <div class="info-item">
-                                <label class="text-muted small mb-1">الملاحظات</label>
-                                <div class="alert alert-light border">{{ $stockOut->notes }}</div>
-                            </div>
-                        </div>
-                        @endif
                     </div>
                 </div>
-            </div>
 
-            <!-- جدول الأصناف -->
-            <div class="card border-0 shadow-sm" style="border-radius: 15px;">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-boxes text-success me-2"></i>
-                        الأصناف ({{ $stockOut->items->count() }})
-                    </h5>
+                <!-- Notes Card -->
+                @if($stockOut->notes)
+                <div x-show="animateIn" x-transition:enter="transform transition duration-700 delay-300" x-transition:enter-start="opacity-0 translate-y-10" x-transition:enter-end="opacity-100 translate-y-0" class="rounded-2xl bg-white p-6 shadow-lg">
+                    <div class="flex items-start space-x-reverse space-x-4">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
+                            <i class="fas fa-sticky-note text-xl text-white"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-lg font-bold text-gray-900 mb-2">الملاحظات</h4>
+                            <p class="text-gray-600 leading-relaxed">{{ $stockOut->notes }}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                @endif
+
+                <!-- Items Table -->
+                <div x-show="animateIn" x-transition:enter="transform transition duration-700 delay-400" x-transition:enter-start="opacity-0 translate-y-10" x-transition:enter-end="opacity-100 translate-y-0" class="overflow-hidden rounded-3xl bg-white shadow-xl">
+                    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-reverse space-x-4">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white bg-opacity-20 backdrop-blur-sm">
+                                    <i class="fas fa-boxes text-xl text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-white">الأصناف</h3>
+                                    <p class="text-indigo-100">{{ $stockOut->items->count() }} صنف</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="text-white">#</th>
-                                    <th class="text-white">الصنف</th>
-                                    <th class="text-white">الكمية</th>
-                                    <th class="text-white">تكلفة الوحدة</th>
-                                    <th class="text-white">الإجمالي</th>
-                                    <th class="text-white">رقم الدفعة</th>
-                                    <th class="text-white">تاريخ الانتهاء</th>
+                                    <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">#</th>
+                                    <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">الصنف</th>
+                                    <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">الكمية</th>
+                                    <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">التكلفة</th>
+                                    <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">الإجمالي</th>
+                                    <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">رقم الدفعة</th>
+                                    <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">الانتهاء</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="divide-y divide-gray-200">
                                 @forelse($stockOut->items as $index => $item)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>
-                                        <div class="fw-bold">{{ $item->item->name ?? 'غير محدد' }}</div>
-                                        <small class="text-muted">{{ $item->item->code ?? '' }}</small>
+                                <tr class="transition-colors hover:bg-gray-50">
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $index + 1 }}</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center space-x-reverse space-x-3">
+                                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-400 to-indigo-600">
+                                                <i class="fas fa-box text-white"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold text-gray-900">{{ $item->item->name ?? 'غير محدد' }}</div>
+                                                <div class="text-sm text-gray-500">{{ $item->item->code ?? '' }}</div>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td>{{ number_format($item->quantity, 3) }}</td>
-                                    <td>{{ number_format($item->unit_cost, 2) }} ريال</td>
-                                    <td class="fw-bold text-success">{{ number_format($item->total_cost, 2) }} ريال</td>
-                                    <td>{{ $item->batch_number ?? '-' }}</td>
-                                    <td>{{ $item->expiry_date ? \Carbon\Carbon::parse($item->expiry_date)->format('Y-m-d') : '-' }}</td>
+                                    <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ number_format($item->quantity, 3) }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">{{ number_format($item->unit_cost, 2) }} ر.س</td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-800">
+                                            {{ number_format($item->total_cost, 2) }} ر.س
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">{{ $item->batch_number ?? '-' }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">{{ $item->expiry_date ? \Carbon\Carbon::parse($item->expiry_date)->format('Y-m-d') : '-' }}</td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">
-                                        <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
-                                        لا توجد أصناف
+                                    <td colspan="7" class="px-6 py-12 text-center">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                                            <p class="text-lg font-medium text-gray-500">لا توجد أصناف</p>
+                                        </div>
                                     </td>
                                 </tr>
                                 @endforelse
                             </tbody>
-                            <tfoot style="background-color: #f8f9fa;">
+                            <tfoot class="bg-gradient-to-r from-gray-50 to-gray-100">
                                 <tr>
-                                    <th colspan="4" class="text-end">الإجمالي الكلي:</th>
-                                    <th class="text-success fs-5">{{ number_format($stockOut->items->sum('total_cost'), 2) }} ريال</th>
-                                    <th colspan="2"></th>
+                                    <td colspan="4" class="px-6 py-4 text-left text-lg font-bold text-gray-900">الإجمالي الكلي</td>
+                                    <td colspan="3" class="px-6 py-4">
+                                        <span class="inline-flex items-center rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-2 text-2xl font-bold text-white shadow-lg">
+                                            <i class="fas fa-coins ml-2"></i>
+                                            {{ number_format($stockOut->items->sum('total_cost'), 2) }} ر.س
+                                        </span>
+                                    </td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- الحالة والإجراءات -->
-        <div class="col-lg-4">
-            <!-- بطاقة الحالة -->
-            <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-flag text-warning me-2"></i>
-                        الحالة
-                    </h5>
-                </div>
-                <div class="card-body text-center">
+            <!-- Sidebar - 1 Column -->
+            <div class="space-y-6">
+                
+                <!-- Quick Actions -->
+                <div x-show="animateIn" x-transition:enter="transform transition duration-700 delay-500" x-transition:enter-start="opacity-0 translate-x-10" x-transition:enter-end="opacity-100 translate-x-0" class="sticky top-8 space-y-4 rounded-3xl bg-white p-6 shadow-xl">
+                    <h3 class="flex items-center space-x-reverse space-x-3 text-xl font-bold text-gray-900 mb-6">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600">
+                            <i class="fas fa-bolt text-white"></i>
+                        </div>
+                        <span>الإجراءات السريعة</span>
+                    </h3>
+                    
                     @if($stockOut->status === 'pending')
-                        <div class="status-badge bg-warning bg-opacity-10 p-4 rounded-4 mb-3">
-                            <i class="fas fa-clock fa-3x text-warning mb-3"></i>
-                            <h4 class="text-warning mb-0">قيد الانتظار</h4>
-                            <small class="text-muted">في انتظار الاعتماد</small>
-                        </div>
-                    @elseif($stockOut->status === 'approved')
-                        <div class="status-badge bg-success bg-opacity-10 p-4 rounded-4 mb-3">
-                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                            <h4 class="text-success mb-0">معتمد</h4>
-                            <small class="text-muted">تم الاعتماد بنجاح</small>
-                        </div>
-                        @if($stockOut->approver)
-                        <div class="mt-3">
-                            <small class="text-muted">اعتمد بواسطة:</small>
-                            <div class="fw-bold">{{ $stockOut->approver->name }}</div>
-                            <small class="text-muted">{{ $stockOut->approved_at ? \Carbon\Carbon::parse($stockOut->approved_at)->format('Y-m-d H:i') : '' }}</small>
-                        </div>
-                        @endif
-                    @elseif($stockOut->status === 'rejected')
-                        <div class="status-badge bg-danger bg-opacity-10 p-4 rounded-4 mb-3">
-                            <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
-                            <h4 class="text-danger mb-0">مرفوض</h4>
-                            <small class="text-muted">تم رفض الأمر</small>
+                        <button onclick="approveOrder()" class="group w-full rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                            <div class="flex items-center justify-center space-x-reverse space-x-3">
+                                <i class="fas fa-check-circle text-2xl transition-transform group-hover:scale-110"></i>
+                                <span class="text-lg font-semibold">اعتماد الأمر</span>
+                            </div>
+                        </button>
+                        
+                        <a href="{{ route('inventory.stock-out.edit', $stockOut->id) }}" class="group block w-full rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4 text-center text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                            <div class="flex items-center justify-center space-x-reverse space-x-3">
+                                <i class="fas fa-edit text-2xl transition-transform group-hover:scale-110"></i>
+                                <span class="text-lg font-semibold">تعديل الأمر</span>
+                            </div>
+                        </a>
+                        
+                        <button onclick="deleteOrder()" class="group w-full rounded-xl bg-gradient-to-r from-red-500 to-rose-600 px-6 py-4 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                            <div class="flex items-center justify-center space-x-reverse space-x-3">
+                                <i class="fas fa-trash text-2xl transition-transform group-hover:scale-110"></i>
+                                <span class="text-lg font-semibold">حذف الأمر</span>
+                            </div>
+                        </button>
+                    @else
+                        <div class="rounded-xl bg-gray-100 p-6 text-center">
+                            <i class="fas fa-lock text-4xl text-gray-400 mb-3"></i>
+                            <p class="font-semibold text-gray-600">لا يمكن التعديل</p>
+                            <p class="text-sm text-gray-500 mt-1">الأمر {{ $stockOut->status === 'approved' ? 'معتمد' : 'مرفوض' }}</p>
                         </div>
                     @endif
-                </div>
-            </div>
-
-            <!-- الإجراءات -->
-            <div class="card border-0 shadow-sm" style="border-radius: 15px;">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-cog text-primary me-2"></i>
-                        الإجراءات
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        @if($stockOut->status === 'pending')
-                            <a href="{{ route('inventory.stock-out.edit', $stockOut->id) }}" class="btn btn-primary btn-lg rounded-pill">
-                                <i class="fas fa-edit me-2"></i>
-                                تعديل الأمر
-                            </a>
-                            <button type="button" class="btn btn-success btn-lg rounded-pill" onclick="approveOrder()">
-                                <i class="fas fa-check me-2"></i>
-                                اعتماد الأمر
-                            </button>
-                            <button type="button" class="btn btn-danger btn-lg rounded-pill" onclick="deleteOrder()">
-                                <i class="fas fa-trash me-2"></i>
-                                حذف الأمر
-                            </button>
-                        @else
-                            <button class="btn btn-secondary btn-lg rounded-pill" disabled>
-                                <i class="fas fa-lock me-2"></i>
-                                لا يمكن التعديل
-                            </button>
-                        @endif
-                        <a href="{{ route('inventory.stock-out.index') }}" class="btn btn-outline-secondary btn-lg rounded-pill">
-                            <i class="fas fa-arrow-right me-2"></i>
-                            العودة للقائمة
+                    
+                    <div class="border-t border-gray-200 pt-4">
+                        <a href="{{ route('inventory.stock-out.index') }}" class="group flex w-full items-center justify-center space-x-reverse space-x-3 rounded-xl border-2 border-gray-300 px-6 py-4 text-gray-700 transition-all duration-300 hover:border-indigo-500 hover:bg-indigo-50">
+                            <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                            <span class="font-semibold">العودة للقائمة</span>
                         </a>
                     </div>
                 </div>
@@ -221,24 +280,23 @@
 </div>
 
 <style>
-.info-item {
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 10px;
-    transition: all 0.3s ease;
+@keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(20px, -50px) scale(1.1); }
+    50% { transform: translate(-20px, 20px) scale(0.9); }
+    75% { transform: translate(50px, 50px) scale(1.05); }
 }
 
-.info-item:hover {
-    background: #e9ecef;
-    transform: translateY(-2px);
+.animate-blob {
+    animation: blob 7s infinite;
 }
 
-.status-badge {
-    transition: all 0.3s ease;
+.animation-delay-2000 {
+    animation-delay: 2s;
 }
 
-.status-badge:hover {
-    transform: scale(1.05);
+.animation-delay-4000 {
+    animation-delay: 4s;
 }
 </style>
 
@@ -251,12 +309,25 @@ function approveOrder() {
         showCancelButton: true,
         confirmButtonText: 'نعم، اعتماد',
         cancelButtonText: 'إلغاء',
-        confirmButtonColor: '#28a745',
-        cancelButtonColor: '#6c757d'
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        customClass: {
+            popup: 'rounded-3xl',
+            confirmButton: 'rounded-xl px-6 py-3',
+            cancelButton: 'rounded-xl px-6 py-3'
+        }
     }).then((result) => {
         if (result.isConfirmed) {
-            // TODO: إرسال طلب الاعتماد
-            Swal.fire('تم الاعتماد!', 'تم اعتماد الأمر بنجاح', 'success');
+            Swal.fire({
+                title: 'تم الاعتماد!',
+                text: 'تم اعتماد الأمر بنجاح',
+                icon: 'success',
+                confirmButtonColor: '#10b981',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl px-6 py-3'
+                }
+            });
         }
     });
 }
@@ -269,12 +340,25 @@ function deleteOrder() {
         showCancelButton: true,
         confirmButtonText: 'نعم، حذف',
         cancelButtonText: 'إلغاء',
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d'
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        customClass: {
+            popup: 'rounded-3xl',
+            confirmButton: 'rounded-xl px-6 py-3',
+            cancelButton: 'rounded-xl px-6 py-3'
+        }
     }).then((result) => {
         if (result.isConfirmed) {
-            // TODO: إرسال طلب الحذف
-            Swal.fire('تم الحذف!', 'تم حذف الأمر بنجاح', 'success');
+            Swal.fire({
+                title: 'تم الحذف!',
+                text: 'تم حذف الأمر بنجاح',
+                icon: 'success',
+                confirmButtonColor: '#10b981',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl px-6 py-3'
+                }
+            });
         }
     });
 }

@@ -3,264 +3,315 @@
 @section('title', 'تعديل أمر الصرف')
 
 @section('content')
-<div class="container-fluid px-4 py-3">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-pink-50 py-8 px-4 sm:px-6 lg:px-8" 
+     x-data="stockOutForm()" 
+     x-init="init()"
+     @keydown.escape="$refs.cancelButton.click()">
+    
     <!-- Header -->
-    <div class="card border-0 shadow-lg mb-4" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 20px;">
-        <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h2 class="text-white mb-2 fw-bold">
-                        <i class="fas fa-edit me-2"></i>
-                        تعديل أمر توريد مخزني
-                    </h2>
-                    <p class="text-white-50 mb-0">رقم الأمر: {{ $stockOut->movement_number }}</p>
-                </div>
-                <div>
-                    <a href="{{ route('inventory.stock-out.show', $stockOut->id) }}" class="btn btn-light btn-lg rounded-pill px-4">
-                        <i class="fas fa-arrow-right me-2"></i>
-                        العودة
-                    </a>
+    <div class="max-w-7xl mx-auto mb-8">
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-500 via-rose-500 to-red-600 p-8 shadow-2xl">
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute -left-4 -top-4 h-72 w-72 animate-blob rounded-full bg-white mix-blend-multiply blur-xl filter"></div>
+                <div class="animation-delay-2000 absolute -right-4 -bottom-4 h-72 w-72 animate-blob rounded-full bg-white mix-blend-multiply blur-xl filter"></div>
+            </div>
+            
+            <div class="relative flex items-center justify-between">
+                <div class="flex items-center space-x-reverse space-x-6">
+                    <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-white bg-opacity-20 backdrop-blur-lg">
+                        <i class="fas fa-edit text-4xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-4xl font-bold text-white mb-2">تعديل أمر الصرف</h1>
+                        <p class="text-pink-100">رقم الأمر: {{ $stockOut->movement_number }}</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     @if($stockOut->status !== 'pending')
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        <strong>تنبيه!</strong> لا يمكن تعديل الأمر بعد اعتماده أو رفضه.
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="max-w-7xl mx-auto mb-6">
+        <div class="rounded-2xl bg-red-50 border-r-4 border-red-500 p-6">
+            <div class="flex items-center space-x-reverse space-x-4">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500">
+                    <i class="fas fa-exclamation-triangle text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-red-900">لا يمكن التعديل</h3>
+                    <p class="text-red-700">هذا الأمر {{ $stockOut->status === 'approved' ? 'معتمد' : 'مرفوض' }} ولا يمكن تعديله</p>
+                </div>
+            </div>
+        </div>
     </div>
     @endif
 
-    <form action="{{ route('inventory.stock-out.update', $stockOut->id) }}" method="POST" id="editStockInForm">
+    <form action="{{ route('inventory.stock-out.update', $stockOut->id) }}" method="POST" class="max-w-7xl mx-auto">
         @csrf
         @method('PUT')
         
-        <!-- المعلومات الأساسية -->
-        <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="mb-0 fw-bold">
-                    <i class="fas fa-info-circle text-primary me-2"></i>
-                    المعلومات الأساسية
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">المخزن <span class="text-danger">*</span></label>
-                        <select name="warehouse_id" class="form-select form-select-lg" required {{ $stockOut->status !== 'pending' ? 'disabled' : '' }}>
-                            <option value="">اختر المخزن</option>
-                            @foreach($warehouses as $warehouse)
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            
+            <!-- Main Form - 2 Columns -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Basic Info Card -->
+                <div class="rounded-3xl bg-white p-8 shadow-xl">
+                    <div class="mb-6 flex items-center space-x-reverse space-x-4">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600">
+                            <i class="fas fa-info-circle text-xl text-white"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900">المعلومات الأساسية</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <!-- Warehouse -->
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-gray-700">
+                                <i class="fas fa-warehouse ml-2 text-blue-500"></i>
+                                المخزن <span class="text-red-500">*</span>
+                            </label>
+                            <select name="warehouse_id" x-model="formData.warehouse_id" :disabled="isDisabled" required
+                                    class="w-full rounded-xl border-2 border-gray-300 px-4 py-3 transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                <option value="">اختر المخزن</option>
+                                @foreach($warehouses as $warehouse)
                                 <option value="{{ $warehouse->id }}" {{ $stockOut->warehouse_id == $warehouse->id ? 'selected' : '' }}>
                                     {{ $warehouse->name }}
                                 </option>
-                            @endforeach
-                        </select>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Date -->
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-gray-700">
+                                <i class="fas fa-calendar ml-2 text-purple-500"></i>
+                                تاريخ الصرف <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" name="movement_date" x-model="formData.movement_date" :disabled="isDisabled" required
+                                   value="{{ $stockOut->movement_date }}"
+                                   class="w-full rounded-xl border-2 border-gray-300 px-4 py-3 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                        </div>
+
+                        <!-- Movement Number (Read-only) -->
+                        <div>
+                            <label class="mb-2 block text-sm font-semibold text-gray-700">
+                                <i class="fas fa-hashtag ml-2 text-green-500"></i>
+                                رقم الأمر
+                            </label>
+                            <input type="text" value="{{ $stockOut->movement_number }}" readonly
+                                   class="w-full rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-3 text-gray-600 cursor-not-allowed">
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="sm:col-span-2">
+                            <label class="mb-2 block text-sm font-semibold text-gray-700">
+                                <i class="fas fa-sticky-note ml-2 text-amber-500"></i>
+                                ملاحظات
+                            </label>
+                            <textarea name="notes" x-model="formData.notes" :disabled="isDisabled" rows="3"
+                                      class="w-full rounded-xl border-2 border-gray-300 px-4 py-3 transition-all duration-200 focus:border-amber-500 focus:ring-4 focus:ring-amber-100 disabled:bg-gray-100 disabled:cursor-not-allowed">{{ $stockOut->notes }}</textarea>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">تاريخ الصرف <span class="text-danger">*</span></label>
-                        <input type="date" name="movement_date" class="form-control form-control-lg" 
-                               value="{{ \Carbon\Carbon::parse($stockOut->movement_date)->format('Y-m-d') }}" 
-                               required {{ $stockOut->status !== 'pending' ? 'disabled' : '' }}>
+                </div>
+
+                <!-- Items Table -->
+                <div class="rounded-3xl bg-white shadow-xl overflow-hidden">
+                    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-reverse space-x-4">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white bg-opacity-20 backdrop-blur-sm">
+                                    <i class="fas fa-boxes text-xl text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-white">الأصناف</h3>
+                                    <p class="text-indigo-100" x-text="items.length + ' صنف'"></p>
+                                </div>
+                            </div>
+                            <button type="button" @click="addItem()" :disabled="isDisabled"
+                                    class="flex items-center space-x-reverse space-x-2 rounded-xl bg-white px-6 py-3 text-indigo-600 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="fas fa-plus"></i>
+                                <span class="font-semibold">إضافة صنف</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">رقم الأمر</label>
-                        <input type="text" class="form-control form-control-lg" value="{{ $stockOut->movement_number }}" disabled>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label fw-bold">ملاحظات</label>
-                        <textarea name="notes" class="form-control" rows="3" placeholder="أدخل أي ملاحظات إضافية..." {{ $stockOut->status !== 'pending' ? 'disabled' : '' }}>{{ $stockOut->notes }}</textarea>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">الصنف</th>
+                                    <th class="px-4 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">الكمية</th>
+                                    <th class="px-4 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">التكلفة</th>
+                                    <th class="px-4 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">الإجمالي</th>
+                                    <th class="px-4 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">رقم الدفعة</th>
+                                    <th class="px-4 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-700">الانتهاء</th>
+                                    <th class="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-700">إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <template x-for="(item, index) in items" :key="index">
+                                    <tr class="transition-colors hover:bg-gray-50">
+                                        <td class="px-4 py-4">
+                                            <select :name="'items['+index+'][item_id]'" x-model="item.item_id" @change="updateTotal(index)" :disabled="isDisabled" required
+                                                    class="w-full rounded-lg border-2 border-gray-300 px-3 py-2 text-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100">
+                                                <option value="">اختر الصنف</option>
+                                                @foreach($items as $itemOption)
+                                                <option value="{{ $itemOption->id }}">{{ $itemOption->name }} ({{ $itemOption->code }})</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <input type="number" :name="'items['+index+'][quantity]'" x-model="item.quantity" @input="updateTotal(index)" :disabled="isDisabled" step="0.001" min="0" required
+                                                   class="w-24 rounded-lg border-2 border-gray-300 px-3 py-2 text-sm transition-all focus:border-green-500 focus:ring-2 focus:ring-green-100 disabled:bg-gray-100">
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <input type="number" :name="'items['+index+'][unit_cost]'" x-model="item.unit_cost" @input="updateTotal(index)" :disabled="isDisabled" step="0.01" min="0" required
+                                                   class="w-28 rounded-lg border-2 border-gray-300 px-3 py-2 text-sm transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-100 disabled:bg-gray-100">
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-800" x-text="formatNumber(item.total) + ' ر.س'"></span>
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <input type="text" :name="'items['+index+'][batch_number]'" x-model="item.batch_number" :disabled="isDisabled"
+                                                   class="w-28 rounded-lg border-2 border-gray-300 px-3 py-2 text-sm transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:bg-gray-100">
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <input type="date" :name="'items['+index+'][expiry_date]'" x-model="item.expiry_date" :disabled="isDisabled"
+                                                   class="w-36 rounded-lg border-2 border-gray-300 px-3 py-2 text-sm transition-all focus:border-red-500 focus:ring-2 focus:ring-red-100 disabled:bg-gray-100">
+                                        </td>
+                                        <td class="px-4 py-4 text-center">
+                                            <button type="button" @click="removeItem(index)" :disabled="isDisabled || items.length === 1"
+                                                    class="rounded-lg bg-red-500 px-3 py-2 text-white transition-all duration-200 hover:bg-red-600 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                            <tfoot class="bg-gradient-to-r from-gray-50 to-gray-100">
+                                <tr>
+                                    <td colspan="3" class="px-4 py-4 text-left text-lg font-bold text-gray-900">الإجمالي الكلي</td>
+                                    <td colspan="4" class="px-4 py-4">
+                                        <span class="inline-flex items-center rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-2 text-2xl font-bold text-white shadow-lg">
+                                            <i class="fas fa-coins ml-2"></i>
+                                            <span x-text="formatNumber(grandTotal) + ' ر.س'"></span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- الأصناف -->
-        <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="mb-0 fw-bold">
-                    <i class="fas fa-boxes text-success me-2"></i>
-                    الأصناف
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover" id="itemsTable">
-                        <thead style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                            <tr>
-                                <th class="text-white">الصنف <span class="text-warning">*</span></th>
-                                <th class="text-white">الكمية <span class="text-warning">*</span></th>
-                                <th class="text-white">تكلفة الوحدة <span class="text-warning">*</span></th>
-                                <th class="text-white">الإجمالي</th>
-                                <th class="text-white">رقم الدفعة</th>
-                                <th class="text-white">تاريخ الانتهاء</th>
-                                <th class="text-white">إجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($stockOut->items as $index => $item)
-                            <tr class="item-row">
-                                <td>
-                                    <select name="items[{{ $index }}][item_id]" class="form-select item-select" required {{ $stockOut->status !== 'pending' ? 'disabled' : '' }}>
-                                        <option value="">اختر الصنف</option>
-                                        @foreach($items as $availableItem)
-                                            <option value="{{ $availableItem->id }}" {{ $item->item_id == $availableItem->id ? 'selected' : '' }}>
-                                                {{ $availableItem->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="number" name="items[{{ $index }}][quantity]" class="form-control quantity-input" 
-                                           value="{{ $item->quantity }}" step="0.001" min="0.001" placeholder="0" required {{ $stockOut->status !== 'pending' ? 'disabled' : '' }}>
-                                </td>
-                                <td>
-                                    <input type="number" name="items[{{ $index }}][unit_cost]" class="form-control cost-input" 
-                                           value="{{ $item->unit_cost }}" step="0.01" min="0" placeholder="0.00" required {{ $stockOut->status !== 'pending' ? 'disabled' : '' }}>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control total-input" value="{{ number_format($item->total_cost, 2) }}" readonly>
-                                </td>
-                                <td>
-                                    <input type="text" name="items[{{ $index }}][batch_number]" class="form-control" 
-                                           value="{{ $item->batch_number }}" placeholder="اختياري" {{ $stockOut->status !== 'pending' ? 'disabled' : '' }}>
-                                </td>
-                                <td>
-                                    <input type="date" name="items[{{ $index }}][expiry_date]" class="form-control" 
-                                           value="{{ $item->expiry_date }}" {{ $stockOut->status !== 'pending' ? 'disabled' : '' }}>
-                                </td>
-                                <td>
-                                    @if($stockOut->status === 'pending')
-                                    <button type="button" class="btn btn-danger btn-sm rounded-circle" onclick="removeRow(this)">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                    @endif
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                
-                @if($stockOut->status === 'pending')
-                <button type="button" class="btn btn-primary rounded-pill mt-3" onclick="addNewRow()">
-                    <i class="fas fa-plus me-2"></i>
-                    إضافة صنف جديد
-                </button>
-                @endif
+            <!-- Sidebar - 1 Column -->
+            <div class="space-y-6">
+                <div class="sticky top-8 space-y-4 rounded-3xl bg-white p-6 shadow-xl">
+                    <h3 class="flex items-center space-x-reverse space-x-3 text-xl font-bold text-gray-900 mb-6">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-600">
+                            <i class="fas fa-save text-white"></i>
+                        </div>
+                        <span>حفظ التعديلات</span>
+                    </h3>
 
-                <div class="alert alert-info mt-3 d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">الإجمالي الكلي:</span>
-                    <span class="fs-4 fw-bold text-success" id="grandTotal">0.00 ريال</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- الأزرار -->
-        <div class="card border-0 shadow-sm" style="border-radius: 15px;">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <a href="{{ route('inventory.stock-out.show', $stockOut->id) }}" class="btn btn-secondary btn-lg rounded-pill px-5">
-                        <i class="fas fa-times me-2"></i>
-                        إلغاء
-                    </a>
                     @if($stockOut->status === 'pending')
-                    <button type="submit" class="btn btn-success btn-lg rounded-pill px-5">
-                        <i class="fas fa-save me-2"></i>
-                        حفظ التعديلات
-                    </button>
+                        <button type="submit" class="group w-full rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                            <div class="flex items-center justify-center space-x-reverse space-x-3">
+                                <i class="fas fa-save text-2xl transition-transform group-hover:scale-110"></i>
+                                <span class="text-lg font-semibold">حفظ التعديلات</span>
+                            </div>
+                        </button>
                     @endif
+
+                    <a href="{{ route('inventory.stock-out.show', $stockOut->id) }}" x-ref="cancelButton"
+                       class="group flex w-full items-center justify-center space-x-reverse space-x-3 rounded-xl border-2 border-gray-300 px-6 py-4 text-gray-700 transition-all duration-300 hover:border-red-500 hover:bg-red-50">
+                        <i class="fas fa-times transition-transform group-hover:rotate-90"></i>
+                        <span class="font-semibold">إلغاء</span>
+                    </a>
                 </div>
             </div>
         </div>
     </form>
 </div>
 
+<style>
+@keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(20px, -50px) scale(1.1); }
+    50% { transform: translate(-20px, 20px) scale(0.9); }
+    75% { transform: translate(50px, 50px) scale(1.05); }
+}
+
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+</style>
+
 <script>
-let itemIndex = {{ $stockOut->items->count() }};
-
-// حساب الإجمالي لكل صف
-function calculateRowTotal(row) {
-    const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
-    const cost = parseFloat(row.querySelector('.cost-input').value) || 0;
-    const total = quantity * cost;
-    row.querySelector('.total-input').value = total.toFixed(2);
-    calculateGrandTotal();
+function stockOutForm() {
+    return {
+        formData: {
+            warehouse_id: '{{ $stockOut->warehouse_id }}',
+            movement_date: '{{ $stockOut->movement_date }}',
+            notes: '{{ $stockOut->notes }}'
+        },
+        items: [],
+        isDisabled: {{ $stockOut->status !== 'pending' ? 'true' : 'false' }},
+        
+        init() {
+            // Load existing items
+            @foreach($stockOut->items as $item)
+            this.items.push({
+                item_id: '{{ $item->item_id }}',
+                quantity: {{ $item->quantity }},
+                unit_cost: {{ $item->unit_cost }},
+                total: {{ $item->total_cost }},
+                batch_number: '{{ $item->batch_number }}',
+                expiry_date: '{{ $item->expiry_date }}'
+            });
+            @endforeach
+            
+            // If no items, add one empty row
+            if (this.items.length === 0) {
+                this.addItem();
+            }
+        },
+        
+        addItem() {
+            this.items.push({
+                item_id: '',
+                quantity: 0,
+                unit_cost: 0,
+                total: 0,
+                batch_number: '',
+                expiry_date: ''
+            });
+        },
+        
+        removeItem(index) {
+            if (this.items.length > 1) {
+                this.items.splice(index, 1);
+            }
+        },
+        
+        updateTotal(index) {
+            const item = this.items[index];
+            item.total = (parseFloat(item.quantity) || 0) * (parseFloat(item.unit_cost) || 0);
+        },
+        
+        get grandTotal() {
+            return this.items.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+        },
+        
+        formatNumber(num) {
+            return parseFloat(num || 0).toFixed(2);
+        }
+    }
 }
-
-// حساب الإجمالي الكلي
-function calculateGrandTotal() {
-    let grandTotal = 0;
-    document.querySelectorAll('.item-row').forEach(row => {
-        const total = parseFloat(row.querySelector('.total-input').value) || 0;
-        grandTotal += total;
-    });
-    document.getElementById('grandTotal').textContent = grandTotal.toFixed(2) + ' ريال';
-}
-
-// إضافة صف جديد
-function addNewRow() {
-    const tbody = document.querySelector('#itemsTable tbody');
-    const newRow = `
-        <tr class="item-row">
-            <td>
-                <select name="items[${itemIndex}][item_id]" class="form-select item-select" required>
-                    <option value="">اختر الصنف</option>
-                    @foreach($items as $item)
-                        <option value="{{ $item->id }}">{{ $item->name }}</option>
-                    @endforeach
-                </select>
-            </td>
-            <td>
-                <input type="number" name="items[${itemIndex}][quantity]" class="form-control quantity-input" step="0.001" min="0.001" placeholder="0" required>
-            </td>
-            <td>
-                <input type="number" name="items[${itemIndex}][unit_cost]" class="form-control cost-input" step="0.01" min="0" placeholder="0.00" required>
-            </td>
-            <td>
-                <input type="text" class="form-control total-input" value="0.00" readonly>
-            </td>
-            <td>
-                <input type="text" name="items[${itemIndex}][batch_number]" class="form-control" placeholder="اختياري">
-            </td>
-            <td>
-                <input type="date" name="items[${itemIndex}][expiry_date]" class="form-control">
-            </td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm rounded-circle" onclick="removeRow(this)">
-                    <i class="fas fa-times"></i>
-                </button>
-            </td>
-        </tr>
-    `;
-    tbody.insertAdjacentHTML('beforeend', newRow);
-    itemIndex++;
-    attachEventListeners();
-}
-
-// حذف صف
-function removeRow(button) {
-    button.closest('tr').remove();
-    calculateGrandTotal();
-}
-
-// ربط الأحداث
-function attachEventListeners() {
-    document.querySelectorAll('.quantity-input, .cost-input').forEach(input => {
-        input.removeEventListener('input', handleInput);
-        input.addEventListener('input', handleInput);
-    });
-}
-
-function handleInput(e) {
-    calculateRowTotal(e.target.closest('tr'));
-}
-
-// تهيئة عند التحميل
-document.addEventListener('DOMContentLoaded', function() {
-    attachEventListeners();
-    calculateGrandTotal();
-});
 </script>
 @endsection
