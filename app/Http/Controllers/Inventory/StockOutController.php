@@ -37,7 +37,7 @@ class StockOutController extends Controller
         }
 
         $stockOuts = $query->paginate(15);
-        $warehouses = Warehouse::where('is_active', true)->get();
+        $warehouses = Warehouse::where('status', 'active')->get();
 
         $totalOrders = StockMovement::where('movement_type', 'stock_out')->count();
         $pendingOrders = StockMovement::where('movement_type', 'stock_out')->where('status', 'pending')->count();
@@ -48,8 +48,8 @@ class StockOutController extends Controller
 
     public function create()
     {
-        $warehouses = Warehouse::where('is_active', true)->get();
-        $items = Item::where('is_active', true)->get();
+        $warehouses = Warehouse::where('status', 'active')->get();
+        $items = Item::where('status', 'active')->get();
         $nextNumber = $this->generateMovementNumber();
 
         return view('inventory.stock-out.create', compact('warehouses', 'items', 'nextNumber'));

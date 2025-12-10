@@ -41,7 +41,7 @@ class StockTransferController extends Controller
         }
 
         $transfers = $query->paginate(15);
-        $warehouses = Warehouse::where('is_active', true)->get();
+        $warehouses = Warehouse::where('status', 'active')->get();
 
         $totalOrders = StockMovement::where('movement_type', 'transfer')->count();
         $pendingOrders = StockMovement::where('movement_type', 'transfer')->where('status', 'pending')->count();
@@ -52,8 +52,8 @@ class StockTransferController extends Controller
 
     public function create()
     {
-        $warehouses = Warehouse::where('is_active', true)->get();
-        $items = Item::where('is_active', true)->get();
+        $warehouses = Warehouse::where('status', 'active')->get();
+        $items = Item::where('status', 'active')->get();
         $nextNumber = $this->generateMovementNumber();
 
         return view('inventory.stock-transfer.create', compact('warehouses', 'items', 'nextNumber'));

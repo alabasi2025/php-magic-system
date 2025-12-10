@@ -49,7 +49,7 @@ class StockInController extends Controller
         }
 
         $stockIns = $query->paginate(15);
-        $warehouses = Warehouse::where('is_active', true)->get();
+        $warehouses = Warehouse::where('status', 'active')->get();
 
         // Statistics
         $totalOrders = StockMovement::where('movement_type', 'stock_in')->count();
@@ -64,8 +64,8 @@ class StockInController extends Controller
      */
     public function create()
     {
-        $warehouses = Warehouse::where('is_active', true)->get();
-        $items = Item::where('is_active', true)->get();
+        $warehouses = Warehouse::where('status', 'active')->get();
+        $items = Item::where('status', 'active')->get();
         $nextNumber = $this->generateMovementNumber();
 
         return view('inventory.stock-in.create', compact('warehouses', 'items', 'nextNumber'));
@@ -148,8 +148,8 @@ class StockInController extends Controller
         }
 
         $stockIn->load('items');
-        $warehouses = Warehouse::where('is_active', true)->get();
-        $items = Item::where('is_active', true)->get();
+        $warehouses = Warehouse::where('status', 'active')->get();
+        $items = Item::where('status', 'active')->get();
 
         return view('inventory.stock-in.edit', compact('stockIn', 'warehouses', 'items'));
     }
