@@ -32,9 +32,9 @@ class ItemController extends Controller
         }
 
         // Filter by below min stock
-        if ($request->filled('below_min_stock') && $request->below_min_stock == '1') {
-            $query->belowMinStock();
-        }
+        // if ($request->filled('below_min_stock') && $request->below_min_stock == '1') {
+        //     $query->belowMinStock();
+        // }
 
         // Search by name, SKU, or barcode
         if ($request->filled('search')) {
