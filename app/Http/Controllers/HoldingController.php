@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 /**
  * @class HoldingController
@@ -23,9 +25,9 @@ class HoldingController extends Controller
      * Display a listing of the Holding resource.
      *
      * @param Request $request
-     * @return JsonResponse
+     * @return View
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): View
     {
         try {
             // Apply filtering, sorting, and pagination
@@ -37,53 +39,49 @@ class HoldingController extends Controller
                 ->orderBy($request->input('sort_by', 'created_at'), $request->input('sort_direction', 'desc'))
                 ->paginate($request->input('per_page', 15));
 
-            // Return a successful JSON response with the paginated data
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Holdings retrieved successfully.',
-                'data' => $holdings,
-            ]);
+            // Return the view with the paginated data
+            return view('organization.holdings.index', compact('holdings'));
         } catch (\Exception $e) {
             // Log the error for debugging
             Log::error("HoldingController@index: Failed to retrieve holdings. Error: " . $e->getMessage());
 
-            // Return a JSON response with an error status
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while fetching holdings.',
-                'error' => $e->getMessage(),
-            ], 500);
+            // Redirect back with error message
+            return back()->with('error', 'حدث خطأ أثناء جلب البيانات: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Show the form for creating a new Holding.
+     *
+     * @return View
+     */
+    public function create(): View
+    {
+        return view('organization.holdings.create');
     }
 
     /**
      * Store a newly created Holding resource in storage.
      *
      * @param StoreHoldingRequest $request
-     * @return JsonResponse
+     * @return RedirectResponse
      */
-    public function store(StoreHoldingRequest $request): JsonResponse
+    public function store(StoreHoldingRequest $request): RedirectResponse
     {
         try {
             // The request is already validated by StoreHoldingRequest
             $holding = Holding::create($request->validated());
 
-            // Return a successful JSON response with the created resource
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Holding created successfully.',
-                'data' => $holding,
-            ], 201);
+            // Redirect to the index page with success message
+            return redirect()->route('holdings.index')
+                ->with('success', 'تم إنشاء الشركة القابضة بنجاح');
         } catch (\Exception $e) {
             // Log the error for debugging
             Log::error("HoldingController@store: Failed to create holding. Error: " . $e->getMessage());
 
-            // Return a JSON response with an error status
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while creating the holding.',
-                'error' => $e->getMessage(),
-            ], 500);
+            // Redirect back with error message
+            return back()->withInput()
+                ->with('error', 'حدث خطأ أثناء إنشاء الشركة القابضة: ' . $e->getMessage());
         }
     }
 
@@ -91,32 +89,34 @@ class HoldingController extends Controller
      * Display the specified Holding resource.
      *
      * @param Holding $holding
-     * @return JsonResponse
+     * @return View
      */
-    public function show(Holding $holding): JsonResponse
+    public function show(Holding $holding): View
     {
-        // The model is automatically resolved by Laravel's Route Model Binding.
         try {
             // Load any necessary relationships (e.g., 'companies')
             $holding->load('companies');
 
-            // Return a successful JSON response with the resource
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Holding retrieved successfully.',
-                'data' => $holding,
-            ]);
+            // Return the view with the holding data
+            return view('organization.holdings.show', compact('holding'));
         } catch (\Exception $e) {
             // Log the error for debugging
             Log::error("HoldingController@show: Failed to retrieve holding ID: {$holding->id}. Error: " . $e->getMessage());
 
-            // Return a JSON response with an error status
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while fetching the holding details.',
-                'error' => $e->getMessage(),
-            ], 500);
+            // Redirect back with error message
+            return back()->with('error', 'حدث خطأ أثناء جلب بيانات الشركة القابضة: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Show the form for editing the specified Holding.
+     *
+     * @param Holding $holding
+     * @return View
+     */
+    public function edit(Holding $holding): View
+    {
+        return view('organization.holdings.edit', compact('holding'));
     }
 
     /**
@@ -124,30 +124,24 @@ class HoldingController extends Controller
      *
      * @param UpdateHoldingRequest $request
      * @param Holding $holding
-     * @return JsonResponse
+     * @return RedirectResponse
      */
-    public function update(UpdateHoldingRequest $request, Holding $holding): JsonResponse
+    public function update(UpdateHoldingRequest $request, Holding $holding): RedirectResponse
     {
         try {
             // The request is already validated by UpdateHoldingRequest
             $holding->update($request->validated());
 
-            // Return a successful JSON response with the updated resource
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Holding updated successfully.',
-                'data' => $holding,
-            ]);
+            // Redirect to the show page with success message
+            return redirect()->route('holdings.show', $holding)
+                ->with('success', 'تم تحديث الشركة القابضة بنجاح');
         } catch (\Exception $e) {
             // Log the error for debugging
             Log::error("HoldingController@update: Failed to update holding ID: {$holding->id}. Error: " . $e->getMessage());
 
-            // Return a JSON response with an error status
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while updating the holding.',
-                'error' => $e->getMessage(),
-            ], 500);
+            // Redirect back with error message
+            return back()->withInput()
+                ->with('error', 'حدث خطأ أثناء تحديث الشركة القابضة: ' . $e->getMessage());
         }
     }
 
@@ -155,37 +149,27 @@ class HoldingController extends Controller
      * Remove the specified Holding resource from storage.
      *
      * @param Holding $holding
-     * @return JsonResponse
+     * @return RedirectResponse
      */
-    public function destroy(Holding $holding): JsonResponse
+    public function destroy(Holding $holding): RedirectResponse
     {
         try {
             // Check for related records before deletion (e.g., if it has companies)
             if ($holding->companies()->exists()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Cannot delete holding because it has associated companies.',
-                ], 409); // Conflict
+                return back()->with('error', 'لا يمكن حذف الشركة القابضة لأنها تحتوي على شركات مرتبطة');
             }
 
             $holding->delete();
 
-            // Return a successful JSON response with no content
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Holding deleted successfully.',
-                'data' => null,
-            ], 204);
+            // Redirect to the index page with success message
+            return redirect()->route('holdings.index')
+                ->with('success', 'تم حذف الشركة القابضة بنجاح');
         } catch (\Exception $e) {
             // Log the error for debugging
             Log::error("HoldingController@destroy: Failed to delete holding ID: {$holding->id}. Error: " . $e->getMessage());
 
-            // Return a JSON response with an error status
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while deleting the holding.',
-                'error' => $e->getMessage(),
-            ], 500);
+            // Redirect back with error message
+            return back()->with('error', 'حدث خطأ أثناء حذف الشركة القابضة: ' . $e->getMessage());
         }
     }
 

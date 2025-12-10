@@ -318,10 +318,7 @@ Route::get('/loyalty', fn() => redirect('/journal-entries'))->name('loyalty.inde
 Route::get('/insurance', fn() => redirect('/journal-entries'))->name('insurance.index');
 Route::get('/genes', fn() => redirect('/journal-entries'))->name('genes.index');
 Route::get('/partnership', fn() => redirect('/journal-entries'))->name('partnership.index');
-Route::get('/holdings', fn() => redirect('/journal-entries'))->name('holdings.index');
-Route::get('/units', fn() => redirect('/journal-entries'))->name('units.index');
-Route::get('/departments', fn() => redirect('/journal-entries'))->name('departments.index');
-Route::get('/organization/projects', fn() => redirect('/journal-entries'))->name('organization.projects.index');
+// تم إزالة الـ redirects المؤقتة - الـ routes الأصلية موجودة في الأسفل
 Route::get('/developer', fn() => redirect('/journal-entries'))->name('developer.index');
 Route::get('/developer/ai/code-generator', fn() => redirect('/journal-entries'))->name('developer.ai.code-generator');
 Route::get('/developer/ai/code-refactor', fn() => redirect('/journal-entries'))->name('developer.ai.code-refactor');
@@ -486,6 +483,7 @@ Route::resource('holdings', \App\Http\Controllers\HoldingController::class);
 
 // المشاريع
 Route::resource('projects', \App\Http\Controllers\ProjectController::class);
+Route::get('/organization/projects', [\App\Http\Controllers\ProjectController::class, 'index'])->name('organization.projects.index');
 
 // ============================================
 // أدوات التطوير الإضافية
