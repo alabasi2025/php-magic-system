@@ -792,6 +792,8 @@
 
     // عند إرسال النموذج
     document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
         // التحقق من وجود صنف واحد على الأقل
         const items = document.querySelectorAll('.item-row');
         let hasValidItem = false;
@@ -804,7 +806,6 @@
         });
         
         if (!hasValidItem) {
-            e.preventDefault();
             alert('يرجى إضافة صنف واحد على الأقل للفاتورة');
             return false;
         }
@@ -817,6 +818,56 @@
         submitBtn.disabled = true;
         submitBtnText.classList.add('d-none');
         submitBtnLoading.classList.remove('d-none');
+        
+        // إرسال النموذج عبر AJAX
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw data;
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            } else if (data.success) {
+                alert(data.message || 'تم حفظ الفاتورة بنجاح');
+                window.location.href = '{{ route("purchases.invoices.index") }}';
+            }
+        })
+        .catch(error => {
+            // إعادة تفعيل الزر
+            submitBtn.disabled = false;
+            submitBtnText.classList.remove('d-none');
+            submitBtnLoading.classList.add('d-none');
+            
+            // عرض رسالة الخطأ
+            let errorMessage = 'حدث خطأ أثناء حفظ الفاتورة:';
+            
+            if (error.errors) {
+                // أخطاء التحقق من الصحة
+                errorMessage += '\n\n';
+                for (let field in error.errors) {
+                    errorMessage += '• ' + error.errors[field].join('\n• ') + '\n';
+                }
+            } else if (error.message) {
+                errorMessage += '\n' + error.message;
+            } else {
+                errorMessage += '\nخطأ غير معروف. يرجى المحاولة مرة أخرى.';
+            }
+            
+            alert(errorMessage);
+        });
     });
 
     // تهيئة الأحداث عند تحميل الصفحة

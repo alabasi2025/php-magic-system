@@ -75,31 +75,57 @@ class PurchaseInvoiceController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'invoice_number' => 'required|string|max:255',
-            'supplier_id' => 'required|exists:suppliers,id',
-            'warehouse_id' => 'required|exists:warehouses,id',
-            'invoice_date' => 'required|date',
-            'due_date' => 'nullable|date|after_or_equal:invoice_date',
-            'payment_method' => 'required|in:cash,credit,bank_transfer,check',
-            'status' => 'required|in:draft,pending,approved,cancelled',
-            'notes' => 'nullable|string',
-            'items' => 'required|array|min:1',
-            'items.*.item_id' => 'required|exists:items,id',
-            'items.*.quantity' => 'required|numeric|min:1',
-            'items.*.unit_price' => 'required|numeric|min:0',
-            'items.*.discount' => 'nullable|numeric|min:0',
-        ]);
+        try {
+            $validated = $request->validate([
+                'invoice_number' => 'required|string|max:255',
+                'supplier_id' => 'required|exists:suppliers,id',
+                'warehouse_id' => 'required|exists:warehouses,id',
+                'invoice_date' => 'required|date',
+                'due_date' => 'nullable|date|after_or_equal:invoice_date',
+                'payment_method' => 'required|in:cash,credit,bank_transfer,check',
+                'status' => 'required|in:draft,pending,approved,cancelled',
+                'notes' => 'nullable|string',
+                'items' => 'required|array|min:1',
+                'items.*.item_id' => 'required|exists:items,id',
+                'items.*.quantity' => 'required|numeric|min:1',
+                'items.*.unit_price' => 'required|numeric|min:0',
+                'items.*.discount' => 'nullable|numeric|min:0',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'فشل التحقق من البيانات',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        }
 
         try {
             // إنشاء الفاتورة باستخدام Model method
             $invoice = PurchaseInvoice::createPurchaseInvoice($request);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم إنشاء فاتورة المشتريات بنجاح',
+                    'redirect' => route('purchases.invoices.show', $invoice->id)
+                ]);
+            }
 
             return redirect()
                 ->route('purchases.invoices.show', $invoice->id)
                 ->with('success', 'تم إنشاء فاتورة المشتريات بنجاح');
 
         } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'حدث خطأ أثناء إنشاء الفاتورة: ' . $e->getMessage()
+                ], 500);
+            }
+            
             return redirect()
                 ->back()
                 ->withInput()
