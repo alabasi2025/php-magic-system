@@ -93,6 +93,13 @@ class PurchaseInvoiceController extends Controller
                 'items.*.quantity' => 'required|numeric|min:1',
                 'items.*.unit_price' => 'required|numeric|min:0',
                 'items.*.discount' => 'nullable|numeric|min:0',
+            ], [
+                'invoice_type_id.required' => 'يرجى اختيار نوع الفاتورة',
+                'supplier_id.required' => 'يرجى اختيار المورد',
+                'warehouse_id.required' => 'يرجى اختيار المخزن',
+                'payment_method.required' => 'يرجى اختيار طريقة الدفع',
+                'items.required' => 'يرجى إضافة صنف واحد على الأقل',
+                'items.min' => 'يرجى إضافة صنف واحد على الأقل',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->ajax() || $request->wantsJson()) {
