@@ -30,7 +30,7 @@
                     {
                         item_id: 1,
                         quantity: 10,
-                        price: 100,
+                        unit_price: 100,
                         discount: 0
                     }
                 ],
