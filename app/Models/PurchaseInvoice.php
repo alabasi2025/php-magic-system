@@ -481,8 +481,10 @@ class PurchaseInvoice extends Model
             $invoice->items()->create([
                 'item_id' => $item['item_id'],
                 'quantity' => $item['quantity'],
-                'price' => $item['price'],
-                'total' => $item['quantity'] * $item['price'],
+                'unit_price' => $item['unit_price'] ?? $item['price'] ?? 0,
+                'discount_rate' => $item['discount'] ?? 0,
+                'tax_rate' => $item['tax_rate'] ?? 0,
+                'total_amount' => ($item['quantity'] * ($item['unit_price'] ?? $item['price'] ?? 0)) - ($item['discount'] ?? 0),
             ]);
         }
     }
