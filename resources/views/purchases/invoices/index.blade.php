@@ -268,7 +268,7 @@
                 <h1><i class="fas fa-file-invoice-dollar"></i> فواتير المشتريات</h1>
                 <p>إدارة ومتابعة فواتير الموردين</p>
             </div>
-            <a href="{{ route('purchases.invoices.create') }}" class="add-invoice-btn">
+            <a href="/purchases/invoices/create" class="add-invoice-btn">
                 <i class="fas fa-plus-circle"></i>
                 إضافة فاتورة جديدة
             </a>
@@ -361,7 +361,7 @@
                 <i class="fas fa-inbox"></i>
                 <h3>لا توجد فواتير بعد</h3>
                 <p>ابدأ بإضافة فاتورة مشتريات جديدة</p>
-                <a href="{{ route('purchases.invoices.create') }}" class="add-invoice-btn mt-3">
+                <a href="/purchases/invoices/create" class="add-invoice-btn mt-3">
                     <i class="fas fa-plus-circle"></i>
                     إضافة أول فاتورة
                 </a>
