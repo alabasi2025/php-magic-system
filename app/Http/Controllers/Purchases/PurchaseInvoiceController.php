@@ -155,7 +155,12 @@ class PurchaseInvoiceController extends Controller
             ->orderBy('name', 'asc')
             ->get();
 
-        return view('purchases.invoices.edit', compact('invoice', 'suppliers', 'items'));
+        // جلب المخازن النشطة
+        $warehouses = Warehouse::where('is_active', 1)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return view('purchases.invoices.edit', compact('invoice', 'suppliers', 'items', 'warehouses'));
     }
 
     /**
