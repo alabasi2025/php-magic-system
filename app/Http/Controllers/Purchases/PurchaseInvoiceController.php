@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PurchaseInvoice;
 use App\Models\Supplier;
 use App\Models\Item;
+use App\Models\Warehouse;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
