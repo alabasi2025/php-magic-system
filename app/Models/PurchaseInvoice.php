@@ -497,7 +497,7 @@ class PurchaseInvoice extends Model
      */
     public function calculateTotals()
     {
-        $subtotal = $this->items()->sum(\DB::raw('quantity * price'));
+        $subtotal = $this->items()->sum(\DB::raw('quantity * unit_price'));
         $tax_amount = 0; // يمكن إضافة حساب الضريبة لاحقاً
         $total = $subtotal + $tax_amount - $this->discount_amount;
 
