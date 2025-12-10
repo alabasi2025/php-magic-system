@@ -905,3 +905,63 @@ Route::get('/cleanup-test-items', function () {
         ], 500);
     }
 });
+
+
+// حذف الفواتير المكررة
+Route::get('/delete-duplicate-invoices', function () {
+    try {
+        $duplicates = \App\Models\PurchaseInvoice::select('internal_number')
+            ->groupBy('internal_number')
+            ->havingRaw('COUNT(*) > 1')
+            ->pluck('internal_number');
+
+        if ($duplicates->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'لا توجد فواتير مكررة!',
+                'deleted' => 0
+            ]);
+        }
+
+        $deletedCount = 0;
+        $details = [];
+
+        foreach ($duplicates as $internalNumber) {
+            $invoices = \App\Models\PurchaseInvoice::where('internal_number', $internalNumber)
+                ->orderBy('created_at', 'desc')
+                ->get();
+            
+            // الاحتفاظ بالأول (الأحدث) وحذف الباقي
+            $keep = $invoices->first();
+            $toDelete = $invoices->skip(1);
+            
+            $detail = [
+                'internal_number' => $internalNumber,
+                'kept' => $keep->id,
+                'deleted' => []
+            ];
+            
+            foreach ($toDelete as $invoice) {
+                $detail['deleted'][] = $invoice->id;
+                $invoice->delete();
+                $deletedCount++;
+            }
+            
+            $details[] = $detail;
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "تم حذف {$deletedCount} فاتورة مكررة بنجاح!",
+            'deleted' => $deletedCount,
+            'details' => $details
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'حدث خطأ أثناء حذف الفواتير المكررة',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
