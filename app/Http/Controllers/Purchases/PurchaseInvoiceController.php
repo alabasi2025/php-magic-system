@@ -184,7 +184,6 @@ class PurchaseInvoiceController extends Controller
         $invoice = PurchaseInvoice::with([
             'supplier',
             'items.item',
-            'payments',
             'creator',
             'approver'
         ])->findOrFail($id);
