@@ -474,9 +474,27 @@ Route::resource('cash-boxes', \App\Http\Controllers\CashBoxController::class);
 
 // الوحدات التنظيمية
 Route::resource('units', \App\Http\Controllers\OrganizationUnitController::class);
+Route::resource('organization/units', \App\Http\Controllers\OrganizationUnitController::class)->names([
+    'index' => 'organization.units.index',
+    'create' => 'organization.units.create',
+    'store' => 'organization.units.store',
+    'show' => 'organization.units.show',
+    'edit' => 'organization.units.edit',
+    'update' => 'organization.units.update',
+    'destroy' => 'organization.units.destroy',
+]);
 
 // الأقسام
 Route::resource('departments', \App\Http\Controllers\DepartmentController::class);
+Route::resource('organization/departments', \App\Http\Controllers\DepartmentController::class)->names([
+    'index' => 'organization.departments.index',
+    'create' => 'organization.departments.create',
+    'store' => 'organization.departments.store',
+    'show' => 'organization.departments.show',
+    'edit' => 'organization.departments.edit',
+    'update' => 'organization.departments.update',
+    'destroy' => 'organization.departments.destroy',
+]);
 
 // الشركات القابضة
 Route::resource('holdings', \App\Http\Controllers\HoldingController::class);
