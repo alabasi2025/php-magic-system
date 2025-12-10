@@ -11,7 +11,7 @@ class OrganizationUnitController extends Controller
     public function index()
     {
         try {
-            $units = Unit::orderBy('created_at', 'desc')->get();
+            $units = Unit::orderBy('created_at', 'desc')->paginate(15);
             return view('organization.units.index', compact('units'));
         } catch (\Exception $e) {
             Log::error("OrganizationUnitController@index: " . $e->getMessage());

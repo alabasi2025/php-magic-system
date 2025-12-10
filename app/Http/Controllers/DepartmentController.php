@@ -13,7 +13,7 @@ class DepartmentController extends Controller
         try {
             $departments = Department::with(['unit', 'manager'])
                 ->orderBy('created_at', 'desc')
-                ->get();
+                ->paginate(15);
             return view('organization.departments.index', compact('departments'));
         } catch (\Exception $e) {
             Log::error("DepartmentController@index: " . $e->getMessage());
