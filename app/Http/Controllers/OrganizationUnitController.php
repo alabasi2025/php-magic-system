@@ -98,8 +98,8 @@ class OrganizationUnitController extends Controller
             $unit = Unit::findOrFail($id);
             
             // Check for related records before deletion
-            if ($unit->organizations()->exists()) {
-                return back()->with('error', 'لا يمكن حذف الوحدة لأنها تحتوي على مؤسسات مرتبطة');
+            if ($unit->departments()->exists() || $unit->projects()->exists()) {
+                return back()->with('error', 'لا يمكن حذف الوحدة لأنها تحتوي على أقسام أو مشاريع مرتبطة');
             }
 
             $unit->delete();
