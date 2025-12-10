@@ -160,7 +160,7 @@ class PurchaseReceiptService
      * @return void
      * @throws Exception
      */
-    public function createStockMovements(PurchaseReceipt $receipt): void
+    public static function createStockMovements(PurchaseReceipt $receipt): void
     {
         try {
             foreach ($receipt->items as $item) {
