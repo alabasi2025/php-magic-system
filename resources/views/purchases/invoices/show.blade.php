@@ -180,10 +180,10 @@
                                             <tr>
                                                 <td class="text-center">{{ $index + 1 }}</td>
                                                 <td>
-                                                    <strong>{{ $item->product->name ?? 'غير محدد' }}</strong>
-                                                    @if(isset($item->product->code))
+                                                    <strong>{{ $item->item->name ?? 'غير محدد' }}</strong>
+                                                    @if(isset($item->item->sku))
                                                         <br>
-                                                        <small class="text-muted">كود: {{ $item->product->code }}</small>
+                                                        <small class="text-muted">كود: {{ $item->item->sku }}</small>
                                                     @endif
                                                 </td>
                                                 <td class="text-center">{{ number_format($item->quantity, 2) }}</td>

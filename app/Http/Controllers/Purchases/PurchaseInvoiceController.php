@@ -183,7 +183,7 @@ class PurchaseInvoiceController extends Controller
     {
         $invoice = PurchaseInvoice::with([
             'supplier',
-            'items.product',
+            'items.item',
             'payments',
             'creator',
             'approver'
@@ -294,7 +294,7 @@ class PurchaseInvoiceController extends Controller
             
             foreach ($validated['items'] as $item) {
                 $invoice->items()->create([
-                    'product_id' => $item['product_id'],
+                    'item_id' => $item['item_id'],
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['price'],
                     'discount' => $item['discount'] ?? 0,
@@ -487,7 +487,7 @@ class PurchaseInvoiceController extends Controller
         }
 
         $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
+            'item_id' => 'required|exists:items,id',
             'quantity' => 'required|numeric|min:1',
             'unit_price' => 'required|numeric|min:0',
             'discount' => 'nullable|numeric|min:0',
@@ -498,7 +498,7 @@ class PurchaseInvoiceController extends Controller
             $total = ($validated['quantity'] * $validated['unit_price']) - ($validated['discount'] ?? 0);
 
             $item = $invoice->items()->create([
-                'product_id' => $validated['product_id'],
+                'item_id' => $validated['item_id'],
                 'quantity' => $validated['quantity'],
                 'unit_price' => $validated['unit_price'],
                 'discount' => $validated['discount'] ?? 0,
