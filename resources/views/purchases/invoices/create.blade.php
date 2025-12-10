@@ -719,7 +719,6 @@
 </div>
 @endsection
 
-@push('scripts')
 <script>
     // Version: 2025-12-10-15:00 - Cache busting
     let itemIndex = 1;
@@ -960,4 +959,4 @@
     
 
 </script>
-@endpush
+@endsection
