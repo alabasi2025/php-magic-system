@@ -1061,8 +1061,17 @@ Route::get('/test-create-invoice', function () {
 // Delete all purchase invoices (temporary - for testing)
 Route::get('/delete-all-purchase-invoices', function () {
     try {
+        DB::beginTransaction();
+        
         $count = \App\Models\PurchaseInvoice::count();
-        \App\Models\PurchaseInvoice::truncate();
+        
+        // Delete all items first
+        DB::table('purchase_invoice_items')->delete();
+        
+        // Then delete all invoices
+        \App\Models\PurchaseInvoice::query()->delete();
+        
+        DB::commit();
         
         return response()->json([
             'success' => true,
@@ -1070,6 +1079,8 @@ Route::get('/delete-all-purchase-invoices', function () {
             'deleted_count' => $count
         ]);
     } catch (\Exception $e) {
+        DB::rollBack();
+        
         return response()->json([
             'success' => false,
             'message' => 'فشل حذف الفواتير',
