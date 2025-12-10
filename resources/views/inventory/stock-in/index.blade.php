@@ -4,656 +4,551 @@
 
 @section('content')
 <style>
-    /* Professional Stock In Page Styles */
-    .stock-header {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        padding: 2.5rem;
-        border-radius: 20px;
-        margin-bottom: 2rem;
-        box-shadow: 0 10px 40px rgba(17, 153, 142, 0.3);
+    /* Modern Animated Background */
+    .inventory-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         position: relative;
         overflow: hidden;
     }
     
-    .stock-header::before {
+    .inventory-page::before {
         content: '';
         position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 300px;
-        height: 300px;
-        background: rgba(255, 255, 255, 0.1);
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
         border-radius: 50%;
+        top: -100px;
+        right: -100px;
+        animation: float 20s ease-in-out infinite;
     }
     
-    .stock-header h1 {
-        color: white;
-        font-weight: 700;
-        font-size: 2.5rem;
-        margin: 0;
+    .inventory-page::after {
+        content: '';
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(118, 75, 162, 0.3) 0%, transparent 70%);
+        border-radius: 50%;
+        bottom: -100px;
+        left: -100px;
+        animation: float 15s ease-in-out infinite reverse;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(30px, -30px) rotate(120deg); }
+        66% { transform: translate(-20px, 20px) rotate(240deg); }
+    }
+    
+    /* Glass Header */
+    .glass-header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 30px;
+        padding: 3rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         position: relative;
         z-index: 1;
     }
     
-    .stock-header .subtitle {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 1.1rem;
-        margin-top: 0.5rem;
+    .glass-header h1 {
+        color: white;
+        font-weight: 800;
+        font-size: 3rem;
+        margin: 0;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     
-    .stat-card {
-        background: white;
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: none;
+    .glass-header .subtitle {
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 1.2rem;
+        margin-top: 0.75rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Stats Cards with 3D Effect */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2.5rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .stat-card-3d {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 25px;
+        padding: 2.5rem;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(255, 255, 255, 0.5);
         position: relative;
         overflow: hidden;
     }
     
-    .stat-card::before {
+    .stat-card-3d::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.5s ease;
     }
     
-    .stat-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+    .stat-card-3d:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 25px 70px rgba(102, 126, 234, 0.4);
     }
     
-    .stat-card.success {
-        --gradient-start: #11998e;
-        --gradient-end: #38ef7d;
+    .stat-card-3d:hover::before {
+        transform: scaleX(1);
     }
     
-    .stat-card.warning {
-        --gradient-start: #f093fb;
-        --gradient-end: #f5576c;
-    }
-    
-    .stat-card.info {
-        --gradient-start: #4facfe;
-        --gradient-end: #00f2fe;
-    }
-    
-    .stat-icon {
-        width: 70px;
-        height: 70px;
-        border-radius: 18px;
+    .stat-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2rem;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        transition: all 0.4s ease;
+    }
+    
+    .stat-card-3d:hover .stat-icon-wrapper {
+        transform: rotate(360deg) scale(1.1);
+    }
+    
+    .stat-icon-wrapper i {
+        font-size: 2.5rem;
         color: white;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     }
     
     .stat-value {
-        font-size: 2.8rem;
+        font-size: 3rem;
         font-weight: 800;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        margin: 0.5rem 0;
+        margin-bottom: 0.5rem;
     }
     
     .stat-label {
         color: #64748b;
-        font-size: 0.95rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
     
-    .main-card {
-        background: white;
-        border-radius: 24px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-        border: none;
-        overflow: hidden;
-    }
-    
-    .card-header-custom {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        padding: 2rem;
-        border-bottom: none;
-    }
-    
-    .search-box {
+    /* Glass Table Container */
+    .glass-table-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 30px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.5);
         position: relative;
+        z-index: 1;
     }
     
-    .search-box input {
-        border-radius: 50px;
-        padding: 0.75rem 1.5rem 0.75rem 3rem;
-        border: 2px solid #e2e8f0;
-        transition: all 0.3s ease;
-        font-size: 0.95rem;
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1.5rem;
     }
     
-    .search-box input:focus {
-        border-color: #11998e;
-        box-shadow: 0 0 0 4px rgba(17, 153, 142, 0.1);
-        outline: none;
+    .table-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     
-    .search-box i {
-        position: absolute;
-        right: 1.2rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94a3b8;
-    }
-    
-    .filter-select {
-        border-radius: 12px;
-        padding: 0.75rem 1rem;
-        border: 2px solid #e2e8f0;
-        transition: all 0.3s ease;
-        font-size: 0.95rem;
-    }
-    
-    .filter-select:focus {
-        border-color: #11998e;
-        box-shadow: 0 0 0 4px rgba(17, 153, 142, 0.1);
-        outline: none;
-    }
-    
-    .btn-gradient {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        border: none;
-        border-radius: 12px;
-        padding: 0.75rem 2rem;
-        color: white;
+    /* Modern Buttons */
+    .btn-modern {
+        padding: 1rem 2rem;
+        border-radius: 15px;
         font-weight: 600;
+        border: none;
+        cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
-    }
-    
-    .btn-gradient:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(17, 153, 142, 0.5);
-        color: white;
-    }
-    
-    .btn-action {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        border: none;
-        transition: all 0.3s ease;
-        margin: 0 3px;
+        gap: 0.75rem;
     }
     
-    .btn-action.btn-view {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    .btn-primary-modern {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
     }
     
-    .btn-action.btn-approve {
+    .btn-primary-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-success-modern {
         background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
         color: white;
     }
     
-    .btn-action.btn-delete {
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        color: white;
+    .btn-success-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(17, 153, 142, 0.4);
     }
     
-    .btn-action:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    }
-    
+    /* Modern Table */
     .modern-table {
+        width: 100%;
         border-collapse: separate;
         border-spacing: 0 12px;
     }
     
     .modern-table thead th {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
+        padding: 1.5rem 1rem;
         font-weight: 600;
-        padding: 1.2rem 1rem;
+        text-align: right;
+        font-size: 1rem;
         border: none;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
     
     .modern-table thead th:first-child {
-        border-top-right-radius: 12px;
+        border-top-right-radius: 15px;
+        border-bottom-right-radius: 15px;
     }
     
     .modern-table thead th:last-child {
-        border-top-left-radius: 12px;
+        border-top-left-radius: 15px;
+        border-bottom-left-radius: 15px;
     }
     
     .modern-table tbody tr {
         background: white;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
     }
     
     .modern-table tbody tr:hover {
         transform: scale(1.02);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
     }
     
     .modern-table tbody td {
-        padding: 1.2rem 1rem;
+        padding: 1.5rem 1rem;
         border: none;
-        vertical-align: middle;
+        color: #334155;
     }
     
-    .modern-table tbody tr td:first-child {
+    .modern-table tbody td:first-child {
         border-top-right-radius: 12px;
         border-bottom-right-radius: 12px;
     }
     
-    .modern-table tbody tr td:last-child {
+    .modern-table tbody td:last-child {
         border-top-left-radius: 12px;
         border-bottom-left-radius: 12px;
     }
     
-    .badge-modern {
-        padding: 0.5rem 1.2rem;
+    /* Status Badges */
+    .status-badge {
+        padding: 0.5rem 1.25rem;
         border-radius: 50px;
         font-weight: 600;
-        font-size: 0.85rem;
-        letter-spacing: 0.3px;
+        font-size: 0.9rem;
+        display: inline-block;
     }
     
-    .badge-pending {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    .status-pending {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
         color: white;
     }
     
-    .badge-approved {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    .status-approved {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
     }
     
-    .badge-rejected {
-        background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+    .status-rejected {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         color: white;
     }
     
-    .order-number {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        padding: 0.4rem 1rem;
-        border-radius: 8px;
-        font-family: 'Courier New', monospace;
-        font-weight: 700;
-        color: #11998e;
+    /* Action Buttons */
+    .action-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 0 0.25rem;
     }
     
+    .action-btn-view {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+    }
+    
+    .action-btn-edit {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+    
+    .action-btn-delete {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-3px) scale(1.1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Filters */
+    .filters-container {
+        background: rgba(248, 250, 252, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .filter-input {
+        flex: 1;
+        min-width: 200px;
+        padding: 0.875rem 1.25rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+    
+    /* Empty State */
     .empty-state {
-        padding: 4rem 2rem;
         text-align: center;
+        padding: 4rem 2rem;
     }
     
     .empty-state i {
         font-size: 5rem;
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #cbd5e1;
         margin-bottom: 1.5rem;
+    }
+    
+    .empty-state h3 {
+        color: #64748b;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #94a3b8;
+        font-size: 1.1rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .glass-header h1 {
+            font-size: 2rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .table-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .modern-table {
+            font-size: 0.9rem;
+        }
     }
 </style>
 
-<div class="container-fluid" dir="rtl">
-    
-    {{-- Header Section --}}
-    <div class="stock-header">
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
-            <div>
-                <h1>
-                    <i class="fas fa-arrow-down ml-2"></i>
-                    أوامر التوريد المخزني
-                </h1>
-                <p class="subtitle mb-0">
-                    <i class="fas fa-info-circle ml-1"></i>
-                    إدارة وتتبع جميع أوامر إدخال البضائع إلى المخازن
-                </p>
+<div class="inventory-page">
+    <div class="container py-5">
+        <!-- Glass Header -->
+        <div class="glass-header" data-aos="fade-down">
+            <h1><i class="fas fa-box-open me-3"></i>أوامر التوريد المخزني</h1>
+            <p class="subtitle">إدارة وتتبع جميع عمليات التوريد إلى المخازن</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card-3d" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <div class="stat-value">{{ $totalStockIns ?? 0 }}</div>
+                <div class="stat-label">إجمالي أوامر التوريد</div>
             </div>
-            <div class="mt-3 mt-md-0">
-                <a href="{{ route('inventory.stock-in.create') }}" class="btn btn-light btn-lg" style="border-radius: 12px; font-weight: 600; padding: 0.75rem 2rem;">
-                    <i class="fas fa-plus ml-2"></i>
+            
+            <div class="stat-card-3d" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value">{{ $pendingStockIns ?? 0 }}</div>
+                <div class="stat-label">قيد الانتظار</div>
+            </div>
+            
+            <div class="stat-card-3d" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-value">{{ $approvedStockIns ?? 0 }}</div>
+                <div class="stat-label">معتمدة</div>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="glass-table-container" data-aos="fade-up" data-aos-delay="400">
+            <div class="table-header">
+                <h2 class="table-title"><i class="fas fa-list me-2"></i>قائمة أوامر التوريد</h2>
+                <a href="{{ route('inventory.stock-in.create') }}" class="btn-modern btn-primary-modern">
+                    <i class="fas fa-plus-circle"></i>
                     إنشاء أمر توريد جديد
                 </a>
             </div>
-        </div>
-    </div>
 
-    {{-- Flash Messages --}}
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-            <i class="fas fa-check-circle ml-2" style="font-size: 1.2rem;"></i> 
-            <strong>رائع!</strong> {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-            <i class="fas fa-exclamation-circle ml-2" style="font-size: 1.2rem;"></i> 
-            <strong>تنبيه!</strong> {{ session('error') }}
-            <button type="button" class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
-        </div>
-    @endif
-
-    {{-- Statistics Cards --}}
-    <div class="row mb-4">
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="stat-card success">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="stat-label mb-2">إجمالي الأوامر</p>
-                        <h2 class="stat-value">{{ $totalOrders }}</h2>
-                        <p class="text-muted mb-0" style="font-size: 0.85rem;">
-                            <i class="fas fa-clipboard-list ml-1"></i>
-                            جميع أوامر التوريد
-                        </p>
-                    </div>
-                    <div class="stat-icon">
-                        <i class="fas fa-clipboard-list"></i>
-                    </div>
-                </div>
+            <!-- Filters -->
+            <div class="filters-container">
+                <input type="text" class="filter-input" placeholder="🔍 بحث برقم الأمر...">
+                <select class="filter-input">
+                    <option value="">جميع المخازن</option>
+                    @foreach($warehouses ?? [] as $warehouse)
+                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                    @endforeach
+                </select>
+                <select class="filter-input">
+                    <option value="">جميع الحالات</option>
+                    <option value="pending">قيد الانتظار</option>
+                    <option value="approved">معتمد</option>
+                    <option value="rejected">مرفوض</option>
+                </select>
+                <button class="btn-modern btn-success-modern">
+                    <i class="fas fa-filter"></i>
+                    تطبيق الفلتر
+                </button>
             </div>
-        </div>
 
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="stat-card warning">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="stat-label mb-2">قيد الانتظار</p>
-                        <h2 class="stat-value">{{ $pendingOrders }}</h2>
-                        <p class="text-muted mb-0" style="font-size: 0.85rem;">
-                            <i class="fas fa-clock ml-1"></i>
-                            تحتاج إلى اعتماد
-                        </p>
-                    </div>
-                    <div class="stat-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="stat-card info">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="stat-label mb-2">المعتمدة</p>
-                        <h2 class="stat-value">{{ $approvedOrders }}</h2>
-                        <p class="text-muted mb-0" style="font-size: 0.85rem;">
-                            <i class="fas fa-check-double ml-1"></i>
-                            أوامر مكتملة
-                        </p>
-                    </div>
-                    <div class="stat-icon">
-                        <i class="fas fa-check-double"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Main Table Card --}}
-    <div class="main-card">
-        <div class="card-header-custom">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <h4 class="mb-0" style="font-weight: 700; color: #1e293b;">
-                    <i class="fas fa-list-ul ml-2"></i>
-                    قائمة أوامر التوريد
-                </h4>
-                <div class="mt-3 mt-md-0">
-                    <button class="btn btn-sm" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 10px; padding: 0.5rem 1.2rem; font-weight: 600; margin-left: 8px;">
-                        <i class="fas fa-print ml-1"></i> طباعة
-                    </button>
-                    <button class="btn btn-sm" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 10px; padding: 0.5rem 1.2rem; font-weight: 600;">
-                        <i class="fas fa-file-excel ml-1"></i> تصدير Excel
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card-body" style="padding: 2rem;">
-            {{-- Search and Filters --}}
-            <form action="{{ route('inventory.stock-in.index') }}" method="GET" class="mb-4">
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" name="search" class="form-control" 
-                                   placeholder="ابحث برقم الأمر..." 
-                                   value="{{ request('search') }}">
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <select name="warehouse_id" class="form-control filter-select">
-                            <option value="">🏢 كل المخازن</option>
-                            @foreach($warehouses as $warehouse)
-                                <option value="{{ $warehouse->id }}" {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
-                                    {{ $warehouse->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-md-2 mb-3">
-                        <select name="status" class="form-control filter-select">
-                            <option value="">⚡ كل الحالات</option>
-                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
-                            <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>معتمد</option>
-                            <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>مرفوض</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-2 mb-3">
-                        <input type="date" name="date_from" class="form-control filter-select" value="{{ request('date_from') }}" placeholder="من تاريخ">
-                    </div>
-
-                    <div class="col-md-1 mb-3">
-                        <button type="submit" class="btn btn-gradient w-100" style="height: 100%;">
-                            <i class="fas fa-filter"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-
-            {{-- Data Table --}}
-            <div class="table-responsive">
-                <table class="modern-table table">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style="width: 60px;">#</th>
-                            <th>رقم الأمر</th>
-                            <th>المخزن</th>
-                            <th>التاريخ</th>
-                            <th class="text-center">عدد الأصناف</th>
-                            <th class="text-center">الحالة</th>
-                            <th>المنشئ</th>
-                            <th class="text-center" style="width: 140px;">الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($stockIns as $stockIn)
+            <!-- Table -->
+            @if(isset($stockIns) && $stockIns->count() > 0)
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
                             <tr>
-                                <td class="text-center">
-                                    <span style="font-weight: 700; color: #11998e; font-size: 1.1rem;">
-                                        {{ $loop->iteration + ($stockIns->currentPage() - 1) * $stockIns->perPage() }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="order-number">{{ $stockIn->movement_number }}</span>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; margin-left: 12px;">
-                                            <i class="fas fa-warehouse"></i>
-                                        </div>
-                                        <div style="font-weight: 600; color: #1e293b;">
-                                            {{ $stockIn->warehouse->name ?? 'غير محدد' }}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="font-weight: 600; color: #1e293b;">
-                                        {{ $stockIn->movement_date->format('Y-m-d') }}
-                                    </div>
-                                    <div style="font-size: 0.85rem; color: #94a3b8;">
-                                        {{ $stockIn->created_at->diffForHumans() }}
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge-modern" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                        {{ $stockIn->items->count() }} صنف
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    @if ($stockIn->status == 'pending')
-                                        <span class="badge-modern badge-pending">
-                                            <i class="fas fa-clock ml-1"></i> قيد الانتظار
-                                        </span>
-                                    @elseif ($stockIn->status == 'approved')
-                                        <span class="badge-modern badge-approved">
-                                            <i class="fas fa-check-circle ml-1"></i> معتمد
-                                        </span>
-                                    @else
-                                        <span class="badge-modern badge-rejected">
-                                            <i class="fas fa-times-circle ml-1"></i> مرفوض
-                                        </span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div style="width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; margin-left: 10px; font-size: 0.85rem;">
-                                            {{ substr($stockIn->creator->name ?? 'غ', 0, 1) }}
-                                        </div>
-                                        <span style="font-weight: 600; color: #1e293b;">
-                                            {{ $stockIn->creator->name ?? 'غير محدد' }}
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <a href="{{ route('inventory.stock-in.show', $stockIn->id) }}" 
-                                       class="btn-action btn-view" 
-                                       data-toggle="tooltip" 
-                                       title="عرض التفاصيل">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    
-                                    @if($stockIn->status == 'pending')
-                                        <form action="{{ route('inventory.stock-in.approve', $stockIn->id) }}" 
-                                              method="POST" 
-                                              class="d-inline">
-                                            @csrf
-                                            <button type="submit" 
-                                                    class="btn-action btn-approve" 
-                                                    data-toggle="tooltip" 
-                                                    title="اعتماد"
-                                                    onclick="return confirm('هل أنت متأكد من اعتماد هذا الأمر؟')">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        </form>
-                                        
-                                        <button type="button" 
-                                                class="btn-action btn-delete" 
-                                                data-toggle="tooltip" 
-                                                title="حذف"
-                                                onclick="confirmDelete({{ $stockIn->id }}, '{{ $stockIn->movement_number }}')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-
-                                        <form id="delete-form-{{ $stockIn->id }}" 
-                                              action="{{ route('inventory.stock-in.destroy', $stockIn->id) }}" 
-                                              method="POST" 
-                                              class="d-none">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
-                                    @endif
-                                </td>
+                                <th>رقم الأمر</th>
+                                <th>المخزن</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                                <th>المنشئ</th>
+                                <th>الإجراءات</th>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8">
-                                    <div class="empty-state">
-                                        <i class="fas fa-inbox"></i>
-                                        <h4>لا توجد أوامر توريد</h4>
-                                        <p>ابدأ بإنشاء أول أمر توريد للنظام</p>
-                                        <a href="{{ route('inventory.stock-in.create') }}" class="btn btn-gradient mt-3">
-                                            <i class="fas fa-plus ml-2"></i>
-                                            إنشاء أول أمر توريد
+                        </thead>
+                        <tbody>
+                            @foreach($stockIns as $stockIn)
+                                <tr>
+                                    <td><strong>{{ $stockIn->movement_number }}</strong></td>
+                                    <td>{{ $stockIn->warehouse->name ?? '-' }}</td>
+                                    <td>{{ $stockIn->movement_date }}</td>
+                                    <td>
+                                        <span class="status-badge status-{{ $stockIn->status }}">
+                                            @if($stockIn->status == 'pending') قيد الانتظار
+                                            @elseif($stockIn->status == 'approved') معتمد
+                                            @else مرفوض
+                                            @endif
+                                        </span>
+                                    </td>
+                                    <td>{{ $stockIn->creator->name ?? '-' }}</td>
+                                    <td>
+                                        <a href="{{ route('inventory.stock-in.show', $stockIn->id) }}" class="action-btn action-btn-view">
+                                            <i class="fas fa-eye"></i>
                                         </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            {{-- Pagination --}}
-            @if($stockIns->hasPages())
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div style="color: #64748b; font-weight: 600;">
-                        عرض {{ $stockIns->firstItem() ?? 0 }} إلى {{ $stockIns->lastItem() ?? 0 }} من أصل {{ $stockIns->total() }} أمر
-                    </div>
-                    <div>
-                        {{ $stockIns->links('pagination::bootstrap-4') }}
-                    </div>
+                                        @if($stockIn->status == 'pending')
+                                            <a href="{{ route('inventory.stock-in.edit', $stockIn->id) }}" class="action-btn action-btn-edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="action-btn action-btn-delete" onclick="confirmDelete({{ $stockIn->id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="mt-4">
+                    {{ $stockIns->links() }}
+                </div>
+            @else
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>لا توجد أوامر توريد</h3>
+                    <p>ابدأ بإنشاء أمر توريد جديد</p>
                 </div>
             @endif
         </div>
     </div>
 </div>
 
+<!-- AOS Animation Library -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-    function confirmDelete(id, number) {
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: 'هل أنت متأكد؟',
-                html: `سيتم حذف الأمر: <strong>${number}</strong>`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ee0979',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'نعم، احذف!',
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('delete-form-' + id).submit();
-                }
-            });
-        } else {
-            if (confirm('هل أنت متأكد من حذف الأمر: ' + number + '؟')) {
-                document.getElementById('delete-form-' + id).submit();
-            }
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true
+    });
+    
+    function confirmDelete(id) {
+        if(confirm('هل أنت متأكد من حذف هذا الأمر؟')) {
+            // Delete logic here
+            console.log('Delete stock-in:', id);
         }
     }
-
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-    });
 </script>
 @endsection
