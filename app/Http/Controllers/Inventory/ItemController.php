@@ -101,7 +101,6 @@ class ItemController extends Controller
                 'unit_price' => $validated['unit_price'],
                 'barcode' => $validated['barcode'] ?? null,
                 'status' => $validated['status'],
-                'is_active' => ($validated['status'] === 'active') ? 1 : 0,
             ];
 
             // Handle image upload
