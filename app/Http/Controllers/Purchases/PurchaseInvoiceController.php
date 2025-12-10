@@ -208,11 +208,12 @@ class PurchaseInvoiceController extends Controller
     {
         $invoice = PurchaseInvoice::findOrFail($id);
 
-        // لا يمكن تعديل الفاتورة المعتمدة
-        if ($invoice->isApproved()) {
+        // التحقق من إمكانية تعديل الفاتورة
+        $editCheck = $invoice->canBeEdited();
+        if (!$editCheck['can_edit']) {
             return redirect()
                 ->route('purchases.invoices.show', $id)
-                ->with('error', 'لا يمكن تعديل فاتورة معتمدة');
+                ->with('error', $editCheck['reason']);
         }
 
         $validated = $request->validate([

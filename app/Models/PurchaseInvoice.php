@@ -304,6 +304,67 @@ class PurchaseInvoice extends Model
     }
 
     /**
+     * التحقق من وجود استلام بضاعة مرتبط بالفاتورة
+     */
+    public function hasReceipt(): bool
+    {
+        return $this->purchaseReceipts()->where('status', 'approved')->exists();
+    }
+
+    /**
+     * التحقق من وجود حركات مخزنية لاحقة
+     */
+    public function hasSubsequentStockMovements(): bool
+    {
+        if (!$this->hasReceipt()) {
+            return false;
+        }
+
+        // الحصول على تاريخ آخر استلام
+        $lastReceiptDate = $this->purchaseReceipts()
+            ->where('status', 'approved')
+            ->max('receipt_date');
+
+        // التحقق من وجود حركات مخزنية بعد تاريخ الاستلام
+        return \App\Models\StockMovement::whereIn('item_id', function($query) {
+                $query->select('item_id')
+                    ->from('purchase_invoice_items')
+                    ->where('purchase_invoice_id', $this->id);
+            })
+            ->where('warehouse_id', $this->warehouse_id)
+            ->where('movement_date', '>', $lastReceiptDate)
+            ->where('movement_type', '!=', 'stock_in')
+            ->exists();
+    }
+
+    /**
+     * التحقق من إمكانية تعديل الفاتورة
+     */
+    public function canBeEdited(): array
+    {
+        // إذا كانت الفاتورة غير معتمدة، يمكن تعديلها
+        if (!$this->isApproved()) {
+            return ['can_edit' => true, 'reason' => null];
+        }
+
+        // إذا كانت معتمدة ولكن لم يتم استلام البضاعة، يمكن إلغاء الاعتماد والتعديل
+        if (!$this->hasReceipt()) {
+            return ['can_edit' => true, 'reason' => null, 'requires_unapproval' => true];
+        }
+
+        // إذا تم استلام البضاعة ولكن لا توجد حركات لاحقة، يمكن إلغاء الاعتماد والتعديل
+        if (!$this->hasSubsequentStockMovements()) {
+            return ['can_edit' => true, 'reason' => null, 'requires_unapproval' => true, 'requires_receipt_cancellation' => true];
+        }
+
+        // إذا توجد حركات مخزنية لاحقة، لا يمكن التعديل
+        return [
+            'can_edit' => false,
+            'reason' => 'لا يمكن تعديل الفاتورة لأنها قيدت في المخزون وتوجد حركات مخزنية لاحقة'
+        ];
+    }
+
+    /**
      * Check if invoice is draft.
      * التحقق من أن الفاتورة مسودة
      *
