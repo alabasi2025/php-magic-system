@@ -294,9 +294,15 @@
                                         <i class="fas fa-times me-1"></i>
                                         إلغاء
                                     </a>
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="fas fa-save me-1"></i>
-                                        حفظ التعديلات
+                                    <button type="submit" class="btn btn-warning" id="submitBtn">
+                                        <span id="submitBtnText">
+                                            <i class="fas fa-save me-1"></i>
+                                            حفظ التعديلات
+                                        </span>
+                                        <span id="submitBtnLoading" class="d-none">
+                                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                            جاري الحفظ...
+                                        </span>
                                     </button>
                                 </div>
                             </div>
@@ -408,6 +414,34 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('grandTotal').textContent = grandTotal.toFixed(2);
         document.getElementById('total_amount').value = grandTotal.toFixed(2);
     }
+    
+    // Loading state عند إرسال النموذج
+    document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('submitBtn');
+        const submitBtnText = document.getElementById('submitBtnText');
+        const submitBtnLoading = document.getElementById('submitBtnLoading');
+        
+        // التحقق من وجود صنف واحد على الأقل
+        const items = document.querySelectorAll('.item-row');
+        let hasValidItem = false;
+        items.forEach(function(row) {
+            const itemSelect = row.querySelector('.item-select');
+            if (itemSelect && itemSelect.value) {
+                hasValidItem = true;
+            }
+        });
+        
+        if (!hasValidItem) {
+            e.preventDefault();
+            alert('يرجى إضافة صنف واحد على الأقل للفاتورة');
+            return false;
+        }
+        
+        // عرض loading state
+        submitBtn.disabled = true;
+        submitBtnText.classList.add('d-none');
+        submitBtnLoading.classList.remove('d-none');
+    });
     
     // حساب الإجماليات عند تحميل الصفحة
     calculateTotals();

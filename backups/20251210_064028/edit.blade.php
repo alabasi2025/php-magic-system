@@ -1,21 +1,27 @@
 @extends('layouts.app')
 
-@section('title', 'إضافة فاتورة مشتريات جديدة')
+@section('title', 'تعديل فاتورة المشتريات')
 
 @section('content')
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">
-                        <i class="fas fa-file-invoice me-2"></i>
-                        إضافة فاتورة مشتريات جديدة
+                        <i class="fas fa-edit me-2"></i>
+                        تعديل فاتورة المشتريات #{{ $invoice->invoice_number ?? '' }}
                     </h4>
-                    <a href="{{ route('purchases.invoices.index') }}" class="btn btn-light btn-sm">
-                        <i class="fas fa-arrow-right me-1"></i>
-                        العودة للقائمة
-                    </a>
+                    <div>
+                        <a href="{{ route('purchases.invoices.show', $invoice->id ?? 0) }}" class="btn btn-info btn-sm me-2">
+                            <i class="fas fa-eye me-1"></i>
+                            عرض
+                        </a>
+                        <a href="{{ route('purchases.invoices.index') }}" class="btn btn-light btn-sm">
+                            <i class="fas fa-arrow-right me-1"></i>
+                            العودة للقائمة
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     @if ($errors->any())
@@ -30,14 +36,15 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('purchases.invoices.store') }}" method="POST" id="invoiceForm">
+                    <form action="{{ route('purchases.invoices.update', $invoice->id ?? 0) }}" method="POST" id="invoiceForm">
                         @csrf
+                        @method('PUT')
                         
                         <!-- معلومات الفاتورة الأساسية -->
                         <div class="row mb-4">
                             <div class="col-12">
                                 <h5 class="border-bottom pb-2 mb-3">
-                                    <i class="fas fa-info-circle text-primary me-2"></i>
+                                    <i class="fas fa-info-circle text-warning me-2"></i>
                                     معلومات الفاتورة
                                 </h5>
                             </div>
@@ -48,7 +55,8 @@
                                     رقم الفاتورة <span class="text-danger">*</span>
                                 </label>
                                 <input type="text" class="form-control @error('invoice_number') is-invalid @enderror" 
-                                       id="invoice_number" name="invoice_number" value="{{ old('invoice_number') }}" required>
+                                       id="invoice_number" name="invoice_number" 
+                                       value="{{ old('invoice_number', $invoice->invoice_number ?? '') }}" required>
                                 @error('invoice_number')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -60,7 +68,8 @@
                                     تاريخ الفاتورة <span class="text-danger">*</span>
                                 </label>
                                 <input type="date" class="form-control @error('invoice_date') is-invalid @enderror" 
-                                       id="invoice_date" name="invoice_date" value="{{ old('invoice_date', date('Y-m-d')) }}" required>
+                                       id="invoice_date" name="invoice_date" 
+                                       value="{{ old('invoice_date', $invoice->invoice_date ?? date('Y-m-d')) }}" required>
                                 @error('invoice_date')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -75,31 +84,13 @@
                                         id="supplier_id" name="supplier_id" required>
                                     <option value="">اختر المورد</option>
                                     @foreach($suppliers ?? [] as $supplier)
-                                        <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                                        <option value="{{ $supplier->id }}" 
+                                            {{ old('supplier_id', $invoice->supplier_id ?? '') == $supplier->id ? 'selected' : '' }}>
                                             {{ $supplier->name }}
                                         </option>
                                     @endforeach
                                 </select>
                                 @error('supplier_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4 mb-3">
-                                <label for="warehouse_id" class="form-label">
-                                    <i class="fas fa-warehouse me-1"></i>
-                                    المخزن <span class="text-danger">*</span>
-                                </label>
-                                <select class="form-select @error('warehouse_id') is-invalid @enderror" 
-                                        id="warehouse_id" name="warehouse_id" required>
-                                    <option value="">اختر المخزن</option>
-                                    @foreach($warehouses ?? [] as $warehouse)
-                                        <option value="{{ $warehouse->id }}" {{ old('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
-                                            {{ $warehouse->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('warehouse_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -112,10 +103,10 @@
                                 <select class="form-select @error('payment_method') is-invalid @enderror" 
                                         id="payment_method" name="payment_method" required>
                                     <option value="">اختر طريقة الدفع</option>
-                                    <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>نقداً</option>
-                                    <option value="credit" {{ old('payment_method') == 'credit' ? 'selected' : '' }}>آجل</option>
-                                    <option value="bank_transfer" {{ old('payment_method') == 'bank_transfer' ? 'selected' : '' }}>تحويل بنكي</option>
-                                    <option value="check" {{ old('payment_method') == 'check' ? 'selected' : '' }}>شيك</option>
+                                    <option value="cash" {{ old('payment_method', $invoice->payment_method ?? '') == 'cash' ? 'selected' : '' }}>نقداً</option>
+                                    <option value="credit" {{ old('payment_method', $invoice->payment_method ?? '') == 'credit' ? 'selected' : '' }}>آجل</option>
+                                    <option value="bank_transfer" {{ old('payment_method', $invoice->payment_method ?? '') == 'bank_transfer' ? 'selected' : '' }}>تحويل بنكي</option>
+                                    <option value="check" {{ old('payment_method', $invoice->payment_method ?? '') == 'check' ? 'selected' : '' }}>شيك</option>
                                 </select>
                                 @error('payment_method')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -129,10 +120,10 @@
                                 </label>
                                 <select class="form-select @error('status') is-invalid @enderror" 
                                         id="status" name="status" required>
-                                    <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>مسودة</option>
-                                    <option value="pending" {{ old('status', 'pending') == 'pending' ? 'selected' : '' }}>معلقة</option>
-                                    <option value="approved" {{ old('status') == 'approved' ? 'selected' : '' }}>معتمدة</option>
-                                    <option value="cancelled" {{ old('status') == 'cancelled' ? 'selected' : '' }}>ملغاة</option>
+                                    <option value="draft" {{ old('status', $invoice->status ?? '') == 'draft' ? 'selected' : '' }}>مسودة</option>
+                                    <option value="pending" {{ old('status', $invoice->status ?? '') == 'pending' ? 'selected' : '' }}>معلقة</option>
+                                    <option value="approved" {{ old('status', $invoice->status ?? '') == 'approved' ? 'selected' : '' }}>معتمدة</option>
+                                    <option value="cancelled" {{ old('status', $invoice->status ?? '') == 'cancelled' ? 'selected' : '' }}>ملغاة</option>
                                 </select>
                                 @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -145,7 +136,7 @@
                                     ملاحظات
                                 </label>
                                 <textarea class="form-control @error('notes') is-invalid @enderror" 
-                                          id="notes" name="notes" rows="3">{{ old('notes') }}</textarea>
+                                          id="notes" name="notes" rows="3">{{ old('notes', $invoice->notes ?? '') }}</textarea>
                                 @error('notes')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -156,7 +147,7 @@
                         <div class="row mb-4">
                             <div class="col-12">
                                 <h5 class="border-bottom pb-2 mb-3">
-                                    <i class="fas fa-boxes text-primary me-2"></i>
+                                    <i class="fas fa-boxes text-warning me-2"></i>
                                     أصناف الفاتورة
                                 </h5>
                             </div>
@@ -179,13 +170,54 @@
                                             </tr>
                                         </thead>
                                         <tbody id="itemsTableBody">
+                                            @forelse(($invoice->items ?? []) as $index => $item)
                                             <tr class="item-row">
                                                 <td>
-                                                    <select class="form-select form-select-sm item-select" name="items[0][item_id]" required>
+                                                    <select class="form-select form-select-sm item-select" name="items[{{ $index }}][product_id]" required>
                                                         <option value="">اختر الصنف</option>
-                                                        @foreach($items ?? [] as $item)
-                                                            <option value="{{ $item->id }}" data-price="{{ $item->unit_price ?? 0 }}">
-                                                                {{ $item->name }} ({{ $item->sku }})
+                                                        @foreach($products ?? [] as $product)
+                                                            <option value="{{ $product->id }}" 
+                                                                data-price="{{ $product->purchase_price ?? 0 }}"
+                                                                {{ ($item->product_id ?? '') == $product->id ? 'selected' : '' }}>
+                                                                {{ $product->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm item-quantity" 
+                                                           name="items[{{ $index }}][quantity]" min="1" 
+                                                           value="{{ $item->quantity ?? 1 }}" required>
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm item-price" 
+                                                           name="items[{{ $index }}][unit_price]" min="0" step="0.01" 
+                                                           value="{{ $item->unit_price ?? 0 }}" required>
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm item-discount" 
+                                                           name="items[{{ $index }}][discount]" min="0" step="0.01" 
+                                                           value="{{ $item->discount ?? 0 }}">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm item-total" 
+                                                           name="items[{{ $index }}][total]" readonly 
+                                                           value="{{ $item->total ?? 0 }}">
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-danger btn-sm remove-item-btn">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            @empty
+                                            <tr class="item-row">
+                                                <td>
+                                                    <select class="form-select form-select-sm item-select" name="items[0][product_id]" required>
+                                                        <option value="">اختر الصنف</option>
+                                                        @foreach($products ?? [] as $product)
+                                                            <option value="{{ $product->id }}" data-price="{{ $product->purchase_price ?? 0 }}">
+                                                                {{ $product->name }}
                                                             </option>
                                                         @endforeach
                                                     </select>
@@ -212,6 +244,7 @@
                                                     </button>
                                                 </td>
                                             </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
@@ -235,7 +268,8 @@
                                         <div class="d-flex justify-content-between mb-2">
                                             <label for="tax_rate" class="mb-0">الضريبة (%):</label>
                                             <input type="number" class="form-control form-control-sm w-50" 
-                                                   id="tax_rate" name="tax_rate" min="0" step="0.01" value="{{ old('tax_rate', 0) }}">
+                                                   id="tax_rate" name="tax_rate" min="0" step="0.01" 
+                                                   value="{{ old('tax_rate', $invoice->tax_rate ?? 0) }}">
                                         </div>
                                         <div class="d-flex justify-content-between mb-2">
                                             <strong>قيمة الضريبة:</strong>
@@ -243,8 +277,8 @@
                                         </div>
                                         <hr>
                                         <div class="d-flex justify-content-between">
-                                            <strong class="text-primary fs-5">الإجمالي النهائي:</strong>
-                                            <strong class="text-primary fs-5" id="grandTotal">0.00</strong>
+                                            <strong class="text-warning fs-5">الإجمالي النهائي:</strong>
+                                            <strong class="text-warning fs-5" id="grandTotal">0.00</strong>
                                         </div>
                                         <input type="hidden" name="total_amount" id="total_amount" value="0">
                                     </div>
@@ -260,15 +294,9 @@
                                         <i class="fas fa-times me-1"></i>
                                         إلغاء
                                     </a>
-                                    <button type="submit" class="btn btn-primary" id="submitBtn">
-                                        <span id="submitBtnText">
-                                            <i class="fas fa-save me-1"></i>
-                                            حفظ الفاتورة
-                                        </span>
-                                        <span id="submitBtnLoading" class="d-none">
-                                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                            جاري الحفظ...
-                                        </span>
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-save me-1"></i>
+                                        حفظ التعديلات
                                     </button>
                                 </div>
                             </div>
@@ -283,7 +311,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let itemIndex = 1;
+    let itemIndex = {{ count($invoice->items ?? []) }};
 
     // إضافة صف جديد
     document.getElementById('addItemBtn').addEventListener('click', function() {
@@ -383,34 +411,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // حساب الإجماليات عند تحميل الصفحة
     calculateTotals();
-    
-    // Loading state عند إرسال النموذج
-    document.getElementById('invoiceForm').addEventListener('submit', function(e) {
-        const submitBtn = document.getElementById('submitBtn');
-        const submitBtnText = document.getElementById('submitBtnText');
-        const submitBtnLoading = document.getElementById('submitBtnLoading');
-        
-        // التحقق من وجود صنف واحد على الأقل
-        const items = document.querySelectorAll('.item-row');
-        let hasValidItem = false;
-        items.forEach(function(row) {
-            const itemSelect = row.querySelector('.item-select');
-            if (itemSelect && itemSelect.value) {
-                hasValidItem = true;
-            }
-        });
-        
-        if (!hasValidItem) {
-            e.preventDefault();
-            alert('يرجى إضافة صنف واحد على الأقل للفاتورة');
-            return false;
-        }
-        
-        // عرض loading state
-        submitBtn.disabled = true;
-        submitBtnText.classList.add('d-none');
-        submitBtnLoading.classList.remove('d-none');
-    });
 });
 </script>
 @endpush

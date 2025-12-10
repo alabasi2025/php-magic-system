@@ -260,15 +260,9 @@
                                         <i class="fas fa-times me-1"></i>
                                         إلغاء
                                     </a>
-                                    <button type="submit" class="btn btn-primary" id="submitBtn">
-                                        <span id="submitBtnText">
-                                            <i class="fas fa-save me-1"></i>
-                                            حفظ الفاتورة
-                                        </span>
-                                        <span id="submitBtnLoading" class="d-none">
-                                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                            جاري الحفظ...
-                                        </span>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>
+                                        حفظ الفاتورة
                                     </button>
                                 </div>
                             </div>
@@ -383,34 +377,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // حساب الإجماليات عند تحميل الصفحة
     calculateTotals();
-    
-    // Loading state عند إرسال النموذج
-    document.getElementById('invoiceForm').addEventListener('submit', function(e) {
-        const submitBtn = document.getElementById('submitBtn');
-        const submitBtnText = document.getElementById('submitBtnText');
-        const submitBtnLoading = document.getElementById('submitBtnLoading');
-        
-        // التحقق من وجود صنف واحد على الأقل
-        const items = document.querySelectorAll('.item-row');
-        let hasValidItem = false;
-        items.forEach(function(row) {
-            const itemSelect = row.querySelector('.item-select');
-            if (itemSelect && itemSelect.value) {
-                hasValidItem = true;
-            }
-        });
-        
-        if (!hasValidItem) {
-            e.preventDefault();
-            alert('يرجى إضافة صنف واحد على الأقل للفاتورة');
-            return false;
-        }
-        
-        // عرض loading state
-        submitBtn.disabled = true;
-        submitBtnText.classList.add('d-none');
-        submitBtnLoading.classList.remove('d-none');
-    });
 });
 </script>
 @endpush
