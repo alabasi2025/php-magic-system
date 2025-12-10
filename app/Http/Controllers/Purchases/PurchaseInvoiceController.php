@@ -54,10 +54,8 @@ class PurchaseInvoiceController extends Controller
             ->orderBy('name', 'asc')
             ->get();
 
-        // جلب المخازن النشطة
-        $warehouses = \App\Models\Warehouse::where('status', 'active')
-            ->orderBy('name', 'asc')
-            ->get();
+        // جلب جميع المخازن
+        $warehouses = \App\Models\Warehouse::orderBy('name', 'asc')->get();
 
         // جلب أوامر الشراء المعتمدة (اختياري)
         $purchaseOrders = PurchaseOrder::where('status', 'approved')
@@ -156,10 +154,8 @@ class PurchaseInvoiceController extends Controller
             ->orderBy('name', 'asc')
             ->get();
 
-        // جلب المخازن النشطة
-        $warehouses = Warehouse::where('status', 'active')
-            ->orderBy('name', 'asc')
-            ->get();
+        // جلب جميع المخازن
+        $warehouses = Warehouse::orderBy('name', 'asc')->get();
 
         return view('purchases.invoices.edit', compact('invoice', 'suppliers', 'items', 'warehouses'));
     }

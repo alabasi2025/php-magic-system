@@ -96,6 +96,26 @@
                             </div>
 
                             <div class="col-md-4 mb-3">
+                                <label for="warehouse_id" class="form-label">
+                                    <i class="fas fa-warehouse me-1"></i>
+                                    المخزن <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('warehouse_id') is-invalid @enderror" 
+                                        id="warehouse_id" name="warehouse_id" required>
+                                    <option value="">اختر المخزن</option>
+                                    @foreach($warehouses ?? [] as $warehouse)
+                                        <option value="{{ $warehouse->id }}" 
+                                            {{ old('warehouse_id', $invoice->warehouse_id ?? '') == $warehouse->id ? 'selected' : '' }}>
+                                            {{ $warehouse->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('warehouse_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-4 mb-3">
                                 <label for="payment_method" class="form-label">
                                     <i class="fas fa-credit-card me-1"></i>
                                     طريقة الدفع <span class="text-danger">*</span>
