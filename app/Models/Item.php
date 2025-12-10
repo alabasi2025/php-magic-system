@@ -51,8 +51,7 @@ class Item extends Model
         'barcode',
         'image',
         'image_path', // Keep for backward compatibility
-        'is_active',
-        'status', // Keep for backward compatibility
+        'status'
     ];
 
     /**
