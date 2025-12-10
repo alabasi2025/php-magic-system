@@ -71,7 +71,8 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        try {
+            $validated = $request->validate([
             'sku' => 'required|string|max:100|unique:items,sku',
             'name' => 'required|string|max:200',
             'description' => 'nullable|string',
@@ -91,9 +92,19 @@ class ItemController extends Controller
 
         $item = Item::create($validated);
 
-        return redirect()
-            ->route('inventory.items.index')
-            ->with('success', 'تم إنشاء الصنف بنجاح');
+            return redirect()
+                ->route('inventory.items.index')
+                ->with('success', 'تم إنشاء الصنف بنجاح');
+        } catch (\Exception $e) {
+            \Log::error('Item creation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $request->all()
+            ]);
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'فشل حفظ الصنف: ' . $e->getMessage()]);
+        }
     }
 
     /**
