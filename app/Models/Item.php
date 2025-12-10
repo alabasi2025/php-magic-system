@@ -114,7 +114,7 @@ class Item extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', 1);
+        return $query->where('status', 'active');
     }
 
     /**
@@ -122,7 +122,7 @@ class Item extends Model
      */
     public function scopeInactive($query)
     {
-        return $query->where('is_active', 0);
+        return $query->where('status', 'inactive');
     }
 
     /**
@@ -145,7 +145,7 @@ class Item extends Model
      */
     public function isActive(): bool
     {
-        return $this->is_active == 1;
+        return $this->status === 'active';
     }
 
     /**
