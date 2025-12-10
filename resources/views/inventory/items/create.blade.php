@@ -322,10 +322,11 @@
                                         الوحدة *
                                     </span>
                                     <select class="form-select premium-input form-select-lg @error('unit_id') is-invalid @enderror" id="unit_id" name="unit_id" required>
+                                        <option value="">اختر الوحدة</option>
                                         @foreach($units as $unit)
-                                            @if($unit->name === 'لتر')
-                                                <option value="{{ $unit->id }}" selected>{{ $unit->name }}</option>
-                                            @endif
+                                            <option value="{{ $unit->id }}" {{ ($unit->name === 'لتر' || $unit->name === 'قطعة') ? 'selected' : '' }}>
+                                                {{ $unit->name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                     @error('unit_id')
