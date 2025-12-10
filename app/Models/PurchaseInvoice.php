@@ -364,4 +364,159 @@ class PurchaseInvoice extends Model
         }
         $this->save();
     }
+
+    /**
+     * Create a new purchase invoice with items.
+     * إنشاء فاتورة شراء جديدة مع الأصناف
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return PurchaseInvoice
+     */
+    public static function createPurchaseInvoice($request)
+    {
+        \DB::beginTransaction();
+        
+        try {
+            // إنشاء الفاتورة
+            $invoice = self::create([
+                'invoice_number' => $request->invoice_number,
+                'internal_number' => self::generateInternalNumber(),
+                'supplier_id' => $request->supplier_id,
+                'warehouse_id' => $request->warehouse_id,
+                'invoice_date' => $request->invoice_date,
+                'due_date' => $request->due_date,
+                'payment_method' => $request->payment_method,
+                'status' => $request->status ?? 'draft',
+                'payment_status' => 'unpaid',
+                'notes' => $request->notes,
+                'subtotal' => 0,
+                'tax_amount' => 0,
+                'discount_amount' => $request->discount_amount ?? 0,
+                'total_amount' => 0,
+                'paid_amount' => 0,
+                'remaining_amount' => 0,
+                'created_by' => auth()->id(),
+            ]);
+
+            // إضافة العناصر
+            if ($request->has('items') && !empty($request->items)) {
+                self::createInvoiceItems($invoice, $request->items);
+            }
+
+            // حساب الإجمالي
+            $invoice->calculateTotals();
+
+            \DB::commit();
+            
+            return $invoice->load(['supplier', 'items']);
+            
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Update an existing purchase invoice.
+     * تحديث فاتورة شراء موجودة
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return PurchaseInvoice|string
+     */
+    public function updatePurchaseInvoice($request)
+    {
+        // التحقق من أن الفاتورة غير معتمدة
+        if ($this->status === 'approved') {
+            return 'cannot_edit_approved_invoice';
+        }
+        
+        \DB::beginTransaction();
+        
+        try {
+            // تحديث بيانات الفاتورة
+            $this->update([
+                'invoice_number' => $request->invoice_number,
+                'supplier_id' => $request->supplier_id,
+                'warehouse_id' => $request->warehouse_id,
+                'invoice_date' => $request->invoice_date,
+                'due_date' => $request->due_date,
+                'payment_method' => $request->payment_method,
+                'status' => $request->status,
+                'notes' => $request->notes,
+                'discount_amount' => $request->discount_amount ?? 0,
+            ]);
+
+            // حذف العناصر القديمة
+            $this->items()->delete();
+
+            // إضافة العناصر الجديدة
+            if ($request->has('items') && !empty($request->items)) {
+                self::createInvoiceItems($this, $request->items);
+            }
+
+            // إعادة حساب الإجمالي
+            $this->calculateTotals();
+
+            \DB::commit();
+            
+            return $this->load(['supplier', 'items']);
+            
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Create invoice items.
+     * إنشاء أصناف الفاتورة
+     *
+     * @param PurchaseInvoice $invoice
+     * @param array $items
+     * @return void
+     */
+    protected static function createInvoiceItems($invoice, $items)
+    {
+        foreach ($items as $item) {
+            $invoice->items()->create([
+                'item_id' => $item['item_id'],
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+                'total' => $item['quantity'] * $item['price'],
+            ]);
+        }
+    }
+
+    /**
+     * Calculate and update invoice totals.
+     * حساب وتحديث إجماليات الفاتورة
+     *
+     * @return void
+     */
+    public function calculateTotals()
+    {
+        $subtotal = $this->items()->sum(\DB::raw('quantity * price'));
+        $tax_amount = 0; // يمكن إضافة حساب الضريبة لاحقاً
+        $total = $subtotal + $tax_amount - $this->discount_amount;
+
+        $this->update([
+            'subtotal' => $subtotal,
+            'tax_amount' => $tax_amount,
+            'total_amount' => $total,
+            'remaining_amount' => $total - $this->paid_amount,
+        ]);
+    }
+
+    /**
+     * Generate internal number for invoice.
+     * توليد رقم داخلي للفاتورة
+     *
+     * @return string
+     */
+    protected static function generateInternalNumber()
+    {
+        $lastInvoice = self::orderBy('id', 'desc')->first();
+        $nextNumber = $lastInvoice ? ($lastInvoice->id + 1) : 1;
+        return 'PI-' . date('Y') . '-' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+    }
 }

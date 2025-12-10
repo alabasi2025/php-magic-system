@@ -92,80 +92,15 @@ class PurchaseInvoiceController extends Controller
             'items.*.discount' => 'nullable|numeric|min:0',
         ]);
 
-        DB::beginTransaction();
         try {
-            // حساب الإجماليات
-            $subtotal = 0;
-            $totalDiscount = 0;
-            
-            foreach ($validated['items'] as $item) {
-                $itemTotal = $item['quantity'] * $item['price'];
-                $subtotal += $itemTotal;
-                $totalDiscount += $item['discount'] ?? 0;
-            }
-
-            $taxRate = $request->input('tax_rate', 0);
-            $taxAmount = (($subtotal - $totalDiscount) * $taxRate) / 100;
-            $totalAmount = ($subtotal - $totalDiscount) + $taxAmount;
-
-            // إنشاء رقم داخلي فريد
-            $internalNumber = 'PI-' . date('Ymd') . '-' . str_pad(PurchaseInvoice::count() + 1, 5, '0', STR_PAD_LEFT);
-
-            // إنشاء الفاتورة
-            $invoice = PurchaseInvoice::create([
-                'invoice_number' => $validated['invoice_number'],
-                'internal_number' => $internalNumber,
-                'supplier_id' => $validated['supplier_id'],
-                'warehouse_id' => $validated['warehouse_id'],
-                'payment_method' => $validated['payment_method'],
-                'invoice_date' => $validated['invoice_date'],
-                'due_date' => $validated['due_date'],
-                'subtotal' => $subtotal,
-                'tax_amount' => $taxAmount,
-                'discount_amount' => $totalDiscount,
-                'total_amount' => $totalAmount,
-                'paid_amount' => 0,
-                'remaining_amount' => $totalAmount,
-                'payment_status' => 'unpaid',
-                'status' => $validated['status'],
-                'notes' => $validated['notes'],
-                'created_by' => Auth::id(),
-            ]);
-
-            // إضافة الأصناف وتحديث المخزون
-            foreach ($validated['items'] as $item) {
-                $invoice->items()->create([
-                    'item_id' => $item['item_id'],
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['price'],
-                    'discount' => $item['discount'] ?? 0,
-                    'total' => ($item['quantity'] * $item['price']) - ($item['discount'] ?? 0),
-                ]);
-                
-                // تحديث المخزون إذا كانت الفاتورة معتمدة
-                if ($validated['status'] == 'approved') {
-                    \App\Models\StockMovement::create([
-                        'item_id' => $item['item_id'],
-                        'warehouse_id' => $validated['warehouse_id'],
-                        'movement_type' => 'in',
-                        'quantity' => $item['quantity'],
-                        'reference_type' => 'purchase_invoice',
-                        'reference_id' => $invoice->id,
-                        'notes' => 'فاتورة شراء رقم ' . $validated['invoice_number'],
-                        'created_by' => Auth::id(),
-                    ]);
-                }
-            }
-
-            DB::commit();
+            // إنشاء الفاتورة باستخدام Model method
+            $invoice = PurchaseInvoice::createPurchaseInvoice($request);
 
             return redirect()
                 ->route('purchases.invoices.show', $invoice->id)
                 ->with('success', 'تم إنشاء فاتورة المشتريات بنجاح');
 
         } catch (\Exception $e) {
-            DB::rollBack();
-            
             return redirect()
                 ->back()
                 ->withInput()
@@ -258,56 +193,17 @@ class PurchaseInvoiceController extends Controller
             'items.*.discount' => 'nullable|numeric|min:0',
         ]);
 
-        DB::beginTransaction();
         try {
-            // حساب الإجماليات
-            $subtotal = 0;
-            $totalDiscount = 0;
+            // تحديث الفاتورة باستخدام Model method
+            $result = $invoice->updatePurchaseInvoice($request);
             
-            foreach ($validated['items'] as $item) {
-                $itemTotal = $item['quantity'] * $item['price'];
-                $subtotal += $itemTotal;
-                $totalDiscount += $item['discount'] ?? 0;
+            // التحقق من نجاح التحديث
+            if (is_string($result)) {
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', 'لا يمكن تعديل فاتورة معتمدة');
             }
-
-            $taxRate = $request->input('tax_rate', 0);
-            $taxAmount = (($subtotal - $totalDiscount) * $taxRate) / 100;
-            $totalAmount = ($subtotal - $totalDiscount) + $taxAmount;
-
-            // تحديث الفاتورة
-            $invoice->update([
-                'invoice_number' => $validated['invoice_number'],
-                'supplier_id' => $validated['supplier_id'],
-                'warehouse_id' => $validated['warehouse_id'],
-                'payment_method' => $validated['payment_method'],
-                'invoice_date' => $validated['invoice_date'],
-                'due_date' => $validated['due_date'],
-                'subtotal' => $subtotal,
-                'tax_amount' => $taxAmount,
-                'discount_amount' => $totalDiscount,
-                'total_amount' => $totalAmount,
-                'remaining_amount' => $totalAmount - $invoice->paid_amount,
-                'status' => $validated['status'],
-                'notes' => $validated['notes'],
-            ]);
-
-            // حذف الأصناف القديمة وإضافة الجديدة
-            $invoice->items()->delete();
-            
-            foreach ($validated['items'] as $item) {
-                $invoice->items()->create([
-                    'item_id' => $item['item_id'],
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['price'],
-                    'discount' => $item['discount'] ?? 0,
-                    'total' => ($item['quantity'] * $item['price']) - ($item['discount'] ?? 0),
-                ]);
-            }
-
-            // تحديث حالة الدفع
-            $invoice->updatePaymentStatus();
-
-            DB::commit();
 
             return redirect()
                 ->route('purchases.invoices.show', $invoice->id)
