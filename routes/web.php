@@ -1154,3 +1154,41 @@ Route::prefix('inventory')->name('inventory.')->group(function () {
     Route::resource('stock-transfer', StockTransferController::class);
     Route::post('stock-transfer/{transfer}/approve', [StockTransferController::class, 'approve'])->name('stock-transfer.approve');
 });
+
+// Temporary route to run stock_movement_items migration
+Route::get('/run-stock-movement-items-migration', function () {
+    try {
+        // Check if table exists
+        if (Schema::hasTable('stock_movement_items')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'جدول stock_movement_items موجود بالفعل',
+                'action' => 'no migration needed'
+            ]);
+        }
+        
+        // Run the specific migration
+        \Illuminate\Support\Facades\Artisan::call('migrate', [
+            '--path' => 'database/migrations/2025_12_11_000001_create_stock_movement_items_table.php',
+            '--force' => true
+        ]);
+        
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تشغيل migration بنجاح',
+            'output' => $output,
+            'table_exists' => Schema::hasTable('stock_movement_items')
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'فشل تشغيل migration',
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile()
+        ], 500);
+    }
+});
