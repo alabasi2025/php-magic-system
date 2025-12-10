@@ -152,12 +152,12 @@ class PurchaseInvoiceController extends Controller
             ->get();
 
         // جلب الأصناف النشطة
-        $items = Item::where('is_active', 1)
+        $items = Item::where('status', 'active')
             ->orderBy('name', 'asc')
             ->get();
 
         // جلب المخازن النشطة
-        $warehouses = Warehouse::where('is_active', 1)
+        $warehouses = Warehouse::where('status', 'active')
             ->orderBy('name', 'asc')
             ->get();
 
