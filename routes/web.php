@@ -8,6 +8,25 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
+// Test route for items
+Route::get('/test-items-simple', function () {
+    try {
+        $count = \App\Models\Item::count();
+        return response()->json([
+            'success' => true,
+            'count' => $count,
+            'message' => 'Items table accessible'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile()
+        ], 500);
+    }
+});
+
 // System Setup Routes (temporary - remove in production)
 // Note: These routes bypass CSRF protection for easier setup
 Route::get('/system-setup', [\App\Http\Controllers\SystemSetupController::class, 'index'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
