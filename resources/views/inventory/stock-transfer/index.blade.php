@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'أوامر التوريد المخزني')
+@section('title', 'أوامر التحويل المخزني')
 
 @section('content')
 <style>
@@ -322,7 +322,7 @@
             <div>
                 <h1>
                     <i class="fas fa-arrow-down ml-2"></i>
-                    أوامر التوريد المخزني
+                    أوامر التحويل المخزني
                 </h1>
                 <p class="subtitle mb-0">
                     <i class="fas fa-info-circle ml-1"></i>
@@ -330,9 +330,9 @@
                 </p>
             </div>
             <div class="mt-3 mt-md-0">
-                <a href="{{ route('inventory.stock-in.create') }}" class="btn btn-light btn-lg" style="border-radius: 12px; font-weight: 600; padding: 0.75rem 2rem;">
+                <a href="{{ route('inventory.stock-transfer.create') }}" class="btn btn-light btn-lg" style="border-radius: 12px; font-weight: 600; padding: 0.75rem 2rem;">
                     <i class="fas fa-plus ml-2"></i>
-                    إنشاء أمر توريد جديد
+                    إنشاء أمر تحويل جديد
                 </a>
             </div>
         </div>
@@ -369,7 +369,7 @@
                         <h2 class="stat-value">{{ $totalOrders }}</h2>
                         <p class="text-muted mb-0" style="font-size: 0.85rem;">
                             <i class="fas fa-clipboard-list ml-1"></i>
-                            جميع أوامر التوريد
+                            جميع أوامر التحويل
                         </p>
                     </div>
                     <div class="stat-icon">
@@ -422,7 +422,7 @@
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0" style="font-weight: 700; color: #1e293b;">
                     <i class="fas fa-list-ul ml-2"></i>
-                    قائمة أوامر التوريد
+                    قائمة أوامر التحويل
                 </h4>
                 <div class="mt-3 mt-md-0">
                     <button class="btn btn-sm" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border-radius: 10px; padding: 0.5rem 1.2rem; font-weight: 600; margin-left: 8px;">
@@ -437,7 +437,7 @@
         
         <div class="card-body" style="padding: 2rem;">
             {{-- Search and Filters --}}
-            <form action="{{ route('inventory.stock-in.index') }}" method="GET" class="mb-4">
+            <form action="{{ route('inventory.stock-transfer.index') }}" method="GET" class="mb-4">
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <div class="search-box">
@@ -496,11 +496,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($stockIns as $stockIn)
+                        @forelse ($stockTransfers as $stockIn)
                             <tr>
                                 <td class="text-center">
                                     <span style="font-weight: 700; color: #11998e; font-size: 1.1rem;">
-                                        {{ $loop->iteration + ($stockIns->currentPage() - 1) * $stockIns->perPage() }}
+                                        {{ $loop->iteration + ($stockTransfers->currentPage() - 1) * $stockTransfers->perPage() }}
                                     </span>
                                 </td>
                                 <td>
@@ -555,7 +555,7 @@
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('inventory.stock-in.show', $stockIn->id) }}" 
+                                    <a href="{{ route('inventory.stock-transfer.show', $stockIn->id) }}" 
                                        class="btn-action btn-view" 
                                        data-toggle="tooltip" 
                                        title="عرض التفاصيل">
@@ -563,7 +563,7 @@
                                     </a>
                                     
                                     @if($stockIn->status == 'pending')
-                                        <form action="{{ route('inventory.stock-in.approve', $stockIn->id) }}" 
+                                        <form action="{{ route('inventory.stock-transfer.approve', $stockIn->id) }}" 
                                               method="POST" 
                                               class="d-inline">
                                             @csrf
@@ -585,7 +585,7 @@
                                         </button>
 
                                         <form id="delete-form-{{ $stockIn->id }}" 
-                                              action="{{ route('inventory.stock-in.destroy', $stockIn->id) }}" 
+                                              action="{{ route('inventory.stock-transfer.destroy', $stockIn->id) }}" 
                                               method="POST" 
                                               class="d-none">
                                             @csrf
@@ -599,11 +599,11 @@
                                 <td colspan="8">
                                     <div class="empty-state">
                                         <i class="fas fa-inbox"></i>
-                                        <h4>لا توجد أوامر توريد</h4>
-                                        <p>ابدأ بإنشاء أول أمر توريد للنظام</p>
-                                        <a href="{{ route('inventory.stock-in.create') }}" class="btn btn-gradient mt-3">
+                                        <h4>لا توجد أوامر تحويل</h4>
+                                        <p>ابدأ بإنشاء أول أمر تحويل للنظام</p>
+                                        <a href="{{ route('inventory.stock-transfer.create') }}" class="btn btn-gradient mt-3">
                                             <i class="fas fa-plus ml-2"></i>
-                                            إنشاء أول أمر توريد
+                                            إنشاء أول أمر تحويل
                                         </a>
                                     </div>
                                 </td>
@@ -614,13 +614,13 @@
             </div>
 
             {{-- Pagination --}}
-            @if($stockIns->hasPages())
+            @if($stockTransfers->hasPages())
                 <div class="d-flex justify-content-between align-items-center mt-4">
                     <div style="color: #64748b; font-weight: 600;">
-                        عرض {{ $stockIns->firstItem() ?? 0 }} إلى {{ $stockIns->lastItem() ?? 0 }} من أصل {{ $stockIns->total() }} أمر
+                        عرض {{ $stockTransfers->firstItem() ?? 0 }} إلى {{ $stockTransfers->lastItem() ?? 0 }} من أصل {{ $stockTransfers->total() }} أمر
                     </div>
                     <div>
-                        {{ $stockIns->links('pagination::bootstrap-4') }}
+                        {{ $stockTransfers->links('pagination::bootstrap-4') }}
                     </div>
                 </div>
             @endif
