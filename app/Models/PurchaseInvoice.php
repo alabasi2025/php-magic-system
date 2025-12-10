@@ -166,6 +166,17 @@ class PurchaseInvoice extends Model
     }
 
     /**
+     * Get the warehouse associated with the invoice.
+     * المخزن المرتبط بالفاتورة
+     *
+     * @return BelongsTo
+     */
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'warehouse_id');
+    }
+
+    /**
      * Get all items for this invoice.
      * جميع الأصناف في الفاتورة
      *

@@ -77,6 +77,24 @@ class Warehouse extends Model
     }
 
     /**
+     * Get all purchase invoices for this warehouse.
+     * جميع فواتير المشتريات لهذا المخزن
+     */
+    public function purchaseInvoices()
+    {
+        return $this->hasMany(PurchaseInvoice::class, 'warehouse_id');
+    }
+
+    /**
+     * Get all purchase receipts for this warehouse.
+     * جميع استلامات البضاعة لهذا المخزن
+     */
+    public function purchaseReceipts()
+    {
+        return $this->hasMany(PurchaseReceipt::class, 'warehouse_id');
+    }
+
+    /**
      * Get all items currently in this warehouse.
      */
     public function items()
