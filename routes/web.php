@@ -1088,3 +1088,9 @@ Route::get('/delete-all-purchase-invoices', function () {
         ], 500);
     }
 });
+
+
+// Auto-fill and submit invoice form (for testing)
+Route::get('/auto-create-invoice', function () {
+    return view('purchases.invoices.auto-create');
+});
