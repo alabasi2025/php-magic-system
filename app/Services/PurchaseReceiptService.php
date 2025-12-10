@@ -166,6 +166,7 @@ class PurchaseReceiptService
             foreach ($receipt->items as $item) {
                 // Create stock movement for each item
                 StockMovement::create([
+                    'movement_number' => 'SM-' . date('Ymd') . '-' . str_pad(StockMovement::whereDate('created_at', now())->count() + 1, 4, '0', STR_PAD_LEFT),
                     'movement_type' => 'stock_in',
                     'warehouse_id' => $receipt->warehouse_id,
                     'item_id' => $item->item_id,
