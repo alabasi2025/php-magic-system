@@ -688,33 +688,5 @@
 </div>
 
 <!-- Error Modal -->
-<!-- Tailwind Modal -->
-<div id="errorModal" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50" onclick="if(event.target===this) closeErrorModal()">
-    <div class="bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full mx-4 border-2 border-red-500">
-        <!-- Header -->
-        <div class="flex items-center justify-between p-6 border-b border-gray-700">
-            <h3 class="text-xl font-bold text-red-500 flex items-center">
-                <i class="fas fa-exclamation-circle ml-2"></i>
-                حدث خطأ
-            </h3>
-            <button onclick="closeErrorModal()" class="text-gray-400 hover:text-white text-2xl">
-                &times;
-            </button>
-        </div>
-        <!-- Body -->
-        <div class="p-6">
-            <div id="errorContent" class="bg-gray-900 p-4 rounded-lg font-mono text-sm text-gray-300 whitespace-pre-wrap break-words max-h-96 overflow-y-auto"></div>
-        </div>
-        <!-- Footer -->
-        <div class="flex justify-end gap-3 p-6 border-t border-gray-700">
-            <button onclick="copyErrorToClipboard()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center">
-                <i class="fas fa-copy ml-2"></i>
-                نسخ الخطأ
-            </button>
-            <button onclick="closeErrorModal()" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg">
-                إغلاق
-            </button>
-        </div>
-    </div>
-</div>
+
 @endsection
