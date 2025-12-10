@@ -30,7 +30,7 @@ class PurchaseReceiptController extends Controller
      */
     public function create()
     {
-        $warehouses = Warehouse::where('is_active', true)->get();
+        $warehouses = Warehouse::where('status', 'active')->get();
         $suppliers = Supplier::where('is_active', true)->get();
         
         return view('purchases.receipts.create', compact('warehouses', 'suppliers'));
@@ -141,7 +141,7 @@ class PurchaseReceiptController extends Controller
     public function edit($id)
     {
         $receipt = PurchaseReceipt::with(['items'])->findOrFail($id);
-        $warehouses = Warehouse::where('is_active', true)->get();
+        $warehouses = Warehouse::where('status', 'active')->get();
         $suppliers = Supplier::where('is_active', true)->get();
         
         return view('purchases.receipts.edit', compact('receipt', 'warehouses', 'suppliers'));
