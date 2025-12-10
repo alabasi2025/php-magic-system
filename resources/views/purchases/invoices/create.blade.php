@@ -840,6 +840,27 @@
     document.getElementById('invoiceForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
+        // التحقق من الحقول المطلوبة
+        const invoiceTypeId = document.getElementById('invoice_type_id').value;
+        const supplierId = document.getElementById('supplier_id').value;
+        const warehouseId = document.getElementById('warehouse_id').value;
+        const paymentMethod = document.getElementById('payment_method').value;
+        
+        let errors = [];
+        
+        if (!invoiceTypeId) {
+            errors.push('يرجى اختيار نوع الفاتورة');
+        }
+        if (!supplierId) {
+            errors.push('يرجى اختيار المورد');
+        }
+        if (!warehouseId) {
+            errors.push('يرجى اختيار المخزن');
+        }
+        if (!paymentMethod) {
+            errors.push('يرجى اختيار طريقة الدفع');
+        }
+        
         // التحقق من وجود صنف واحد على الأقل
         const items = document.querySelectorAll('.item-row');
         let hasValidItem = false;
@@ -852,8 +873,13 @@
         });
         
         if (!hasValidItem) {
-            console.log('لا يوجد صنف صحيح');
-            showErrorModal('يرجى إضافة صنف واحد على الأقل للفاتورة');
+            errors.push('يرجى إضافة صنف واحد على الأقل للفاتورة');
+        }
+        
+        // عرض الأخطاء إن وجدت
+        if (errors.length > 0) {
+            console.log('أخطاء في النموذج:', errors);
+            showErrorModal('يرجى تصحيح الأخطاء التالية:\n\n' + errors.join('\n'));
             return false;
         }
         
