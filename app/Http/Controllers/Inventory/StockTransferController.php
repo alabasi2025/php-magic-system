@@ -40,14 +40,14 @@ class StockTransferController extends Controller
             $query->where('movement_number', 'like', '%' . $request->search . '%');
         }
 
-        $transfers = $query->paginate(15);
+        $stockTransfers = $query->paginate(15);
         $warehouses = Warehouse::where('status', 'active')->get();
 
         $totalOrders = StockMovement::where('movement_type', 'transfer')->count();
         $pendingOrders = StockMovement::where('movement_type', 'transfer')->where('status', 'pending')->count();
         $approvedOrders = StockMovement::where('movement_type', 'transfer')->where('status', 'approved')->count();
 
-        return view('inventory.stock-transfer.index', compact('transfers', 'warehouses', 'totalOrders', 'pendingOrders', 'approvedOrders'));
+        return view('inventory.stock-transfer.index', compact('stockTransfers', 'warehouses', 'totalOrders', 'pendingOrders', 'approvedOrders'));
     }
 
     public function create()
