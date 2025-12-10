@@ -57,6 +57,13 @@ Route::prefix('purchases')->name('purchases.')->group(function () {
     Route::put('invoices/{invoice}/items/{item}', [PurchaseInvoiceController::class, 'updateItem'])->name('invoices.items.update');
     Route::delete('invoices/{invoice}/items/{item}', [PurchaseInvoiceController::class, 'deleteItem'])->name('invoices.items.delete');
     
+    // Settings
+    // الإعدادات
+    Route::get('/settings', [\App\Http\Controllers\Purchases\PurchaseSettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/invoice-types', [\App\Http\Controllers\Purchases\PurchaseSettingsController::class, 'storeInvoiceType'])->name('settings.invoice-types.store');
+    Route::put('/settings/invoice-types/{invoiceType}', [\App\Http\Controllers\Purchases\PurchaseSettingsController::class, 'updateInvoiceType'])->name('settings.invoice-types.update');
+    Route::delete('/settings/invoice-types/{invoiceType}', [\App\Http\Controllers\Purchases\PurchaseSettingsController::class, 'deleteInvoiceType'])->name('settings.invoice-types.delete');
+    
     // Reports
     // التقارير
     Route::prefix('reports')->name('reports.')->group(function () {

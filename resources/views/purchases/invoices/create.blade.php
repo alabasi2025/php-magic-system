@@ -453,6 +453,28 @@
                         
                         <div class="row">
                             <div class="col-md-4 mb-3">
+                                <label for="invoice_type_id" class="luxury-label">
+                                    <i class="fas fa-tag"></i>
+                                    نوع الفاتورة
+                                    <span class="required-star">*</span>
+                                </label>
+                                <select class="form-select luxury-input @error('invoice_type_id') is-invalid @enderror" 
+                                        id="invoice_type_id" 
+                                        name="invoice_type_id" 
+                                        required>
+                                    <option value="">اختر نوع الفاتورة</option>
+                                    @foreach($invoiceTypes as $type)
+                                        <option value="{{ $type->id }}" {{ old('invoice_type_id') == $type->id ? 'selected' : '' }}>
+                                            {{ $type->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('invoice_type_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
                                 <label for="supplier_id" class="luxury-label">
                                     <i class="fas fa-truck"></i>
                                     المورد

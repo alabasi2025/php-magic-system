@@ -63,7 +63,9 @@ class PurchaseInvoiceController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('purchases.invoices.create', compact('suppliers', 'items', 'warehouses', 'purchaseOrders'));
+        $invoiceTypes = \App\Models\PurchaseInvoiceType::active()->orderBy('name')->get();
+        
+        return view('purchases.invoices.create', compact('suppliers', 'items', 'warehouses', 'purchaseOrders', 'invoiceTypes'));
     }
 
     /**
@@ -77,6 +79,7 @@ class PurchaseInvoiceController extends Controller
     {
         try {
             $validated = $request->validate([
+                'invoice_type_id' => 'required|exists:purchase_invoice_types,id',
                 'invoice_number' => 'nullable|string|max:255',
                 'supplier_id' => 'required|exists:suppliers,id',
                 'warehouse_id' => 'required|exists:warehouses,id',

@@ -144,6 +144,17 @@ class PurchaseInvoice extends Model
     }
 
     /**
+     * Get the invoice type.
+     * نوع الفاتورة
+     *
+     * @return BelongsTo
+     */
+    public function invoiceType(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseInvoiceType::class, 'invoice_type_id');
+    }
+
+    /**
      * Get the supplier associated with the invoice.
      * المورد المرتبط بالفاتورة
      *
@@ -383,8 +394,15 @@ class PurchaseInvoice extends Model
             
             for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
                 try {
+                    // الحصول على نوع الفاتورة
+                    $invoiceType = null;
+                    if ($request->has('invoice_type_id') && $request->invoice_type_id) {
+                        $invoiceType = PurchaseInvoiceType::find($request->invoice_type_id);
+                    }
+                    
                     $invoice = self::create([
-                        'invoice_number' => self::generateInvoiceNumber(),
+                        'invoice_type_id' => $invoiceType ? $invoiceType->id : null,
+                        'invoice_number' => $invoiceType ? $invoiceType->getNextInvoiceNumber() : self::generateInvoiceNumber(),
                         'internal_number' => self::generateInternalNumber(),
                         'supplier_id' => $request->supplier_id,
                         'warehouse_id' => $request->warehouse_id,
