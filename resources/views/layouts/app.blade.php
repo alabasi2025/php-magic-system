@@ -415,6 +415,10 @@
                                 <i class="fas fa-chart-line text-lg"></i>
                                 <span class="sidebar-text">تقارير المشتريات</span>
                             </a>
+                            <a href="{{ route('purchases.settings.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-yellow-50 hover:to-transparent text-gray-600 hover:text-yellow-600 text-sm transition-all duration-200">
+                                <i class="fas fa-cog text-lg"></i>
+                                <span class="sidebar-text">إعدادات المشتريات</span>
+                            </a>
                         </div>
                     </div>
                     
