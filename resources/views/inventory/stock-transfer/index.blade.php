@@ -496,7 +496,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($stockTransfers as $stockIn)
+                        @forelse ($stockTransfers as $transfer)
                             <tr>
                                 <td class="text-center">
                                     <span style="font-weight: 700; color: #11998e; font-size: 1.1rem;">
@@ -504,7 +504,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="order-number">{{ $stockIn->movement_number }}</span>
+                                    <span class="order-number">{{ $transfer->movement_number }}</span>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -512,29 +512,29 @@
                                             <i class="fas fa-warehouse"></i>
                                         </div>
                                         <div style="font-weight: 600; color: #1e293b;">
-                                            {{ $stockIn->warehouse->name ?? 'غير محدد' }}
+                                            {{ $transfer->warehouse->name ?? 'غير محدد' }}
                                         </div>
                                     </div>
                                 </td>
                                 <td>
                                     <div style="font-weight: 600; color: #1e293b;">
-                                        {{ $stockIn->movement_date->format('Y-m-d') }}
+                                        {{ $transfer->movement_date->format('Y-m-d') }}
                                     </div>
                                     <div style="font-size: 0.85rem; color: #94a3b8;">
-                                        {{ $stockIn->created_at->diffForHumans() }}
+                                        {{ $transfer->created_at->diffForHumans() }}
                                     </div>
                                 </td>
                                 <td class="text-center">
                                     <span class="badge-modern" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                        {{ $stockIn->items->count() }} صنف
+                                        {{ $transfer->items->count() }} صنف
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    @if ($stockIn->status == 'pending')
+                                    @if ($transfer->status == 'pending')
                                         <span class="badge-modern badge-pending">
                                             <i class="fas fa-clock ml-1"></i> قيد الانتظار
                                         </span>
-                                    @elseif ($stockIn->status == 'approved')
+                                    @elseif ($transfer->status == 'approved')
                                         <span class="badge-modern badge-approved">
                                             <i class="fas fa-check-circle ml-1"></i> معتمد
                                         </span>
@@ -547,23 +547,23 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div style="width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; margin-left: 10px; font-size: 0.85rem;">
-                                            {{ substr($stockIn->creator->name ?? 'غ', 0, 1) }}
+                                            {{ substr($transfer->creator->name ?? 'غ', 0, 1) }}
                                         </div>
                                         <span style="font-weight: 600; color: #1e293b;">
-                                            {{ $stockIn->creator->name ?? 'غير محدد' }}
+                                            {{ $transfer->creator->name ?? 'غير محدد' }}
                                         </span>
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('inventory.stock-transfer.show', $stockIn->id) }}" 
+                                    <a href="{{ route('inventory.stock-transfer.show', $transfer->id) }}" 
                                        class="btn-action btn-view" 
                                        data-toggle="tooltip" 
                                        title="عرض التفاصيل">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     
-                                    @if($stockIn->status == 'pending')
-                                        <form action="{{ route('inventory.stock-transfer.approve', $stockIn->id) }}" 
+                                    @if($transfer->status == 'pending')
+                                        <form action="{{ route('inventory.stock-transfer.approve', $transfer->id) }}" 
                                               method="POST" 
                                               class="d-inline">
                                             @csrf
@@ -580,12 +580,12 @@
                                                 class="btn-action btn-delete" 
                                                 data-toggle="tooltip" 
                                                 title="حذف"
-                                                onclick="confirmDelete({{ $stockIn->id }}, '{{ $stockIn->movement_number }}')">
+                                                onclick="confirmDelete({{ $transfer->id }}, '{{ $transfer->movement_number }}')">
                                             <i class="fas fa-trash"></i>
                                         </button>
 
-                                        <form id="delete-form-{{ $stockIn->id }}" 
-                                              action="{{ route('inventory.stock-transfer.destroy', $stockIn->id) }}" 
+                                        <form id="delete-form-{{ $transfer->id }}" 
+                                              action="{{ route('inventory.stock-transfer.destroy', $transfer->id) }}" 
                                               method="POST" 
                                               class="d-none">
                                             @csrf
