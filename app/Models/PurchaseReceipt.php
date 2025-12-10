@@ -47,6 +47,7 @@ class PurchaseReceipt extends Model
     protected $fillable = [
         'receipt_number',
         'purchase_order_id',
+        'purchase_invoice_id',
         'supplier_id',
         'warehouse_id',
         'receipt_date',
@@ -80,6 +81,17 @@ class PurchaseReceipt extends Model
     public function purchaseOrder(): BelongsTo
     {
         return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id');
+    }
+
+    /**
+     * Get the purchase invoice associated with the receipt.
+     * فاتورة الشراء المرتبطة بالاستلام
+     *
+     * @return BelongsTo
+     */
+    public function purchaseInvoice(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseInvoice::class, 'purchase_invoice_id');
     }
 
     /**

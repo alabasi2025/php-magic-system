@@ -41,6 +41,7 @@ Route::prefix('purchases')->name('purchases.')->group(function () {
     
     // Purchase Receipts Management
     // إدارة استلام البضاعة
+    Route::get('receipts/get-invoices-by-warehouse', [PurchaseReceiptController::class, 'getInvoicesByWarehouse'])->name('receipts.get-invoices-by-warehouse');
     Route::resource('receipts', PurchaseReceiptController::class);
     Route::patch('receipts/{receipt}/approve', [PurchaseReceiptController::class, 'approve'])->name('receipts.approve');
     Route::patch('receipts/{receipt}/reject', [PurchaseReceiptController::class, 'reject'])->name('receipts.reject');

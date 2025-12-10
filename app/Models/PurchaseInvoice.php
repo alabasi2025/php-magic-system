@@ -131,6 +131,17 @@ class PurchaseInvoice extends Model
     }
 
     /**
+     * Get all receipts for this invoice.
+     * جميع استلامات البضاعة لهذه الفاتورة
+     *
+     * @return HasMany
+     */
+    public function receipts(): HasMany
+    {
+        return $this->hasMany(PurchaseReceipt::class, 'purchase_invoice_id');
+    }
+
+    /**
      * Get the supplier associated with the invoice.
      * المورد المرتبط بالفاتورة
      *
