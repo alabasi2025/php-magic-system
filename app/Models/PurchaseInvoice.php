@@ -517,8 +517,22 @@ class PurchaseInvoice extends Model
      */
     protected static function generateInternalNumber()
     {
-        $lastInvoice = self::orderBy('id', 'desc')->first();
-        $nextNumber = $lastInvoice ? ($lastInvoice->id + 1) : 1;
-        return 'PI-' . date('Y') . '-' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+        $year = date('Y');
+        $prefix = 'PI-' . $year . '-';
+        
+        // البحث عن آخر رقم داخلي في نفس السنة
+        $lastInvoice = self::where('internal_number', 'LIKE', $prefix . '%')
+            ->orderBy('internal_number', 'desc')
+            ->first();
+        
+        if ($lastInvoice) {
+            // استخراج الرقم من آخر internal_number
+            $lastNumber = (int) substr($lastInvoice->internal_number, -6);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+        
+        return $prefix . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
     }
 }

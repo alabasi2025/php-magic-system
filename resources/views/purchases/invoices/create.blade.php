@@ -665,6 +665,31 @@
         </div>
     </div>
 </div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: #1e293b; border: 2px solid #ef4444; border-radius: 15px;">
+            <div class="modal-header" style="border-bottom: 1px solid #374151;">
+                <h5 class="modal-title" id="errorModalLabel" style="color: #ef4444;">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    حدث خطأ
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="color: #e5e7eb;">
+                <div id="errorContent" style="background: #0f172a; padding: 15px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word; max-height: 400px; overflow-y: auto;"></div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #374151;">
+                <button type="button" class="btn" style="background: #3b82f6; color: white;" onclick="copyErrorToClipboard()">
+                    <i class="fas fa-copy me-2"></i>
+                    نسخ الخطأ
+                </button>
+                <button type="button" class="btn" style="background: #6b7280; color: white;" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -866,7 +891,7 @@
                 errorMessage += '\nخطأ غير معروف. يرجى المحاولة مرة أخرى.';
             }
             
-            alert(errorMessage);
+            showErrorModal(errorMessage);
         });
     });
 
@@ -875,5 +900,22 @@
         attachEventListeners();
         calculateTotals();
     });
+    
+    // عرض رسالة الخطأ في modal
+    function showErrorModal(message) {
+        document.getElementById('errorContent').textContent = message;
+        const modal = new bootstrap.Modal(document.getElementById('errorModal'));
+        modal.show();
+    }
+    
+    // نسخ رسالة الخطأ
+    function copyErrorToClipboard() {
+        const errorText = document.getElementById('errorContent').textContent;
+        navigator.clipboard.writeText(errorText).then(function() {
+            alert('تم نسخ رسالة الخطأ إلى الحافظة');
+        }, function() {
+            alert('فشل نسخ رسالة الخطأ');
+        });
+    }
 </script>
 @endpush
