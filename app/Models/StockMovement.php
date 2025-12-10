@@ -139,6 +139,14 @@ class StockMovement extends Model
     }
 
     /**
+     * Get the items for this movement.
+     */
+    public function items()
+    {
+        return $this->hasMany(StockMovementItem::class);
+    }
+
+    /**
      * Scope to get pending movements.
      */
     public function scopePending($query)

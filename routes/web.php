@@ -1131,3 +1131,26 @@ Route::get('/debug/delete-all-invoices', function () {
         ], 500);
     }
 });
+
+// ============================================================================
+// Inventory Stock Movements Routes (أوامر المخزون)
+// ============================================================================
+
+use App\Http\Controllers\Inventory\StockInController;
+use App\Http\Controllers\Inventory\StockOutController;
+use App\Http\Controllers\Inventory\StockTransferController;
+
+Route::prefix('inventory')->name('inventory.')->group(function () {
+    
+    // Stock In (أوامر التوريد)
+    Route::resource('stock-in', StockInController::class);
+    Route::post('stock-in/{stockIn}/approve', [StockInController::class, 'approve'])->name('stock-in.approve');
+    
+    // Stock Out (أوامر الصرف)
+    Route::resource('stock-out', StockOutController::class);
+    Route::post('stock-out/{stockOut}/approve', [StockOutController::class, 'approve'])->name('stock-out.approve');
+    
+    // Stock Transfer (أوامر التحويل)
+    Route::resource('stock-transfer', StockTransferController::class);
+    Route::post('stock-transfer/{transfer}/approve', [StockTransferController::class, 'approve'])->name('stock-transfer.approve');
+});
