@@ -11,7 +11,7 @@ class DepartmentController extends Controller
     public function index()
     {
         try {
-            $departments = Department::with(['unit', 'organization'])
+            $departments = Department::with(['unit', 'manager'])
                 ->orderBy('created_at', 'desc')
                 ->get();
             return view('organization.departments.index', compact('departments'));
@@ -34,7 +34,6 @@ class DepartmentController extends Controller
                 'name' => 'required|string|max:255',
                 'name_en' => 'nullable|string|max:255',
                 'unit_id' => 'nullable|exists:units,id',
-                'organization_id' => 'nullable|exists:organizations,id',
                 'description' => 'nullable|string',
                 'is_active' => 'boolean',
             ]);
@@ -53,7 +52,7 @@ class DepartmentController extends Controller
     public function show($id)
     {
         try {
-            $department = Department::with(['unit', 'organization'])->findOrFail($id);
+            $department = Department::with(['unit', 'manager'])->findOrFail($id);
             return view('organization.departments.show', compact('department'));
         } catch (\Exception $e) {
             Log::error("DepartmentController@show: " . $e->getMessage());
@@ -82,7 +81,6 @@ class DepartmentController extends Controller
                 'name' => 'required|string|max:255',
                 'name_en' => 'nullable|string|max:255',
                 'unit_id' => 'nullable|exists:units,id',
-                'organization_id' => 'nullable|exists:organizations,id',
                 'description' => 'nullable|string',
                 'is_active' => 'boolean',
             ]);
