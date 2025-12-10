@@ -208,14 +208,6 @@ class PurchaseInvoiceController extends Controller
     {
         $invoice = PurchaseInvoice::findOrFail($id);
 
-        // التحقق من إمكانية تعديل الفاتورة
-        $editCheck = $invoice->canBeEdited();
-        if (!$editCheck['can_edit']) {
-            return redirect()
-                ->route('purchases.invoices.show', $id)
-                ->with('error', $editCheck['reason']);
-        }
-
         $validated = $request->validate([
             'invoice_number' => 'required|string|max:255',
             'supplier_id' => 'required|exists:suppliers,id',
