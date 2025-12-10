@@ -89,7 +89,7 @@
                                     <td>{{ $department->name }}</td>
                                     <td>{{ $department->type }}</td>
                                     <td>{{ $department->manager->name ?? 'غير محدد' }}</td>
-                                    <td>{{ number_format($department->budget, 2) }}</td>
+                                    <td>{{ $department->budget ? number_format($department->budget, 2) : 'غير محدد' }}</td>
                                     <td>{{ $department->unit->name ?? 'غير محدد' }}</td>
                                     <td>
                                         @if ($department->is_active)
