@@ -27,6 +27,40 @@ Route::get('/test-items-simple', function () {
     }
 });
 
+// Test route to simulate item creation
+Route::get('/test-create-item', function () {
+    try {
+        $data = [
+            'sku' => 'TEST-' . time(),
+            'name' => 'Test Item',
+            'description' => null,
+            'unit_id' => 1,
+            'unit_price' => 5.5,
+            'min_stock' => 100,
+            'max_stock' => 10000,
+            'barcode' => null,
+            'image_path' => null,
+            'status' => 'active'
+        ];
+        
+        $item = \App\Models\Item::create($data);
+        
+        return response()->json([
+            'success' => true,
+            'item' => $item,
+            'message' => 'Item created successfully'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+            'trace' => explode("\n", $e->getTraceAsString())
+        ], 500);
+    }
+});
+
 // System Setup Routes (temporary - remove in production)
 // Note: These routes bypass CSRF protection for easier setup
 Route::get('/system-setup', [\App\Http\Controllers\SystemSetupController::class, 'index'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
