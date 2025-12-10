@@ -395,7 +395,7 @@ class PurchaseInvoice extends Model
                 'total_amount' => 0,
                 'paid_amount' => 0,
                 'remaining_amount' => 0,
-                'created_by' => auth()->id() ?? \App\Models\User::first()->id,
+                'created_by' => auth()->id() ?? (\App\Models\User::first()?->id ?? 1),
             ]);
 
             // إضافة العناصر
