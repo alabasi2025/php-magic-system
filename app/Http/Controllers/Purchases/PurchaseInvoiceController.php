@@ -77,7 +77,7 @@ class PurchaseInvoiceController extends Controller
     {
         try {
             $validated = $request->validate([
-                'invoice_number' => 'required|string|max:255',
+                'invoice_number' => 'nullable|string|max:255',
                 'supplier_id' => 'required|exists:suppliers,id',
                 'warehouse_id' => 'required|exists:warehouses,id',
                 'invoice_date' => 'required|date',

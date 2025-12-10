@@ -400,15 +400,14 @@
                                 <label for="invoice_number" class="luxury-label">
                                     <i class="fas fa-hashtag"></i>
                                     رقم الفاتورة
-                                    <span class="required-star">*</span>
+                                    <span class="text-muted" style="font-size: 0.85em;">(تلقائي)</span>
                                 </label>
                                 <input type="text" 
                                        class="form-control luxury-input @error('invoice_number') is-invalid @enderror" 
                                        id="invoice_number" 
                                        name="invoice_number" 
                                        value="{{ old('invoice_number') }}" 
-                                       placeholder="مثال: INV-2025-001"
-                                       required>
+                                       placeholder="سيتم توليده تلقائياً إذا ترك فارغاً">
                                 @error('invoice_number')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

@@ -377,26 +377,51 @@ class PurchaseInvoice extends Model
         \DB::beginTransaction();
         
         try {
-            // إنشاء الفاتورة
-            $invoice = self::create([
-                'invoice_number' => $request->invoice_number,
-                'internal_number' => self::generateInternalNumber(),
-                'supplier_id' => $request->supplier_id,
-                'warehouse_id' => $request->warehouse_id,
-                'invoice_date' => $request->invoice_date,
-                'due_date' => $request->due_date,
-                'payment_method' => $request->payment_method,
-                'status' => $request->status ?? 'draft',
-                'payment_status' => 'unpaid',
-                'notes' => $request->notes,
-                'subtotal' => 0,
-                'tax_amount' => 0,
-                'discount_amount' => $request->discount_amount ?? 0,
-                'total_amount' => 0,
-                'paid_amount' => 0,
-                'remaining_amount' => 0,
-                'created_by' => auth()->id() ?? \App\Models\User::first()->id,
-            ]);
+            // محاولة إنشاء الفاتورة مع إعادة المحاولة في حالة التكرار
+            $maxRetries = 5;
+            $invoice = null;
+            
+            for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+                try {
+                    $invoice = self::create([
+                        'invoice_number' => self::generateInvoiceNumber(),
+                        'internal_number' => self::generateInternalNumber(),
+                        'supplier_id' => $request->supplier_id,
+                        'warehouse_id' => $request->warehouse_id,
+                        'invoice_date' => $request->invoice_date,
+                        'due_date' => $request->due_date,
+                        'payment_method' => $request->payment_method,
+                        'status' => $request->status ?? 'draft',
+                        'payment_status' => 'unpaid',
+                        'notes' => $request->notes,
+                        'subtotal' => 0,
+                        'tax_amount' => 0,
+                        'discount_amount' => $request->discount_amount ?? 0,
+                        'total_amount' => 0,
+                        'paid_amount' => 0,
+                        'remaining_amount' => 0,
+                        'created_by' => auth()->id() ?? \App\Models\User::first()->id,
+                    ]);
+                    
+                    // نجحت العملية
+                    break;
+                    
+                } catch (\Illuminate\Database\QueryException $e) {
+                    // في حالة خطأ التكرار
+                    if ($e->getCode() == 23000 && $attempt < $maxRetries) {
+                        // إعادة المحاولة
+                        usleep(100000); // انتظار 100ms
+                        continue;
+                    }
+                    
+                    // إذا فشلت جميع المحاولات
+                    throw $e;
+                }
+            }
+            
+            if (!$invoice) {
+                throw new \Exception('فشل إنشاء الفاتورة بعد ' . $maxRetries . ' محاولات');
+            }
 
             // إضافة العناصر
             if ($request->has('items') && !empty($request->items)) {
@@ -523,6 +548,7 @@ class PurchaseInvoice extends Model
         // البحث عن آخر رقم داخلي في نفس السنة
         $lastInvoice = self::where('internal_number', 'LIKE', $prefix . '%')
             ->orderBy('internal_number', 'desc')
+            ->lockForUpdate()
             ->first();
         
         if ($lastInvoice) {
@@ -534,5 +560,34 @@ class PurchaseInvoice extends Model
         }
         
         return $prefix . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+    }
+    
+    /**
+     * Generate invoice number.
+     * توليد رقم الفاتورة
+     *
+     * @return string
+     */
+    protected static function generateInvoiceNumber()
+    {
+        $year = date('Y');
+        $month = date('m');
+        $prefix = 'INV-' . $year . $month . '-';
+        
+        // البحث عن آخر رقم فاتورة في نفس الشهر
+        $lastInvoice = self::where('invoice_number', 'LIKE', $prefix . '%')
+            ->orderBy('invoice_number', 'desc')
+            ->lockForUpdate()
+            ->first();
+        
+        if ($lastInvoice) {
+            // استخراج الرقم من آخر invoice_number
+            $lastNumber = (int) substr($lastInvoice->invoice_number, -4);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+        
+        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 }
