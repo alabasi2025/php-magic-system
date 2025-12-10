@@ -507,7 +507,7 @@
                                     <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>نقداً</option>
                                     <option value="credit" {{ old('payment_method') == 'credit' ? 'selected' : '' }}>آجل</option>
                                     <option value="bank_transfer" {{ old('payment_method') == 'bank_transfer' ? 'selected' : '' }}>تحويل بنكي</option>
-                                    <option value="cheque" {{ old('payment_method') == 'cheque' ? 'selected' : '' }}>شيك</option>
+                                    <option value="check" {{ old('payment_method') == 'check' ? 'selected' : '' }}>شيك</option>
                                 </select>
                                 @error('payment_method')
                                     <div class="invalid-feedback">{{ $message }}</div>
