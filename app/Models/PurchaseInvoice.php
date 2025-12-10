@@ -577,7 +577,27 @@ class PurchaseInvoice extends Model
             $nextNumber = 1;
         }
         
-        return $prefix . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+        // التحقق من عدم وجود الرقم (في حالة وجود فجوات)
+        $maxAttempts = 100; // حد أقصى للمحاولات لتجنب حلقة لا نهائية
+        $attempts = 0;
+        
+        while ($attempts < $maxAttempts) {
+            $internalNumber = $prefix . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+            
+            // التحقق من عدم وجود هذا الرقم
+            $exists = self::where('internal_number', $internalNumber)->exists();
+            
+            if (!$exists) {
+                return $internalNumber;
+            }
+            
+            // إذا كان موجوداً، جرب الرقم التالي
+            $nextNumber++;
+            $attempts++;
+        }
+        
+        // في حالة فشل جميع المحاولات (نادر جداً)
+        throw new \Exception('فشل في توليد رقم داخلي فريد بعد ' . $maxAttempts . ' محاولة');
     }
     
     /**
@@ -606,6 +626,26 @@ class PurchaseInvoice extends Model
             $nextNumber = 1;
         }
         
-        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        // التحقق من عدم وجود الرقم (في حالة وجود فجوات)
+        $maxAttempts = 100;
+        $attempts = 0;
+        
+        while ($attempts < $maxAttempts) {
+            $invoiceNumber = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            
+            // التحقق من عدم وجود هذا الرقم
+            $exists = self::where('invoice_number', $invoiceNumber)->exists();
+            
+            if (!$exists) {
+                return $invoiceNumber;
+            }
+            
+            // إذا كان موجوداً، جرب الرقم التالي
+            $nextNumber++;
+            $attempts++;
+        }
+        
+        // في حالة فشل جميع المحاولات
+        throw new \Exception('فشل في توليد رقم فاتورة فريد بعد ' . $maxAttempts . ' محاولة');
     }
 }

@@ -66,12 +66,46 @@ class PurchaseInvoiceType extends Model
     {
         $year = date('Y');
         $month = date('m');
+        $prefix = "{$this->prefix}-{$year}{$month}-";
         
-        // زيادة آخر رقم
-        $this->increment('last_number');
-        $this->refresh();
+        // البحث عن آخر رقم فاتورة لهذا النوع في هذا الشهر
+        $lastInvoice = PurchaseInvoice::where('invoice_type_id', $this->id)
+            ->where('invoice_number', 'LIKE', $prefix . '%')
+            ->orderBy('invoice_number', 'desc')
+            ->lockForUpdate()
+            ->first();
         
-        return "{$this->prefix}-{$year}{$month}-" . str_pad($this->last_number, 4, '0', STR_PAD_LEFT);
+        if ($lastInvoice) {
+            // استخراج الرقم من آخر invoice_number
+            $lastNumber = (int) substr($lastInvoice->invoice_number, -4);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+        
+        // التحقق من عدم وجود الرقم (في حالة وجود فجوات)
+        $maxAttempts = 100;
+        $attempts = 0;
+        
+        while ($attempts < $maxAttempts) {
+            $invoiceNumber = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            
+            // التحقق من عدم وجود هذا الرقم
+            $exists = PurchaseInvoice::where('invoice_number', $invoiceNumber)->exists();
+            
+            if (!$exists) {
+                // تحديث last_number في جدول الأنواع
+                $this->update(['last_number' => $nextNumber]);
+                return $invoiceNumber;
+            }
+            
+            // إذا كان موجوداً، جرب الرقم التالي
+            $nextNumber++;
+            $attempts++;
+        }
+        
+        // في حالة فشل جميع المحاولات
+        throw new \Exception('فشل في توليد رقم فاتورة فريد لنوع ' . $this->name . ' بعد ' . $maxAttempts . ' محاولة');
     }
 
     /**
