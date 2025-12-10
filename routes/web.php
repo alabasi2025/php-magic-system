@@ -1094,3 +1094,24 @@ Route::get('/delete-all-purchase-invoices', function () {
 Route::get('/auto-create-invoice', function () {
     return view('purchases.invoices.auto-create');
 });
+
+
+// Debug: Delete all invoices
+Route::get('/debug/delete-all-invoices', function () {
+    try {
+        $count = \App\Models\PurchaseInvoice::count();
+        \App\Models\PurchaseInvoice::query()->forceDelete();
+        \App\Models\PurchaseInvoiceType::query()->update(['last_number' => 0]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => "تم حذف {$count} فاتورة بنجاح. يمكنك الآن إنشاء فاتورة جديدة.",
+            'deleted_count' => $count
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'خطأ: ' . $e->getMessage()
+        ], 500);
+    }
+});
