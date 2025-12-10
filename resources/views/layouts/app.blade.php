@@ -291,7 +291,7 @@
                             
                             <a href="{{ route('bank-accounts.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent text-gray-600 hover:text-blue-600 text-sm transition-all duration-200">
                                 <i class="fas fa-university text-lg icon-gradient-blue"></i>
-                                <span class="sidebar-text">الحسابات البنكية</span>
+                                <span class="sidebar-text">البنوك</span>
                             </a>
                             
                             <a href="{{ route('cash-receipts.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent text-gray-600 hover:text-green-600 text-sm transition-all duration-200">
@@ -306,7 +306,7 @@
                             
                             <a href="{{ route('cash-boxes.index') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent text-gray-600 hover:text-purple-600 text-sm transition-all duration-200">
                                 <i class="fas fa-cash-register text-lg icon-gradient-purple"></i>
-                                <span class="sidebar-text">الصناديق النقدية</span>
+                                <span class="sidebar-text">الصناديق</span>
                             </a>
                         </div>
                     </div>
