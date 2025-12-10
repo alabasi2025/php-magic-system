@@ -13,10 +13,23 @@
                         فاتورة مشتريات #{{ $invoice->invoice_number ?? '' }}
                     </h4>
                     <div>
-                        <a href="{{ route('purchases.invoices.edit', $invoice->id ?? 0) }}" class="btn btn-warning btn-sm me-2">
-                            <i class="fas fa-edit me-1"></i>
-                            تعديل
-                        </a>
+                        @php
+                            $editCheck = $invoice->canBeEdited();
+                        @endphp
+                        @if($editCheck['can_edit'])
+                            <a href="{{ route('purchases.invoices.edit', $invoice->id ?? 0) }}" class="btn btn-warning btn-sm me-2">
+                                <i class="fas fa-edit me-1"></i>
+                                تعديل
+                                @if(isset($editCheck['requires_unapproval']) && $editCheck['requires_unapproval'])
+                                    <small class="d-block" style="font-size: 0.7em;">(يتطلب إلغاء الاعتماد)</small>
+                                @endif
+                            </a>
+                        @else
+                            <button class="btn btn-secondary btn-sm me-2" disabled title="{{ $editCheck['reason'] }}">
+                                <i class="fas fa-lock me-1"></i>
+                                لا يمكن التعديل
+                            </button>
+                        @endif
                         <button type="button" class="btn btn-light btn-sm me-2" onclick="window.print()">
                             <i class="fas fa-print me-1"></i>
                             طباعة
@@ -299,10 +312,17 @@
                         </div>
                         <div>
                             @if(($invoice->status ?? '') !== 'cancelled')
-                                <a href="{{ route('purchases.invoices.edit', $invoice->id ?? 0) }}" class="btn btn-warning">
-                                    <i class="fas fa-edit me-1"></i>
-                                    تعديل الفاتورة
-                                </a>
+                                @if($editCheck['can_edit'])
+                                    <a href="{{ route('purchases.invoices.edit', $invoice->id ?? 0) }}" class="btn btn-warning">
+                                        <i class="fas fa-edit me-1"></i>
+                                        تعديل الفاتورة
+                                    </a>
+                                @else
+                                    <button class="btn btn-secondary" disabled title="{{ $editCheck['reason'] }}">
+                                        <i class="fas fa-lock me-1"></i>
+                                        لا يمكن التعديل
+                                    </button>
+                                @endif
                             @endif
                             <button type="button" class="btn btn-danger" onclick="confirmDelete()">
                                 <i class="fas fa-trash me-1"></i>
