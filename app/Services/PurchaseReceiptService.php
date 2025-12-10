@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\PurchaseReceipt;
 use App\Models\PurchaseReceiptItem;
 use App\Models\StockMovement;
+use App\Models\ItemWarehouse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Exception;
@@ -178,10 +179,38 @@ class PurchaseReceiptService
                     'notes' => 'استلام بضاعة - ' . $receipt->receipt_number,
                     'created_by' => $receipt->created_by,
                 ]);
+                
+                // Update item warehouse inventory
+                $this->updateInventory(
+                    $item->item_id,
+                    $receipt->warehouse_id,
+                    $item->quantity,
+                    $item->unit_price
+                );
             }
         } catch (Exception $e) {
             throw new Exception('فشل إنشاء حركات المخزون: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * تحديث رصيد المخزون
+     * Update inventory balance
+     *
+     * @param int $itemId
+     * @param int $warehouseId
+     * @param float $quantity
+     * @param float $cost
+     * @return void
+     */
+    protected function updateInventory(int $itemId, int $warehouseId, float $quantity, float $cost): void
+    {
+        $inventory = ItemWarehouse::firstOrNew([
+            'item_id' => $itemId,
+            'warehouse_id' => $warehouseId,
+        ]);
+        
+        $inventory->addQuantity($quantity, $cost);
     }
 
     /**
