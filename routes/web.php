@@ -907,6 +907,42 @@ Route::get('/cleanup-test-items', function () {
 });
 
 
+// تشغيل migration و seeder لأنواع الفواتير
+Route::get('/run-purchase-invoice-types-setup', function () {
+    try {
+        // تشغيل Migration
+        \Artisan::call('migrate', [
+            '--path' => 'database/migrations/2025_12_10_144000_create_purchase_invoice_types_table.php',
+            '--force' => true
+        ]);
+        
+        $migrationOutput = \Artisan::output();
+        
+        // تشغيل Seeder
+        \Artisan::call('db:seed', [
+            '--class' => 'Database\\Seeders\\PurchaseInvoiceTypeSeeder',
+            '--force' => true
+        ]);
+        
+        $seederOutput = \Artisan::output();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تشغيل Migration و Seeder بنجاح!',
+            'migration_output' => $migrationOutput,
+            'seeder_output' => $seederOutput,
+            'types_count' => \App\Models\PurchaseInvoiceType::count()
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'حدث خطأ: ' . $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // حذف الفواتير المكررة
 Route::get('/delete-duplicate-invoices', function () {
     try {
