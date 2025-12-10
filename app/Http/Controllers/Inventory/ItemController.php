@@ -24,7 +24,7 @@ class ItemController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Item::with(['unit', 'unitConversions.unit']);
+        $query = Item::with('unit');
 
         // Filter by status
         if ($request->filled('status')) {
