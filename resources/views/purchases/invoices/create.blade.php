@@ -886,7 +886,7 @@
         // عرض الأخطاء إن وجدت
         if (errors.length > 0) {
             console.log('أخطاء في النموذج:', errors);
-            showErrorModal('يرجى تصحيح الأخطاء التالية:\n\n' + errors.join('\n'));
+            alert('يرجى تصحيح الأخطاء التالية:\n\n' + errors.join('\n'));
             return false;
         }
         
@@ -948,7 +948,7 @@
                 errorMessage += '\nخطأ غير معروف. يرجى المحاولة مرة أخرى.';
             }
             
-            showErrorModal(errorMessage);
+            alert(errorMessage);
         });
     });
 
@@ -958,27 +958,6 @@
         calculateTotals();
     });
     
-    // عرض رسالة الخطأ في modal
-    function showErrorModal(message) {
-        document.getElementById('errorContent').textContent = message;
-        document.getElementById('errorModal').classList.remove('hidden');
-        document.getElementById('errorModal').classList.add('flex');
-    }
-    
-    // إغلاق modal
-    function closeErrorModal() {
-        document.getElementById('errorModal').classList.add('hidden');
-        document.getElementById('errorModal').classList.remove('flex');
-    }
-    
-    // نسخ رسالة الخطأ
-    function copyErrorToClipboard() {
-        const errorText = document.getElementById('errorContent').textContent;
-        navigator.clipboard.writeText(errorText).then(function() {
-            alert('تم نسخ رسالة الخطأ إلى الحافظة');
-        }, function() {
-            alert('فشل نسخ رسالة الخطأ');
-        });
-    }
+
 </script>
 @endpush
