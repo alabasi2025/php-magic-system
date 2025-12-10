@@ -196,7 +196,7 @@
                                                 </td>
                                                 <td>
                                                     <input type="number" class="form-control form-control-sm item-price" 
-                                                           name="items[0][price]" min="0" step="0.01" value="0" required>
+                                                           name="items[0][unit_price]" min="0" step="0.01" value="0" required>
                                                 </td>
                                                 <td>
                                                     <input type="number" class="form-control form-control-sm item-discount" 
