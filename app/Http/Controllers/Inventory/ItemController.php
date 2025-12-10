@@ -71,9 +71,6 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        \Log::info('Item Store Request', $request->all());
-        
-        // Validation
         $validated = $request->validate([
             'sku' => 'required|string|max:100|unique:items,sku',
             'name' => 'required|string|max:200',
@@ -87,49 +84,16 @@ class ItemController extends Controller
             'unit_price' => 'required|numeric|min:0',
         ]);
 
-        try {
-            DB::beginTransaction();
-
-            // Create item with simplified data
-            $itemData = [
-                'sku' => $validated['sku'],
-                'name' => $validated['name'],
-                'description' => $validated['description'] ?? null,
-                'unit_id' => $validated['unit_id'],
-                'min_stock' => $validated['min_stock'],
-                'max_stock' => $validated['max_stock'],
-                'unit_price' => $validated['unit_price'],
-                'barcode' => $validated['barcode'] ?? null,
-                'status' => $validated['status'],
-            ];
-
-            // Handle image upload
-            if ($request->hasFile('image')) {
-                $itemData['image_path'] = $request->file('image')->store('items', 'public');
-            }
-
-            \Log::info('Item Data Before Create', $itemData);
-            $item = Item::create($itemData);
-            \Log::info('Item created successfully', ['item_id' => $item->id, 'sku' => $item->sku]);
-
-            DB::commit();
-
-            return redirect()
-                ->route('inventory.items.index')
-                ->with('success', 'تم إنشاء الصنف بنجاح');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Item Store Error', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            return redirect()
-                ->back()
-                ->withInput()
-                ->with('error', 'حدث خطأ أثناء حفظ الصنف: ' . $e->getMessage());
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $validated['image_path'] = $request->file('image')->store('items', 'public');
         }
+
+        $item = Item::create($validated);
+
+        return redirect()
+            ->route('inventory.items.index')
+            ->with('success', 'تم إنشاء الصنف بنجاح');
     }
 
     /**
