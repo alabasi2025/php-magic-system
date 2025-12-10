@@ -31,8 +31,8 @@ Route::get('/test-items-simple', function () {
 Route::get('/test-create-item', function () {
     try {
         $data = [
-            'sku' => 'TEST-' . time(),
-            'name' => 'Test Item',
+            'sku' => 'DIESEL-001',
+            'name' => 'ديزل',
             'description' => null,
             'unit_id' => 1,
             'unit_price' => 5.5,
