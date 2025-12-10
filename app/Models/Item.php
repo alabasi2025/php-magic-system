@@ -39,17 +39,12 @@ class Item extends Model
         'sku',
         'name',
         'description',
-        'category_id',
         'unit_id',
         'min_stock',
         'max_stock',
-        'reorder_level',
-        'cost_price',
-        'selling_price',
-        'unit_price', // Keep for backward compatibility
+        'unit_price',
         'barcode',
-        'image',
-        'image_path', // Keep for backward compatibility
+        'image_path',
         'status'
     ];
 
