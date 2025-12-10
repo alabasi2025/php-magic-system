@@ -852,7 +852,8 @@
         });
         
         if (!hasValidItem) {
-            alert('يرجى إضافة صنف واحد على الأقل للفاتورة');
+            console.log('لا يوجد صنف صحيح');
+            showErrorModal('يرجى إضافة صنف واحد على الأقل للفاتورة');
             return false;
         }
         
@@ -892,6 +893,8 @@
             }
         })
         .catch(error => {
+            console.log('خطأ في حفظ الفاتورة:', error);
+            
             // إعادة تفعيل الزر
             submitBtn.disabled = false;
             submitBtnText.classList.remove('d-none');
