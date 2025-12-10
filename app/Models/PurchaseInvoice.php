@@ -59,6 +59,8 @@ class PurchaseInvoice extends Model
         'purchase_order_id',
         'purchase_receipt_id',
         'supplier_id',
+        'warehouse_id',
+        'payment_method',
         'invoice_date',
         'due_date',
         'subtotal',

@@ -117,6 +117,7 @@ class PurchaseInvoiceController extends Controller
                 'internal_number' => $internalNumber,
                 'supplier_id' => $validated['supplier_id'],
                 'warehouse_id' => $validated['warehouse_id'],
+                'payment_method' => $validated['payment_method'],
                 'invoice_date' => $validated['invoice_date'],
                 'due_date' => $validated['due_date'],
                 'subtotal' => $subtotal,
@@ -277,6 +278,8 @@ class PurchaseInvoiceController extends Controller
             $invoice->update([
                 'invoice_number' => $validated['invoice_number'],
                 'supplier_id' => $validated['supplier_id'],
+                'warehouse_id' => $validated['warehouse_id'],
+                'payment_method' => $validated['payment_method'],
                 'invoice_date' => $validated['invoice_date'],
                 'due_date' => $validated['due_date'],
                 'subtotal' => $subtotal,
