@@ -44,6 +44,54 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @forelse($invoices as $invoice)
+                                <tr>
+                                    <td>
+                                        <a href="{{ route('purchases.invoices.show', $invoice->id) }}" class="text-primary">
+                                            {{ $invoice->invoice_number }}
+                                        </a>
+                                    </td>
+                                    <td>{{ $invoice->invoice_date }}</td>
+                                    <td>{{ $invoice->supplier ? $invoice->supplier->name : 'غير محدد' }}</td>
+                                    <td>{{ number_format($invoice->total_amount, 2) }} ريال</td>
+                                    <td>{{ number_format($invoice->paid_amount, 2) }} ريال</td>
+                                    <td>{{ number_format($invoice->remaining_amount, 2) }} ريال</td>
+                                    <td>
+                                        @if($invoice->status == 'draft')
+                                            <span class="badge bg-secondary">مسودة</span>
+                                        @elseif($invoice->status == 'pending')
+                                            <span class="badge bg-warning">قيد المراجعة</span>
+                                        @elseif($invoice->status == 'approved')
+                                            <span class="badge bg-success">معتمدة</span>
+                                        @elseif($invoice->status == 'rejected')
+                                            <span class="badge bg-danger">مرفوضة</span>
+                                        @else
+                                            <span class="badge bg-secondary">{{ $invoice->status }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ route('purchases.invoices.show', $invoice->id) }}" 
+                                               class="btn btn-sm btn-info" title="عرض">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ route('purchases.invoices.edit', $invoice->id) }}" 
+                                               class="btn btn-sm btn-primary" title="تعديل">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ route('purchases.invoices.destroy', $invoice->id) }}" 
+                                                  method="POST" class="d-inline"
+                                                  onsubmit="return confirm('هل أنت متأكد من حذف هذه الفاتورة؟')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" title="حذف">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
                                 <tr>
                                     <td colspan="8" class="text-center text-muted">
                                         <i class="fas fa-file-invoice fa-3x mb-3"></i>
@@ -53,9 +101,16 @@
                                         </a>
                                     </td>
                                 </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+
+                    @if($invoices->hasPages())
+                    <div class="mt-3">
+                        {{ $invoices->links() }}
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
