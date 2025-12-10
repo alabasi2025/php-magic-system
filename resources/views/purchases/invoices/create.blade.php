@@ -337,6 +337,10 @@
         color: #ffffff;
         transform: translateX(5px);
     }
+    
+    .d-none {
+        display: none !important;
+    }
 </style>
 @endpush
 
