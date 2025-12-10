@@ -49,7 +49,12 @@ class PurchaseInvoiceController extends Controller
             ->get();
 
         // جلب الأصناف النشطة
-        $items = Item::where('is_active', 1)
+        $items = Item::where('status', 'active')
+            ->orderBy('name', 'asc')
+            ->get();
+
+        // جلب المخازن النشطة
+        $warehouses = \App\Models\Warehouse::where('status', 'active')
             ->orderBy('name', 'asc')
             ->get();
 
@@ -59,7 +64,7 @@ class PurchaseInvoiceController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('purchases.invoices.create', compact('suppliers', 'items', 'purchaseOrders'));
+        return view('purchases.invoices.create', compact('suppliers', 'items', 'warehouses', 'purchaseOrders'));
     }
 
     /**
@@ -74,13 +79,14 @@ class PurchaseInvoiceController extends Controller
         $validated = $request->validate([
             'invoice_number' => 'required|string|max:255',
             'supplier_id' => 'required|exists:suppliers,id',
+            'warehouse_id' => 'required|exists:warehouses,id',
             'invoice_date' => 'required|date',
             'due_date' => 'nullable|date|after_or_equal:invoice_date',
             'payment_method' => 'required|in:cash,credit,bank_transfer,check',
             'status' => 'required|in:draft,pending,approved,cancelled',
             'notes' => 'nullable|string',
             'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.item_id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|numeric|min:1',
             'items.*.price' => 'required|numeric|min:0',
             'items.*.discount' => 'nullable|numeric|min:0',
@@ -110,6 +116,7 @@ class PurchaseInvoiceController extends Controller
                 'invoice_number' => $validated['invoice_number'],
                 'internal_number' => $internalNumber,
                 'supplier_id' => $validated['supplier_id'],
+                'warehouse_id' => $validated['warehouse_id'],
                 'invoice_date' => $validated['invoice_date'],
                 'due_date' => $validated['due_date'],
                 'subtotal' => $subtotal,
@@ -124,15 +131,29 @@ class PurchaseInvoiceController extends Controller
                 'created_by' => Auth::id(),
             ]);
 
-            // إضافة الأصناف
+            // إضافة الأصناف وتحديث المخزون
             foreach ($validated['items'] as $item) {
                 $invoice->items()->create([
-                    'product_id' => $item['product_id'],
+                    'item_id' => $item['item_id'],
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['price'],
                     'discount' => $item['discount'] ?? 0,
                     'total' => ($item['quantity'] * $item['price']) - ($item['discount'] ?? 0),
                 ]);
+                
+                // تحديث المخزون إذا كانت الفاتورة معتمدة
+                if ($validated['status'] == 'approved') {
+                    \App\Models\StockMovement::create([
+                        'item_id' => $item['item_id'],
+                        'warehouse_id' => $validated['warehouse_id'],
+                        'movement_type' => 'in',
+                        'quantity' => $item['quantity'],
+                        'reference_type' => 'purchase_invoice',
+                        'reference_id' => $invoice->id,
+                        'notes' => 'فاتورة شراء رقم ' . $validated['invoice_number'],
+                        'created_by' => Auth::id(),
+                    ]);
+                }
             }
 
             DB::commit();
@@ -224,13 +245,14 @@ class PurchaseInvoiceController extends Controller
         $validated = $request->validate([
             'invoice_number' => 'required|string|max:255',
             'supplier_id' => 'required|exists:suppliers,id',
+            'warehouse_id' => 'required|exists:warehouses,id',
             'invoice_date' => 'required|date',
             'due_date' => 'nullable|date|after_or_equal:invoice_date',
             'payment_method' => 'required|in:cash,credit,bank_transfer,check',
             'status' => 'required|in:draft,pending,approved,cancelled',
             'notes' => 'nullable|string',
             'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.item_id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|numeric|min:1',
             'items.*.price' => 'required|numeric|min:0',
             'items.*.discount' => 'nullable|numeric|min:0',

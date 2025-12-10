@@ -86,6 +86,25 @@
                             </div>
 
                             <div class="col-md-4 mb-3">
+                                <label for="warehouse_id" class="form-label">
+                                    <i class="fas fa-warehouse me-1"></i>
+                                    المخزن <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('warehouse_id') is-invalid @enderror" 
+                                        id="warehouse_id" name="warehouse_id" required>
+                                    <option value="">اختر المخزن</option>
+                                    @foreach($warehouses ?? [] as $warehouse)
+                                        <option value="{{ $warehouse->id }}" {{ old('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                                            {{ $warehouse->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('warehouse_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-4 mb-3">
                                 <label for="payment_method" class="form-label">
                                     <i class="fas fa-credit-card me-1"></i>
                                     طريقة الدفع <span class="text-danger">*</span>
@@ -162,11 +181,11 @@
                                         <tbody id="itemsTableBody">
                                             <tr class="item-row">
                                                 <td>
-                                                    <select class="form-select form-select-sm item-select" name="items[0][product_id]" required>
+                                                    <select class="form-select form-select-sm item-select" name="items[0][item_id]" required>
                                                         <option value="">اختر الصنف</option>
-                                                        @foreach($products ?? [] as $product)
-                                                            <option value="{{ $product->id }}" data-price="{{ $product->purchase_price ?? 0 }}">
-                                                                {{ $product->name }}
+                                                        @foreach($items ?? [] as $item)
+                                                            <option value="{{ $item->id }}" data-price="{{ $item->unit_price ?? 0 }}">
+                                                                {{ $item->name }} ({{ $item->sku }})
                                                             </option>
                                                         @endforeach
                                                     </select>
