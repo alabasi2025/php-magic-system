@@ -28,8 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Item extends Model
 {
-    use HasFactory;
-    // Fixed: Removed SoftDeletes to avoid deleted_at column error
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
