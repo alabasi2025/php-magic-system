@@ -227,6 +227,8 @@
         align-items: center;
         gap: 10px;
         box-shadow: 0 5px 20px rgba(245, 158, 11, 0.3);
+        position: relative;
+        z-index: 10;
     }
     
     .add-invoice-btn:hover {
