@@ -173,8 +173,8 @@
                                         @endphp
                                         @forelse(($invoice->items ?? []) as $index => $item)
                                             @php
-                                                $itemTotal = ($item->quantity * $item->price) - $item->discount;
-                                                $subtotal += ($item->quantity * $item->price);
+                                                $itemTotal = ($item->quantity * $item->unit_price) - $item->discount;
+                                                $subtotal += ($item->quantity * $item->unit_price);
                                                 $totalDiscount += $item->discount;
                                             @endphp
                                             <tr>
@@ -187,7 +187,7 @@
                                                     @endif
                                                 </td>
                                                 <td class="text-center">{{ number_format($item->quantity, 2) }}</td>
-                                                <td class="text-end">{{ number_format($item->price, 2) }}</td>
+                                                <td class="text-end">{{ number_format($item->unit_price, 2) }}</td>
                                                 <td class="text-end">{{ number_format($item->discount, 2) }}</td>
                                                 <td class="text-end"><strong>{{ number_format($itemTotal, 2) }}</strong></td>
                                             </tr>
