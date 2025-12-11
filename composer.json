@@ -25,9 +25,7 @@
         "spatie/laravel-medialibrary": "^11.0",
         "spatie/laravel-permission": "^6.23",
         "spatie/laravel-query-builder": "^6.0",
-        "wireui/wireui": "^2.5",
-        "barryvdh/laravel-dompdf": "^3.0",
-        "maatwebsite/excel": "^3.1"
+        "wireui/wireui": "^2.5"
     },
     "require-dev": {
 
