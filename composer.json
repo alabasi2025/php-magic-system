@@ -48,8 +48,7 @@
         "spatie/laravel-failed-job-monitor": "^4.0",
         "spatie/laravel-health": "^1.24",
         "spatie/laravel-schedule-monitor": "^3.0",
-        "spatie/laravel-server-monitor": "^1.6",
-        "spatie/laravel-uptime-monitor": "^3.7"
+        "spatie/laravel-server-monitor": "^1.6"
     },
     "autoload": {
         "psr-4": {
