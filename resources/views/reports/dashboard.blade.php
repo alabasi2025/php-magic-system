@@ -68,7 +68,7 @@
                 <h3 class="text-xl font-bold text-white mb-2">ميزان المراجعة</h3>
                 <p class="text-gray-300 text-sm mb-4">عرض أرصدة جميع الحسابات</p>
                 <div class="flex gap-2">
-                    <a href="{{ route('reports.trial-balance') }}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
+                    <a href="{{ route('accounting-reports.trial-balance') }}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
                         عرض
                     </a>
                     <button class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition-colors">
@@ -86,7 +86,7 @@
                 <h3 class="text-xl font-bold text-white mb-2">قائمة الدخل</h3>
                 <p class="text-gray-300 text-sm mb-4">الإيرادات والمصروفات وصافي الربح</p>
                 <div class="flex gap-2">
-                    <a href="{{ route('reports.income-statement') }}" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
+                    <a href="{{ route('accounting-reports.income-statement') }}" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
                         عرض
                     </a>
                     <button class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition-colors">
@@ -104,7 +104,7 @@
                 <h3 class="text-xl font-bold text-white mb-2">الميزانية العمومية</h3>
                 <p class="text-gray-300 text-sm mb-4">الأصول والخصوم وحقوق الملكية</p>
                 <div class="flex gap-2">
-                    <a href="{{ route('reports.balance-sheet') }}" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
+                    <a href="{{ route('accounting-reports.balance-sheet') }}" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
                         عرض
                     </a>
                     <button class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition-colors">
@@ -122,7 +122,7 @@
                 <h3 class="text-xl font-bold text-white mb-2">دفتر الأستاذ العام</h3>
                 <p class="text-gray-300 text-sm mb-4">حركات الحسابات التفصيلية</p>
                 <div class="flex gap-2">
-                    <a href="{{ route('reports.general-ledger') }}" class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
+                    <a href="{{ route('accounting-reports.general-ledger') }}" class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
                         عرض
                     </a>
                     <button class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition-colors">
@@ -140,7 +140,7 @@
                 <h3 class="text-xl font-bold text-white mb-2">القيود اليومية</h3>
                 <p class="text-gray-300 text-sm mb-4">تقرير شامل بجميع القيود</p>
                 <div class="flex gap-2">
-                    <a href="{{ route('reports.journal-entries') }}" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
+                    <a href="{{ route('accounting-reports.journal-entries') }}" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
                         عرض
                     </a>
                     <button class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition-colors">
@@ -158,7 +158,7 @@
                 <h3 class="text-xl font-bold text-white mb-2">التدفقات النقدية</h3>
                 <p class="text-gray-300 text-sm mb-4">تحليل التدفقات النقدية</p>
                 <div class="flex gap-2">
-                    <a href="{{ route('reports.cash-flow') }}" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
+                    <a href="{{ route('accounting-reports.cash-flow') }}" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-center text-sm transition-colors">
                         عرض
                     </a>
                     <button class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm transition-colors">
