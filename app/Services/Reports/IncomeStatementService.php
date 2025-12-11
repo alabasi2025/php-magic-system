@@ -89,7 +89,7 @@ class IncomeStatementService
      */
     protected function getAccountsByType(string $type, string $startDate, string $endDate): array
     {
-        $accounts = ChartAccount::where('type', $type)
+        $accounts = ChartAccount::where('account_type', $type)
             ->where('is_active', true)
             ->orderBy('code')
             ->get();

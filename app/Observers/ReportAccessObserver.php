@@ -11,7 +11,7 @@ class ReportAccessObserver
     {
         AuditLog::create([
             'user_id' => Auth::id(),
-            'action' => 'report_accessed',
+            'event' => 'report_accessed',
             'auditable_type' => 'Report',
             'auditable_id' => null,
             'old_values' => null,
@@ -28,7 +28,7 @@ class ReportAccessObserver
     {
         AuditLog::create([
             'user_id' => Auth::id(),
-            'action' => 'report_exported',
+            'event' => 'report_exported',
             'auditable_type' => 'Report',
             'auditable_id' => null,
             'old_values' => null,

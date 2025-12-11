@@ -23,7 +23,7 @@ return new class extends Migration
             
             // معلومات الكيان المتأثر
             $table->string('auditable_type'); // App\Models\JournalEntry
-            $table->unsignedBigInteger('auditable_id');
+            $table->unsignedBigInteger('auditable_id')->nullable();
             $table->index(['auditable_type', 'auditable_id']);
             
             // نوع الحدث

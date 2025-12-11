@@ -85,7 +85,7 @@ class CashFlowService
      */
     protected function getCashAccounts()
     {
-        return ChartAccount::where('type', 'asset')
+        return ChartAccount::where('account_type', 'asset')
             ->where('is_active', true)
             ->where(function ($query) {
                 $query->where('name', 'like', '%نقد%')
@@ -164,7 +164,7 @@ class CashFlowService
     protected function calculateInvestingCashFlow(string $startDate, string $endDate): array
     {
         // الحصول على حركات الأصول الثابتة
-        $fixedAssetAccounts = ChartAccount::where('type', 'asset')
+        $fixedAssetAccounts = ChartAccount::where('account_type', 'asset')
             ->where('is_active', true)
             ->where(function ($query) {
                 $query->where('name', 'like', '%ثابت%')
@@ -205,7 +205,7 @@ class CashFlowService
     protected function calculateFinancingCashFlow(string $startDate, string $endDate): array
     {
         // الحصول على حركات القروض وحقوق الملكية
-        $financingAccounts = ChartAccount::whereIn('type', ['liability', 'equity'])
+        $financingAccounts = ChartAccount::whereIn('account_type', ['liability', 'equity'])
             ->where('is_active', true)
             ->where(function ($query) {
                 $query->where('name', 'like', '%قرض%')
