@@ -349,9 +349,8 @@ Route::get('/developer/git/dashboard', fn() => redirect('/journal-entries'))->na
 Route::get('/developer/git/commit', fn() => redirect('/journal-entries'))->name('developer.git.commit');
 Route::get('/developer/git/history', fn() => redirect('/journal-entries'))->name('developer.git.history');
 
-// Temporary: Removed auth middleware for testing
-// Route::middleware(['auth'])->group(function () {
-// if (true) {
+// Auth middleware enabled for security
+Route::middleware(['auth'])->group(function () {
     
     // ============================================
     // مسارات القيود اليومية (Journal Entries)
@@ -428,8 +427,7 @@ Route::get('/developer/git/history', fn() => redirect('/journal-entries'))->name
         Route::post('/apply/{id}', 'applySearch')->name('apply');
         Route::delete('/saved/{id}', 'deleteSavedSearch')->name('delete');
     });
-    
-// });
+});
 
 // قوالب القيود اليومية الذكية
 Route::resource('journal-templates', \App\Http\Controllers\JournalTemplateController::class);

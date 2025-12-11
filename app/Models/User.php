@@ -10,9 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-// use Laravel\Sanctum\HasApiTokens;
-// Assuming Spatie's Laravel Permission package is used for roles and permissions
-// use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @OA\Schema(
@@ -31,7 +29,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -107,27 +105,69 @@ class User extends Authenticatable implements MustVerifyEmail
     // }
 
     /**
-     * Get the posts created by the user.
-     *
-     * @return HasMany
+     * Get the journal entries created by this user.
      */
-    public function posts(): HasMany
+    public function journalEntries(): HasMany
     {
-        // Example of a common relationship: a user can have many posts
-        return $this->hasMany(Post::class);
+        return $this->hasMany(JournalEntry::class, 'created_by');
+    }
+
+    /**
+     * Get the audit logs for this user.
+     */
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(AuditLog::class);
     }
 
     // --- Custom Methods ---
 
     /**
-     * Check if the user is a super admin.
-     *
-     * @return bool
+     * Check if user has a specific permission.
      */
-    public function isSuperAdmin(): bool
+    public function hasPermission(string $permission): bool
     {
-        // Assuming 'super-admin' is a reserved role name
-        return $this->hasRole('super-admin');
+        return $this->hasPermissionTo($permission);
+    }
+
+    /**
+     * Check if user has any of the given permissions.
+     */
+    public function hasAnyPermission(array $permissions): bool
+    {
+        return $this->hasAnyPermission($permissions);
+    }
+
+    /**
+     * Check if user has all of the given permissions.
+     */
+    public function hasAllPermissions(array $permissions): bool
+    {
+        return $this->hasAllPermissions($permissions);
+    }
+
+    /**
+     * Check if user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    /**
+     * Check if user is an accountant.
+     */
+    public function isAccountant(): bool
+    {
+        return $this->hasRole('accountant');
+    }
+
+    /**
+     * Check if user is an auditor.
+     */
+    public function isAuditor(): bool
+    {
+        return $this->hasRole('auditor');
     }
 
     /**
