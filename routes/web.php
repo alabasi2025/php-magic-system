@@ -353,6 +353,20 @@ Route::get('/developer/git/history', fn() => redirect('/journal-entries'))->name
 Route::middleware(['auth'])->group(function () {
     
     // ============================================
+    // مسارات التقارير المحاسبية (Accounting Reports)
+    // ============================================
+    Route::prefix('accounting-reports')->name('accounting-reports.')->controller(\App\Http\Controllers\AccountingReportController::class)->group(function () {
+        Route::get('/dashboard', 'dashboard')->name('dashboard');
+        Route::get('/trial-balance', 'trialBalance')->name('trial-balance');
+        Route::get('/income-statement', 'incomeStatement')->name('income-statement');
+        Route::get('/balance-sheet', 'balanceSheet')->name('balance-sheet');
+        Route::get('/general-ledger', 'generalLedger')->name('general-ledger');
+        Route::get('/journal-entries', 'journalEntries')->name('journal-entries');
+        Route::get('/cash-flow', 'cashFlow')->name('cash-flow');
+        Route::post('/clear-cache', 'clearCache')->name('clear-cache');
+    });
+    
+    // ============================================
     // مسارات القيود اليومية (Journal Entries)
     // ============================================
     Route::prefix('journal-entries')->name('journal-entries.')->controller(JournalEntryController::class)->group(function () {
