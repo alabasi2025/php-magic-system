@@ -308,6 +308,19 @@
                                 <i class="fas fa-cash-register text-lg icon-gradient-purple"></i>
                                 <span class="sidebar-text">الصناديق</span>
                             </a>
+                            
+                            <!-- Separator -->
+                            <div class="border-t border-gray-200 my-2"></div>
+                            
+                            <!-- التقارير المحاسبية -->
+                            <div class="px-2 py-1">
+                                <span class="text-xs font-bold text-gray-500 uppercase">التقارير المحاسبية</span>
+                            </div>
+                            
+                            <a href="{{ route('accounting-reports.dashboard') }}" class="flex items-center space-x-3 space-x-reverse p-2 rounded-lg hover:bg-gradient-to-r hover:from-indigo-50 hover:to-transparent text-gray-600 hover:text-indigo-600 text-sm transition-all duration-200">
+                                <i class="fas fa-chart-line text-lg icon-gradient-indigo"></i>
+                                <span class="sidebar-text">لوحة التقارير</span>
+                            </a>
                         </div>
                     </div>
                     
